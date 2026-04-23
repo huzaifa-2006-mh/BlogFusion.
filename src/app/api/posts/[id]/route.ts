@@ -50,18 +50,14 @@ export async function PATCH(
 
     // Handle new images if uploaded
     if (files.length > 0 && files[0].size > 0) {
-      const uploadDir = join(process.cwd(), 'public', 'uploads');
-      await mkdir(uploadDir, { recursive: true });
       const uploadedImagePaths: string[] = [];
 
       for (const file of files) {
         if (file.size > 0) {
           const bytes = await file.arrayBuffer();
           const buffer = Buffer.from(bytes);
-          const filename = `${Date.now()}-${file.name}`;
-          const path = join(uploadDir, filename);
-          await writeFile(path, buffer);
-          uploadedImagePaths.push(`/uploads/${filename}`);
+          const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
+          uploadedImagePaths.push(base64Image);
         }
       }
       updateData.images = uploadedImagePaths;
