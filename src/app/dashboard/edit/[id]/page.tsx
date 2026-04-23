@@ -27,12 +27,14 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
         const catData = await catRes.json();
         const postData = await postRes.json();
         
-        setCategories(catData);
-        setTitle(postData.title);
-        setCategoryId(postData.categoryId);
-        setContent(postData.content);
-        if (postData.images) {
-          setPreviews(postData.images);
+        if (postData) {
+          setCategories(catData);
+          setTitle(postData.title || '');
+          setCategoryId(postData.categoryId || '');
+          setContent(postData.content || '');
+          if (postData.images) {
+            setPreviews(postData.images);
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);

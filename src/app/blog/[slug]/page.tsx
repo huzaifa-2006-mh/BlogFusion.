@@ -17,6 +17,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
+  // Ensure author exists before accessing
+  const authorName = post.author?.username || "Admin";
+  const authorInitial = authorName[0]?.toUpperCase() || "A";
+
   // Logic to handle inline images
   // We'll replace "[IMAGE]" placeholders with actual images from the gallery
   let contentWithImages = post.content.replace(/\n/g, '<br/>');
@@ -48,10 +52,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', marginTop: '1rem', lineHeight: '1.2' }}>{post.title}</h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
             <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary-color)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
-              {post.author.username[0].toUpperCase()}
+              {authorInitial}
             </div>
             <div>
-              <p style={{ margin: 0, fontWeight: '600', color: 'var(--primary-color)' }}>{post.author.username}</p>
+              <p style={{ margin: 0, fontWeight: '600', color: 'var(--primary-color)' }}>{authorName}</p>
               <p style={{ margin: 0, fontSize: '0.85rem', color: '#888' }}>
                 {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} • {Math.ceil(post.content.length / 500)} min read
               </p>
