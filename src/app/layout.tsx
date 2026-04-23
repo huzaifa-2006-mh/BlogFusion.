@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "BlogFusion - Multi-Niche Blog",
     description: "Explore tech, earning, and entertainment.",
-    url: "https://blogfusion.com",
+    url: "https://blog-fusion-beta.vercel.app",
     siteName: "BlogFusion",
     locale: "en_US",
     type: "website",

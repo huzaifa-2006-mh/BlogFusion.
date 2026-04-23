@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import prisma from '@/lib/prisma';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://blogfusion.com'; // Change this to your real domain when live
+  const baseUrl = 'https://blog-fusion-beta.vercel.app'; 
 
   // Fetch all posts and categories for the sitemap
   const posts = await prisma.post.findMany({ where: { published: true } });

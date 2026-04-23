@@ -58,3 +58,25 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'Failed to delete category' }, { status: 500 });
   }
 }
+export async function PATCH(request: Request) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('auth_session');
+
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { id, name } = await request.json();
+    const slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+
+    const category = await prisma.category.update({
+      where: { id },
+      data: { name, slug },
+    });
+
+    return NextResponse.json(category);
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to update category' }, { status: 500 });
+  }
+}

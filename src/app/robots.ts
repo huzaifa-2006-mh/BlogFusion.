@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/dashboard/',
     },
-    sitemap: 'https://blogfusion.com/sitemap.xml',
+    sitemap: 'https://blog-fusion-beta.vercel.app/sitemap.xml',
   };
 }
