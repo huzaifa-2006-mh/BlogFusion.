@@ -2,7 +2,7 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma';
 
 const Footer = async () => {
-  let categories = [];
+  let categories: any[] = [];
   try {
     categories = await prisma.category.findMany({ take: 6 });
   } catch (error) {

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma';
 
 export default async function Home() {
-  let posts = [];
+  let posts: any[] = [];
   try {
     posts = await prisma.post.findMany({
       where: { published: true },

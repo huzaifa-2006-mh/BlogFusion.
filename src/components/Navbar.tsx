@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 
 const Navbar = async () => {
   // Fetch categories from database
-  let categories = [];
+  let categories: any[] = [];
   try {
     categories = await prisma.category.findMany();
   } catch (error) {
