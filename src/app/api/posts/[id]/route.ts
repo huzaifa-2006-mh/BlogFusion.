@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
@@ -69,6 +70,7 @@ export async function PATCH(
       data: updateData,
     });
 
+    revalidatePath('/');
     return NextResponse.json(post);
   } catch (error) {
     console.error('Update error:', error);
@@ -93,6 +95,8 @@ export async function DELETE(
     await prisma.post.delete({
       where: { id },
     });
+    
+    revalidatePath('/');
     return NextResponse.json({ message: 'Post deleted successfully' });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 });

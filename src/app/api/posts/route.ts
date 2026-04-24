@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
       },
     });
 
+    revalidatePath('/');
     return NextResponse.json(post);
   } catch (error) {
     console.error('Post creation error:', error);

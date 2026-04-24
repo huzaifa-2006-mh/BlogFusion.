@@ -121,42 +121,43 @@ export default function ManageCategories() {
             </tr>
           </thead>
           <tbody>
-                {categories.map((cat) => (
-                  <tr key={cat.id} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '1.2rem', fontWeight: '600' }}>
-                      {editingId === cat.id ? (
-                        <input 
-                          type="text" 
-                          value={editingName} 
-                          onChange={(e) => setEditingName(e.target.value)}
-                          style={{ padding: '0.4rem', border: '1px solid var(--primary-color)', borderRadius: '4px', width: '100%' }}
-                        />
-                      ) : (
-                        cat.name
-                      )}
-                    </td>
-                    <td style={{ padding: '1.2rem' }}>{cat.slug}</td>
-                    <td style={{ padding: '1.2rem', textAlign: 'right' }}>
-                      {editingId === cat.id ? (
-                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                          <button onClick={handleUpdate} className="btn btn-primary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} disabled={isUpdating}>Save</button>
-                          <button onClick={() => setEditingId(null)} className="btn btn-outline" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>Cancel</button>
-                        </div>
-                      ) : (
-                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-                          <button 
-                            onClick={() => startEditing(cat)}
-                            style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', fontWeight: '600' }}
-                          >Edit</button>
-                          <button 
-                            onClick={() => handleDelete(cat.id)}
-                            style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', fontWeight: '600' }}
-                          >Delete</button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+            {categories.length > 0 ? (
+              categories.map((cat) => (
+                <tr key={cat.id} style={{ borderBottom: '1px solid #eee' }}>
+                  <td style={{ padding: '1.2rem', fontWeight: '600' }}>
+                    {editingId === cat.id ? (
+                      <input 
+                        type="text" 
+                        value={editingName} 
+                        onChange={(e) => setEditingName(e.target.value)}
+                        style={{ padding: '0.4rem', border: '1px solid var(--primary-color)', borderRadius: '4px', width: '100%' }}
+                      />
+                    ) : (
+                      cat.name
+                    )}
+                  </td>
+                  <td style={{ padding: '1.2rem' }}>{cat.slug}</td>
+                  <td style={{ padding: '1.2rem', textAlign: 'right' }}>
+                    {editingId === cat.id ? (
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                        <button onClick={handleUpdate} className="btn btn-primary" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} disabled={isUpdating}>Save</button>
+                        <button onClick={() => setEditingId(null)} className="btn btn-outline" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }}>Cancel</button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                        <button 
+                          onClick={() => startEditing(cat)}
+                          style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', fontWeight: '600' }}
+                        >Edit</button>
+                        <button 
+                          onClick={() => handleDelete(cat.id)}
+                          style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer', fontWeight: '600' }}
+                        >Delete</button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))
             ) : (
               <tr>
                 <td colSpan={3} style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>No categories found. Add your first one above!</td>

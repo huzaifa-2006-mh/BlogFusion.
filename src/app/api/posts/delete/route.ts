@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 export async function DELETE(request: Request) {
   console.log('--- DELETE REQUEST RECEIVED ---');
@@ -28,6 +29,7 @@ export async function DELETE(request: Request) {
     });
     
     console.log('Successfully deleted post:', deletedPost.id);
+    revalidatePath('/');
     return NextResponse.json({ message: 'Post deleted successfully' });
   } catch (error: any) {
     console.error('API Delete Error Detail:', error);

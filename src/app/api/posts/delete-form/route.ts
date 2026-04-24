@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export async function POST(request: Request) {
@@ -22,6 +23,8 @@ export async function POST(request: Request) {
     await prisma.post.delete({
       where: { id },
     });
+
+    revalidatePath('/');
 
     // Redirect back to dashboard posts
     return NextResponse.redirect(new URL('/dashboard/posts', request.url));
