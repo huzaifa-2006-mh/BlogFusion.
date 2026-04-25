@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
+import ShareButtons from '@/components/ShareButtons';
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -89,11 +90,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <div className="mt-4 pt-4" style={{ borderTop: '1px solid #eee', marginTop: '5rem' }}>
           <h3>Share this wisdom:</h3>
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-            <button className="btn btn-outline" style={{ padding: '0.6rem 1.5rem' }}>Twitter</button>
-            <button className="btn btn-outline" style={{ padding: '0.6rem 1.5rem' }}>LinkedIn</button>
-            <button className="btn btn-outline" style={{ padding: '0.6rem 1.5rem' }}>Facebook</button>
-          </div>
+          <ShareButtons title={post.title} />
         </div>
       </div>
     </article>
