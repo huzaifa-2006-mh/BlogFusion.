@@ -48,7 +48,7 @@ const Footer = async () => {
           <div className="footer-links">
             <h4>Contact</h4>
             <p style={{ color: '#a8b2d1', fontSize: '0.9rem' }}>
-              Email: contact@blogfusion.com<br />
+              Email: huzaifamm70@gmail.com<br />
               Location: Pakistan
             </p>
           </div>
