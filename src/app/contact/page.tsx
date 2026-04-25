@@ -18,7 +18,7 @@ export default function Contact() {
               </p>
               
               <div className="mt-4">
-                <p><strong>📧 Email:</strong> contact@blogfusion.com</p>
+                <p><strong>📧 Email:</strong> huzaifamm70@gmail.com</p>
               </div>
 
               <div className="mt-4">
