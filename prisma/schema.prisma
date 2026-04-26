@@ -30,6 +30,7 @@ model Post {
   author      User     @relation(fields: [authorId], references: [id])
   authorId    String
   published   Boolean  @default(false)
+  views       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -39,4 +40,15 @@ model Category {
   name  String @unique
   slug  String @unique
   posts Post[]
+}
+
+model Analytics {
+  id          String   @id @default(cuid())
+  visitorId   String   // Browser-based unique ID
+  email       String?  // Optional email if provided
+  path        String?
+  duration    Int      @default(0) // total seconds
+  lastPing    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

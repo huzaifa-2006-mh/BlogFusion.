@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 
 export const metadata: Metadata = {
   title: "BlogFusion | Best Platform for Tech, Online Earning, Jobs & Entertainment Blogs",
@@ -33,6 +34,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
+        <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>
         <Footer />

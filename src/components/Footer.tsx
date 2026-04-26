@@ -51,6 +51,7 @@ const Footer = async () => {
               Email: huzaifamm70@gmail.com<br />
               Location: Pakistan
             </p>
+            <EmailSubscription />
           </div>
         </div>
         

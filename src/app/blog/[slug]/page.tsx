@@ -18,6 +18,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     notFound();
   }
 
+  // Increment view count in background
+  prisma.post.update({
+    where: { id: post.id },
+    data: { views: { increment: 1 } }
+  }).catch(err => console.error("Error updating views:", err));
+
   // Ensure author exists before accessing
   const authorName = post.author?.username || "Admin";
   const authorInitial = authorName[0]?.toUpperCase() || "A";
