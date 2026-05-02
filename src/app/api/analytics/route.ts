@@ -13,7 +13,8 @@ export async function POST(request: Request) {
     // Find a recent session for this visitor on this path (within last 30 minutes)
     const thirtyMinsAgo = new Date(Date.now() - 30 * 60 * 1000);
     
-    const existingSession = await (prisma as any).analytics.findFirst({
+// @ts-ignore
+    const existingSession = await prisma.analytics.findFirst({
       where: {
         visitorId,
         path,
@@ -23,7 +24,8 @@ export async function POST(request: Request) {
     });
 
     if (existingSession) {
-      const updated = await (prisma as any).analytics.update({
+// @ts-ignore
+      const updated = await prisma.analytics.update({
         where: { id: existingSession.id },
         data: {
           duration: typeof duration === 'number' ? duration : existingSession.duration + 30,
@@ -33,7 +35,8 @@ export async function POST(request: Request) {
       });
       return NextResponse.json(updated);
     } else {
-      const created = await (prisma as any).analytics.create({
+// @ts-ignore
+      const created = await prisma.analytics.create({
         data: {
           visitorId,
           path,
@@ -52,7 +55,8 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     // 1. Total Unique Visitors
-    const uniqueVisitorsCount = await (prisma as any).analytics.groupBy({
+// @ts-ignore
+    const uniqueVisitorsCount = await prisma.analytics.groupBy({
       by: ['visitorId'],
     }).then(res => res.length);
 
@@ -63,7 +67,8 @@ export async function GET() {
     const totalReads = posts.reduce((sum, p) => sum + (p.views || 0), 0);
 
     // 3. Average Time Spent (per visitor)
-    const visitorDurations = await (prisma as any).analytics.groupBy({
+// @ts-ignore
+    const visitorDurations = await prisma.analytics.groupBy({
       by: ['visitorId'],
       _sum: { duration: true }
     });
@@ -72,13 +77,15 @@ export async function GET() {
       : 0;
 
     // 4. Unique Emails
-    const uniqueEmails = await (prisma as any).analytics.groupBy({
+// @ts-ignore
+    const uniqueEmails = await prisma.analytics.groupBy({
       by: ['email'],
       where: { email: { not: null } }
     }).then(res => res.length);
 
     // 5. Recent Activity
-    const recentActivity = await (prisma as any).analytics.findMany({
+// @ts-ignore
+    const recentActivity = await prisma.analytics.findMany({
       orderBy: { updatedAt: 'desc' },
       take: 15,
       select: {

@@ -17,7 +17,8 @@ export default async function DashboardHome() {
     stats.categoryCount = await prisma.category.count();
     
     // Total Unique Visitors
-    const uniqueVisitors = await (prisma as any).analytics.groupBy({
+// @ts-ignore
+    const uniqueVisitors = await prisma.analytics.groupBy({
       by: ['visitorId'],
     });
     stats.totalVisitors = uniqueVisitors.length;
@@ -27,7 +28,8 @@ export default async function DashboardHome() {
     stats.totalReads = posts.reduce((sum, p) => sum + (p.views || 0), 0);
 
     // Average Time Spent (in seconds)
-    const visitorDurations = await (prisma as any).analytics.groupBy({
+// @ts-ignore
+    const visitorDurations = await prisma.analytics.groupBy({
       by: ['visitorId'],
       _sum: { duration: true }
     });
@@ -36,14 +38,16 @@ export default async function DashboardHome() {
       : 0;
 
     // Unique Emails Collected
-    const uniqueEmails = await (prisma as any).analytics.groupBy({
+// @ts-ignore
+    const uniqueEmails = await prisma.analytics.groupBy({
       by: ['email'],
       where: { email: { not: null } }
     });
     stats.uniqueEmails = uniqueEmails.length;
 
     // Recent Activity (last 10 sessions)
-    recentActivity = await (prisma as any).analytics.findMany({
+// @ts-ignore
+    recentActivity = await prisma.analytics.findMany({
       orderBy: { updatedAt: 'desc' },
       take: 10
     });

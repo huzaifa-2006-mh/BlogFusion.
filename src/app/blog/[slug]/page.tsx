@@ -3,8 +3,10 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default async function BlogPostPage({ params }: any) {
+  // @ts-ignore
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
 
   const post = await prisma.post.findUnique({
     where: { slug },
@@ -19,6 +21,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
 
   // Increment view count in background
+  // @ts-ignore
   prisma.post.update({
     where: { id: post.id },
     data: { views: { increment: 1 } }
