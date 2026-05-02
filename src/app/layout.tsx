@@ -7,7 +7,7 @@ import AnalyticsTracker from "@/components/AnalyticsTracker";
 export const metadata: Metadata = {
   title: "BlogFusion | Best Platform for Tech, Online Earning, Jobs & Entertainment Blogs",
   description: "Welcome to BlogFusion, a complete multi-niche blog where you can explore the latest updates in technology, programming tutorials, online earning methods, job opportunities, anime reviews, and entertainment content.",
-  keywords: "online earning in Pakistan, latest tech blogs, programming tutorials for beginners, online jobs 2026, how to earn money online, anime reviews, drama reviews, freelancing tips, blogging tips",
+  keywords: "fusion blog, blog fusion, blog, online earning in Pakistan, latest tech blogs, programming tutorials for beginners, online jobs 2026, how to earn money online, anime reviews, drama reviews, freelancing tips, blogging tips",
   openGraph: {
     title: "BlogFusion - Multi-Niche Blog",
     description: "Explore tech, earning, and entertainment.",

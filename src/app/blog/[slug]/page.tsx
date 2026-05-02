@@ -30,7 +30,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   // Logic to handle inline images
   // We'll replace "[IMAGE]" placeholders with actual images from the gallery
-  let contentWithImages = post.content.replace(/\n/g, '<br/>');
+  // Also parse "** Heading" at the start of a line as <h2>
+  let contentWithImages = post.content.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1.8rem; color: var(--primary-color);">$1</h2>');
+  contentWithImages = contentWithImages.replace(/\n/g, '<br/>');
   const gallery = [...(post.images || [])];
   
   // The first image is already the cover image, so we'll use the rest for inline

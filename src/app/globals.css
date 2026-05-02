@@ -136,6 +136,10 @@ p {
   color: var(--secondary-color);
 }
 
+.nav-close {
+  display: none;
+}
+
 /* Hero Section */
 .hero {
   padding: 8rem 0 4rem;
@@ -467,11 +471,13 @@ p {
     margin-top: 1rem;
     gap: 1rem;
     padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
   }
   
-  .sidebar-nav a {
+  .sidebar-nav a, .sidebar-nav button {
     white-space: nowrap;
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
+    flex-shrink: 0;
   }
   
   .dashboard-main {
@@ -486,16 +492,22 @@ p {
 @media (max-width: 768px) {
   .nav-links {
     position: fixed;
-    top: 70px;
+    top: 0;
     left: -100%;
     width: 100%;
-    height: calc(100vh - 70px);
+    height: 100vh;
     background: var(--primary-color);
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 0;
+    padding-top: 1rem;
     transition: 0.3s;
     z-index: 999;
+  }
+  
+  .nav-close {
+    display: block;
+    width: 100%;
   }
   
   #nav-toggle:checked ~ .nav-links {

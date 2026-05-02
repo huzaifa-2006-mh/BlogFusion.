@@ -101,7 +101,7 @@ export default async function DashboardHome() {
       {/* Recent Activity Section */}
       <div className="section" style={{ padding: '3rem 0' }}>
         <h2 className="mb-4">Recent Visitor Activity</h2>
-        <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+        <div className="card" style={{ padding: '0', overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ background: 'rgba(10, 25, 47, 0.05)', borderBottom: '1px solid #eee' }}>

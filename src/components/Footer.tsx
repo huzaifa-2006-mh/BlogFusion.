@@ -14,8 +14,9 @@ const Footer = async () => {
       <div className="container">
         <div className="footer-content">
           <div className="footer-info">
-            <Link href="/" className="footer-logo">
-              BlogFusion<span className="highlight">.</span>
+            <Link href="/" className="footer-logo" style={{ display: 'flex', alignItems: 'center' }}>
+              <img src="/logo.png" alt="BlogFusion Logo" style={{ height: '40px', width: 'auto', marginRight: '10px' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling!.style.display = 'block'; }} />
+              <span style={{ display: 'none' }}>BlogFusion<span className="highlight">.</span></span>
             </Link>
             <p style={{ color: '#a8b2d1' }}>
               Your go-to platform for the latest in technology, online earning, programming tutorials, and entertainment. 
