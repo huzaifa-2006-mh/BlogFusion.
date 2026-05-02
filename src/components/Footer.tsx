@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
+import EmailSubscription from './EmailSubscription';
 
 const Footer = async () => {
   let categories: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
