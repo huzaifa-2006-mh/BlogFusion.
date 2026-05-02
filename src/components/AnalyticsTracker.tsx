@@ -36,6 +36,10 @@ export default function AnalyticsTracker() {
     };
 
     logVisit();
+    
+    // Close mobile menu on navigation
+    const toggle = document.getElementById('nav-toggle') as HTMLInputElement;
+    if (toggle) toggle.checked = false;
 
     // 3. Heartbeat every 30 seconds
     const interval = setInterval(async () => {

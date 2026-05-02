@@ -3,7 +3,7 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma';
 
 export default async function Home() {
-  let posts: any[] = []; // Explicitly typed to allow build
+  let posts: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
   try {
     posts = await prisma.post.findMany({
       where: { published: true },

@@ -1,7 +1,7 @@
 import prisma from '@/lib/prisma';
 
 export default async function DashboardHome() {
-  let stats = {
+  const stats = {
     postCount: 0,
     categoryCount: 0,
     totalVisitors: 0,
@@ -10,7 +10,7 @@ export default async function DashboardHome() {
     uniqueEmails: 0
   };
 
-  let recentActivity: any[] = [];
+  let recentActivity: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
 
   try {
     stats.postCount = await prisma.post.count();
@@ -61,7 +61,7 @@ export default async function DashboardHome() {
   return (
     <div className="fade-in">
       <h1 className="mb-4">Welcome Back, Chief!</h1>
-      <p className="mb-4">Here's a detailed look at your platform's performance.</p>
+      <p className="mb-4">Here&apos;s a detailed look at your platform&apos;s performance.</p>
 
       {/* Main Stats Grid */}
       <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>

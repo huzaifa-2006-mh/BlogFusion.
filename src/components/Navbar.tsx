@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 
 const Navbar = async () => {
   // Fetch categories from database
-  let categories: any[] = [];
+  let categories: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
   try {
     categories = await prisma.category.findMany();
   } catch (error) {
@@ -49,17 +49,6 @@ const Navbar = async () => {
             Dashboard
           </Link>
         </nav>
-        <script dangerouslySetInnerHTML={{ __html: `
-          document.addEventListener('DOMContentLoaded', function() {
-            var links = document.querySelectorAll('.nav-links a');
-            var toggle = document.getElementById('nav-toggle');
-            links.forEach(function(link) {
-              link.addEventListener('click', function() {
-                if (toggle) toggle.checked = false;
-              });
-            });
-          });
-        `}} />
       </div>
     </header>
   );
