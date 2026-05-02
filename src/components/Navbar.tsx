@@ -19,8 +19,7 @@ const Navbar = async () => {
     <header className="header">
       <div className="container nav">
         <Link href="/" className="logo" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/logo.png" alt="BlogFusion Logo" style={{ height: '40px', width: 'auto', marginRight: '10px' }} onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling!.style.display = 'block'; }} />
-          <span style={{ display: 'none' }}>BlogFusion<span className="highlight">.</span></span>
+          <img src="/logo.png" alt="BlogFusion Logo" style={{ height: '40px', width: 'auto' }} />
         </Link>
         
         {/* Mobile Menu Toggle (Simplified) */}
