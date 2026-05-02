@@ -5,18 +5,23 @@ import EmailSubscription from './EmailSubscription';
 const Footer = async () => {
   let categories: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any
   try {
-    categories = await prisma.category.findMany({ take: 6 });
+    // Only show top 4 categories to keep footer compact
+    categories = await prisma.category.findMany({ take: 4 });
   } catch (error) {
     categories = [];
   }
 
   return (
     <footer className="footer">
+
       <div className="container">
         <div className="footer-content">
           <div className="footer-info">
-            <Link href="/" className="footer-logo" style={{ display: 'flex', alignItems: 'center' }}>
-              <img src="/logo.png" alt="BlogFusion Logo" style={{ height: '40px', width: 'auto' }} />
+            <Link href="/" className="logo-link">
+              <div className="logo-container">
+                <img src="/logo.png" alt="BlogFusion" className="logo-img" />
+                <span className="logo-fallback">BlogFusion<span className="highlight">.</span></span>
+              </div>
             </Link>
             <p style={{ color: '#a8b2d1' }}>
               Your go-to platform for the latest in technology, online earning, programming tutorials, and entertainment. 
@@ -57,7 +62,10 @@ const Footer = async () => {
         </div>
         
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} BlogFusion. All rights reserved. Designed for excellence.</p>
+          <p>
+            &copy; {new Date().getFullYear()} BlogFusion. All rights reserved. 
+            Designed for excellence by <a href="https://mhs-tech-alpha.vercel.app/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--secondary-color)', fontWeight: 'bold' }}>MHS Tech</a>.
+          </p>
         </div>
       </div>
     </footer>

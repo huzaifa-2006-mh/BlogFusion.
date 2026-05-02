@@ -41,7 +41,31 @@ export default function AnalyticsTracker() {
     const toggle = document.getElementById('nav-toggle') as HTMLInputElement;
     if (toggle) toggle.checked = false;
 
-    // 3. Heartbeat every 30 seconds
+    // 3. Capture final duration on unload
+    const handleUnload = () => {
+      const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000);
+      const data = JSON.stringify({
+        visitorId: vid,
+        path: pathname,
+        duration: elapsed,
+        email: localStorage.getItem('user_email') || null
+      });
+      
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/analytics', data);
+      } else {
+        fetch('/api/analytics', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: data,
+          keepalive: true
+        });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+
+    // 4. Heartbeat every 20 seconds
     const interval = setInterval(async () => {
       const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000);
       try {
@@ -55,14 +79,31 @@ export default function AnalyticsTracker() {
             email: localStorage.getItem('user_email') || null
           })
         });
-      } catch (err) {
-        // Silent fail
+      } catch (err) {}
+    }, 20000);
+
+    // 5. Logo Fallback Handler
+    const logos = document.querySelectorAll('.logo-img');
+    logos.forEach((img: any) => {
+      if (img.complete && img.naturalHeight !== 0) {
+        // Image loaded, hide fallback text
+        const fallback = img.nextElementSibling;
+        if (fallback) fallback.style.display = 'none';
       }
-    }, 30000);
+      img.onload = () => {
+        const fallback = img.nextElementSibling;
+        if (fallback) fallback.style.display = 'none';
+      };
+      img.onerror = () => {
+        // Image failed, show fallback text (already default)
+        img.style.display = 'none';
+      };
+    });
 
     return () => {
+      window.removeEventListener('beforeunload', handleUnload);
       clearInterval(interval);
-      startTimeRef.current = Date.now(); // Reset for path change
+      startTimeRef.current = Date.now();
     };
   }, [pathname]);
 

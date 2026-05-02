@@ -103,43 +103,45 @@ export default async function DashboardHome() {
       </div>
 
       {/* Recent Activity Section */}
-      <div className="section" style={{ padding: '3rem 0' }}>
+      <div className="section" style={{ padding: '2rem 0' }}>
         <h2 className="mb-4">Recent Visitor Activity</h2>
-        <div className="card" style={{ padding: '0', overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ background: 'rgba(10, 25, 47, 0.05)', borderBottom: '1px solid #eee' }}>
-                <th style={{ padding: '1rem' }}>User / ID</th>
-                <th style={{ padding: '1rem' }}>Page Viewed</th>
-                <th style={{ padding: '1rem' }}>Time Spent</th>
-                <th style={{ padding: '1rem' }}>Last Active</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentActivity.length > 0 ? (
-                recentActivity.map((act) => (
-                  <tr key={act.id} style={{ borderBottom: '1px solid #f8f9fa' }}>
-                    <td style={{ padding: '1rem' }}>
-                      <span style={{ fontWeight: '600' }}>{act.email || "Anonymous"}</span>
-                      <br />
-                      <span style={{ fontSize: '0.7rem', color: '#888' }}>{act.visitorId.substring(0, 12)}...</span>
-                    </td>
-                    <td style={{ padding: '1rem', color: 'var(--primary-color)', fontSize: '0.9rem' }}>
-                      {act.path || '/'}
-                    </td>
-                    <td style={{ padding: '1rem' }}>{formatTime(act.duration)}</td>
-                    <td style={{ padding: '1rem', fontSize: '0.85rem', color: '#888' }}>
-                      {new Date(act.updatedAt).toLocaleTimeString()}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>No activity recorded yet.</td>
+        <div className="card" style={{ padding: '0', overflowX: 'auto', border: '1px solid rgba(0,0,0,0.05)' }}>
+          <div style={{ minWidth: '600px' }}> {/* Ensure table doesn't squish too much */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ background: 'rgba(10, 25, 47, 0.05)', borderBottom: '1px solid #eee' }}>
+                  <th style={{ padding: '1rem' }}>User / ID</th>
+                  <th style={{ padding: '1rem' }}>Page Viewed</th>
+                  <th style={{ padding: '1rem' }}>Time Spent</th>
+                  <th style={{ padding: '1rem' }}>Last Active</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentActivity.length > 0 ? (
+                  recentActivity.map((act) => (
+                    <tr key={act.id} style={{ borderBottom: '1px solid #f8f9fa' }}>
+                      <td style={{ padding: '1rem' }}>
+                        <span style={{ fontWeight: '600', color: 'var(--primary-color)' }}>{act.email || "Anonymous"}</span>
+                        <br />
+                        <span style={{ fontSize: '0.7rem', color: '#888' }}>ID: {act.visitorId?.substring(0, 8)}</span>
+                      </td>
+                      <td style={{ padding: '1rem', color: '#444', fontSize: '0.9rem' }}>
+                        <code>{act.path || '/'}</code>
+                      </td>
+                      <td style={{ padding: '1rem' }}>{formatTime(act.duration)}</td>
+                      <td style={{ padding: '1rem', fontSize: '0.85rem', color: '#888' }}>
+                        {new Date(act.updatedAt).toLocaleTimeString()}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>No activity recorded yet.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

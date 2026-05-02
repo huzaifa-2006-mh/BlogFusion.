@@ -18,8 +18,11 @@ const Navbar = async () => {
   return (
     <header className="header">
       <div className="container nav">
-        <Link href="/" className="logo" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/logo.png" alt="BlogFusion Logo" style={{ height: '40px', width: 'auto' }} />
+        <Link href="/" className="logo-link">
+          <div className="logo-container">
+            <img src="/logo.png" alt="BlogFusion" className="logo-img" />
+            <span className="logo-fallback">BlogFusion<span className="highlight">.</span></span>
+          </div>
         </Link>
         
         {/* Mobile Menu Toggle (Simplified) */}

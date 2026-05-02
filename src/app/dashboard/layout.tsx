@@ -28,9 +28,12 @@ export default function DashboardLayout({
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
-        <div className="logo" style={{ marginBottom: '2rem' }}>
-          BlogFusion<span className="highlight">.</span>
-        </div>
+        <Link href="/" className="logo-link">
+          <div className="logo-container" style={{ marginBottom: '2rem' }}>
+            <img src="/logo.png" alt="BlogFusion" className="logo-img" />
+            <span className="logo-fallback">BlogFusion<span className="highlight">.</span></span>
+          </div>
+        </Link>
         
         <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '2rem' }}>
           <p style={{ color: '#8892b0', fontSize: '0.8rem' }}>Logged in as</p>
