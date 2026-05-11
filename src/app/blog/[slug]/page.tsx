@@ -47,8 +47,15 @@ export default async function BlogPostPage({ params }: any) {
   }
 
   // Replace <back href="..."> with <a>
-  let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: var(--secondary-color); text-decoration: underline;">$2</a>');
+  let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: inherit;">$2</a>');
   
+  // Handle <color val="..."> tag
+  processedContent = processedContent.replace(/<color val="(.*?)">(.*?)<\/color>/g, '<span style="color: $1">$2</span>');
+
+  // Handle <u> (underline) and <no-u> (remove underline)
+  processedContent = processedContent.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline">$1</span>');
+  processedContent = processedContent.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none">$1</span>');
+
   // Handle <b> (already standard, but ensuring it's not messed up)
   // Replace Markdown-like headings
   processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1.8rem; color: var(--primary-color);">$1</h2>');

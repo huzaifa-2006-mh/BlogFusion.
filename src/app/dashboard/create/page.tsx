@@ -80,7 +80,9 @@ export default function CreatePost() {
   const [fontSize, setFontSize] = useState('16px');
   const [fontFamily, setFontFamily] = useState('Inter');
 
-  const insertTag = (tagType: 'bold' | 'link') => {
+  const [textColor, setTextColor] = useState('#000000');
+
+  const insertTag = (tagType: 'bold' | 'link' | 'color' | 'underline' | 'no-underline') => {
     const textarea = document.getElementById('blog-content-area') as HTMLTextAreaElement;
     if (!textarea) return;
 
@@ -96,6 +98,12 @@ export default function CreatePost() {
       const url = prompt('Enter the URL:', 'https://');
       if (url === null) return;
       replacement = `<back href="${url}">${selectedText || 'link text'}</back>`;
+    } else if (tagType === 'color') {
+      replacement = `<color val="${textColor}">${selectedText || 'colored text'}</color>`;
+    } else if (tagType === 'underline') {
+      replacement = `<u>${selectedText || 'underlined text'}</u>`;
+    } else if (tagType === 'no-underline') {
+      replacement = `<no-u>${selectedText || 'non-underlined text'}</no-u>`;
     }
 
     const newContent = text.substring(0, start) + replacement + text.substring(end);
@@ -189,8 +197,23 @@ export default function CreatePost() {
             alignItems: 'center'
           }}>
             <button type="button" onClick={() => insertTag('bold')} style={{ padding: '0.4rem 0.8rem', fontWeight: 'bold', cursor: 'pointer' }}>B</button>
+            <button type="button" onClick={() => insertTag('underline')} style={{ padding: '0.4rem 0.8rem', textDecoration: 'underline', cursor: 'pointer' }}>U</button>
+            <button type="button" onClick={() => insertTag('no-underline')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer', position: 'relative' }}>
+              U <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-45deg)', width: '100%', height: '1px', background: 'red' }}></span>
+            </button>
             <button type="button" onClick={() => insertTag('link')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer' }}>🔗 Link</button>
             
+            <div style={{ borderLeft: '1px solid #ccc', height: '20px', margin: '0 0.5rem' }}></div>
+            
+            <label style={{ fontSize: '0.8rem' }}>Color:</label>
+            <input 
+              type="color" 
+              value={textColor} 
+              onChange={(e) => setTextColor(e.target.value)} 
+              style={{ padding: '0', width: '30px', height: '25px', cursor: 'pointer', border: '1px solid #ccc' }} 
+            />
+            <button type="button" onClick={() => insertTag('color')} style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', cursor: 'pointer' }}>Apply Color</button>
+
             <div style={{ borderLeft: '1px solid #ccc', height: '20px', margin: '0 0.5rem' }}></div>
             
             <label style={{ fontSize: '0.8rem' }}>Size:</label>

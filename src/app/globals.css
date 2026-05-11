@@ -683,6 +683,11 @@ p {
     line-height: 1.6 !important;
   }
   
+  .blog-content a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+  
   .featured-image {
     margin-bottom: 2rem !important;
     border-radius: 8px !important;
