@@ -31,24 +31,40 @@ export default async function BlogPostPage({ params }: any) {
   const authorName = post.author?.username || "Admin";
   const authorInitial = authorName[0]?.toUpperCase() || "A";
 
-  // Logic to handle inline images
-  // We'll replace "[IMAGE]" placeholders with actual images from the gallery
-  // Also parse "** Heading" at the start of a line as <h2>
-  let contentWithImages = post.content.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1.8rem; color: var(--primary-color);">$1</h2>');
-  contentWithImages = contentWithImages.replace(/\n/g, '<br/>');
-  const gallery = [...(post.images || [])];
+  // Logic to handle custom tags and font styles
+  let content = post.content;
   
-  // The first image is already the cover image, so we'll use the rest for inline
+  // Extract font settings if present: <post-settings size="20px" family="Arial" />
+  const fontSettingsMatch = content.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
+  let customStyles: React.CSSProperties = {};
+  if (fontSettingsMatch) {
+    customStyles = {
+      fontSize: fontSettingsMatch[1],
+      fontFamily: fontSettingsMatch[2]
+    };
+    // Remove the settings tag from content
+    content = content.replace(/<post-settings .*? \/>/, '');
+  }
+
+  // Replace <back href="..."> with <a>
+  let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: var(--secondary-color); text-decoration: underline;">$2</a>');
+  
+  // Handle <b> (already standard, but ensuring it's not messed up)
+  // Replace Markdown-like headings
+  processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1.8rem; color: var(--primary-color);">$1</h2>');
+  processedContent = processedContent.replace(/\n/g, '<br/>');
+  
+  const gallery = [...(post.images || [])];
   const inlineImages = gallery.slice(1);
   
   let imageIndex = 0;
-  while (contentWithImages.includes('[IMAGE]') && imageIndex < inlineImages.length) {
+  while (processedContent.includes('[IMAGE]') && imageIndex < inlineImages.length) {
     const imgHtml = `
       <div class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
         <img src="${inlineImages[imageIndex]}" alt="Blog image ${imageIndex + 1}" style="width: 100%; height: auto; display: block;" />
       </div>
     `;
-    contentWithImages = contentWithImages.replace('[IMAGE]', imgHtml);
+    processedContent = processedContent.replace('[IMAGE]', imgHtml);
     imageIndex++;
   }
 
@@ -81,8 +97,8 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         )}
 
-        <div className="blog-content" style={{ fontSize: '1.25rem', lineHeight: '1.8', color: '#333' }}>
-          <div dangerouslySetInnerHTML={{ __html: contentWithImages }} />
+        <div className="blog-content" style={{ fontSize: '1.25rem', lineHeight: '1.8', color: '#333', ...customStyles }}>
+          <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
 
         {/* Display remaining gallery images at the bottom if not used inline */}

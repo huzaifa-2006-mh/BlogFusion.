@@ -46,7 +46,9 @@ export default function CreatePost() {
       const formData = new FormData();
       formData.append('title', title);
       formData.append('categoryId', categoryId);
-      formData.append('content', content);
+      
+      const contentWithSettings = `<post-settings size="${fontSize}" family="${fontFamily}" />\n` + content;
+      formData.append('content', contentWithSettings);
       
       imageFiles.forEach(file => {
         formData.append('images', file);
@@ -73,6 +75,38 @@ export default function CreatePost() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const [fontSize, setFontSize] = useState('16px');
+  const [fontFamily, setFontFamily] = useState('Inter');
+
+  const insertTag = (tagType: 'bold' | 'link') => {
+    const textarea = document.getElementById('blog-content-area') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+
+    let replacement = '';
+    if (tagType === 'bold') {
+      replacement = `<b>${selectedText || 'bold text'}</b>`;
+    } else if (tagType === 'link') {
+      const url = prompt('Enter the URL:', 'https://');
+      if (url === null) return;
+      replacement = `<back href="${url}">${selectedText || 'link text'}</back>`;
+    }
+
+    const newContent = text.substring(0, start) + replacement + text.substring(end);
+    setContent(newContent);
+    
+    // Focus back and set cursor
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + replacement.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
   };
 
   return (
@@ -141,14 +175,54 @@ export default function CreatePost() {
 
         <div className="form-group">
           <label>Content</label>
-          <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem' }}>
-            💡 Tip: Type <strong>[IMAGE]</strong> anywhere in your text to place one of your uploaded photos at that exact spot!
+          
+          {/* Rich Text Toolbar */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '0.5rem', 
+            padding: '0.5rem', 
+            background: '#f1f1f1', 
+            border: '1px solid #ddd', 
+            borderBottom: 'none',
+            borderRadius: '4px 4px 0 0',
+            flexWrap: 'wrap',
+            alignItems: 'center'
+          }}>
+            <button type="button" onClick={() => insertTag('bold')} style={{ padding: '0.4rem 0.8rem', fontWeight: 'bold', cursor: 'pointer' }}>B</button>
+            <button type="button" onClick={() => insertTag('link')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer' }}>🔗 Link</button>
+            
+            <div style={{ borderLeft: '1px solid #ccc', height: '20px', margin: '0 0.5rem' }}></div>
+            
+            <label style={{ fontSize: '0.8rem' }}>Size:</label>
+            <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={{ padding: '0.2rem' }}>
+              {['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px'].map(size => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
+
+            <label style={{ fontSize: '0.8rem', marginLeft: '0.5rem' }}>Font:</label>
+            <select value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} style={{ padding: '0.2rem' }}>
+              {['Inter', 'Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana', 'Tahoma'].map(font => (
+                <option key={font} value={font}>{font}</option>
+              ))}
+            </select>
+          </div>
+
+          <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', marginTop: '0.5rem' }}>
+            💡 Tip: Type <strong>[IMAGE]</strong> anywhere in your text to place one of your uploaded photos!
           </p>
+          
           <textarea 
+            id="blog-content-area"
             value={content} 
             onChange={(e) => setContent(e.target.value)} 
             placeholder="Write your blog content here..." 
-            style={{ minHeight: '400px' }}
+            style={{ 
+              minHeight: '400px', 
+              borderRadius: '0 0 4px 4px',
+              fontSize: fontSize,
+              fontFamily: fontFamily
+            }}
             required
           ></textarea>
         </div>

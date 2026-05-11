@@ -438,6 +438,23 @@ p {
   position: sticky;
   top: 0;
   height: 100vh;
+  transition: transform 0.3s ease;
+  z-index: 1002;
+}
+
+.mobile-nav-toggle {
+  display: none;
+  background: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+  padding: 1rem;
+  cursor: pointer;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1003;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .sidebar-nav {
@@ -528,28 +545,42 @@ p {
   }
   
   .sidebar {
-    height: auto;
-    position: relative;
-    padding: 1.5rem;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .mobile-nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
   }
   
   .sidebar-nav {
     display: flex;
-    overflow-x: auto;
+    flex-direction: column;
     margin-top: 1rem;
-    gap: 1rem;
-    padding-bottom: 0.5rem;
-    -webkit-overflow-scrolling: touch;
+    gap: 0.5rem;
   }
   
   .sidebar-nav a, .sidebar-nav button {
     white-space: nowrap;
-    margin-bottom: 0 !important;
-    flex-shrink: 0;
+    margin-bottom: 0.5rem !important;
   }
   
   .dashboard-main {
-    padding: 1.2rem;
+    padding: 1.5rem;
+    padding-top: 5rem;
   }
   
   .card-grid {
