@@ -59,7 +59,21 @@ export default async function BlogPostPage({ params }: any) {
   // Handle <b> (already standard, but ensuring it's not messed up)
   // Replace Markdown-like headings
   processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1.8rem; color: var(--primary-color);">$1</h2>');
+
+  // Handle <code> tags with newline preservation
+  const codeBlocks: string[] = [];
+  processedContent = processedContent.replace(/<code>([\s\S]*?)<\/code>/g, (match, code) => {
+    const placeholder = `[CODE_BLOCK_${codeBlocks.length}]`;
+    codeBlocks.push(`<pre class="code-block"><code>${code.trim()}</code></pre>`);
+    return placeholder;
+  });
+
   processedContent = processedContent.replace(/\n/g, '<br/>');
+
+  // Restore code blocks
+  codeBlocks.forEach((block, index) => {
+    processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
+  });
   
   const gallery = [...(post.images || [])];
   const inlineImages = gallery.slice(1);

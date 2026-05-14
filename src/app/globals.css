@@ -912,3 +912,37 @@ p {
     margin-top: -0.2rem;
   }
 }
+
+/* Code Block Styling */
+.code-block {
+  background-color: #f8f9fa !important;
+  border: 1px solid #e1e4e8 !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+  margin: 2rem 0 !important;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  color: #24292e !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02) !important;
+  display: block;
+}
+
+.code-block code {
+  font-family: inherit !important;
+  color: inherit !important;
+  white-space: pre !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.code-instruction {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #856404;
+}

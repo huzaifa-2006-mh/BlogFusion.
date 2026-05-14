@@ -104,6 +104,8 @@ export default function CreatePost() {
       replacement = `<u>${selectedText || 'underlined text'}</u>`;
     } else if (tagType === 'no-underline') {
       replacement = `<no-u>${selectedText || 'non-underlined text'}</no-u>`;
+    } else if (tagType === 'code') {
+      replacement = `<code>${selectedText || '// write your code here'}</code>`;
     }
 
     const newContent = text.substring(0, start) + replacement + text.substring(end);
@@ -202,6 +204,7 @@ export default function CreatePost() {
               U <span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-45deg)', width: '100%', height: '1px', background: 'red' }}></span>
             </button>
             <button type="button" onClick={() => insertTag('link')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer' }}>🔗 Link</button>
+            <button type="button" onClick={() => insertTag('code')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer' }}>💻 Code</button>
             
             <div style={{ borderLeft: '1px solid #ccc', height: '20px', margin: '0 0.5rem' }}></div>
             
@@ -229,6 +232,10 @@ export default function CreatePost() {
                 <option key={font} value={font}>{font}</option>
               ))}
             </select>
+          </div>
+
+          <div className="code-instruction">
+            <strong>How to write code:</strong> Highlight your code and click the <strong>💻 Code</strong> button, or wrap your code manually in <code>&lt;code&gt;...&lt;/code&gt;</code> tags.
           </div>
 
           <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', marginTop: '0.5rem' }}>
