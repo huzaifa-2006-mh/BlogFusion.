@@ -1,6 +1,16 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const category = await prisma.category.findUnique({ where: { slug } });
+  return {
+    title: category ? `${category.name} Blogs | BlogFusion` : 'Category Not Found',
+    description: `Explore the latest tips, tutorials, and guides in ${category?.name || 'this category'}.`,
+  };
+}
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -21,50 +31,41 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   }
 
   return (
-    <div>
-      <section className="hero" style={{ padding: '6rem 0 3rem' }}>
-        <div className="container">
-          <span className="card-category" style={{ fontSize: '1rem', marginBottom: '1rem' }}>Category</span>
-          <h1>{category.name}</h1>
-          <p style={{ maxWidth: '800px', margin: '0 auto' }}>Explore the latest insights and tutorials in {category.name}.</p>
-        </div>
-      </section>
+    <div className="category-detail-page">
+      <div className="container">
+        <header className="category-header fade-in">
+          <h1 className="text-center">{category.name}</h1>
+          <p className="text-center">
+            Discover {category.name} tips, tricks, and productivity hacks to streamline your workflow. 
+            Learn advanced features and shortcuts to become a {category.name} power user.
+          </p>
+        </header>
 
-      <section className="section">
-        <div className="container">
-          <div className="section-title">
-            <h2>Latest in {category.name}</h2>
-          </div>
-          
+        <div className="blog-list-container fade-in" style={{ animationDelay: '0.2s' }}>
           {category.posts.length > 0 ? (
-            <div className="card-grid">
-              {category.posts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="card" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  {post.coverImage ? (
-                    <div className="card-img">
-                      <img src={post.coverImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  ) : (
-                    <div className="card-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0', color: '#888' }}>
-                      No Image
-                    </div>
-                  )}
-                  <div className="card-body">
-                    <span className="card-category">{category.name}</span>
-                    <h3 className="card-title">{post.title}</h3>
-                    <p style={{ fontSize: '0.95rem' }}>{post.excerpt}</p>
-                    <span className="highlight" style={{ fontWeight: '600', fontSize: '0.9rem' }}>Read Full Story &rarr;</span>
-                  </div>
+            <div className="premium-blog-list">
+              {category.posts.map((post, index) => (
+                <Link key={post.id} href={`/blog/${post.slug}`} className="blog-list-item">
+                  <span className="blog-number">{index + 1}.</span>
+                  <span className="blog-title">{post.title}</span>
+                  <span className="blog-date">
+                    {new Date(post.createdAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </span>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center" style={{ padding: '4rem', background: '#f8f9fa', borderRadius: '12px' }}>
-              <p style={{ fontSize: '1.2rem', color: '#888' }}>No blogs found in this category yet. Stay tuned!</p>
+            <div className="text-center" style={{ padding: '6rem 0', opacity: 0.5 }}>
+              <p style={{ fontSize: '1.2rem' }}>No blogs found in {category.name} yet.</p>
+              <Link href="/category" className="btn btn-outline mt-4">Back to Topics</Link>
             </div>
           )}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
