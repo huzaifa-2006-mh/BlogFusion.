@@ -946,3 +946,25 @@ p {
   font-size: 0.9rem;
   color: #856404;
 }
+
+/* List Styling in Blog Content */
+.blog-content ul, .blog-content ol {
+  margin: 1.5rem 0 1.5rem 2.5rem !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.blog-content ul {
+  list-style-type: disc !important;
+}
+
+.blog-content ol {
+  list-style-type: decimal !important;
+}
+
+.blog-content li {
+  margin-bottom: 0.8rem !important;
+  padding-left: 0.5rem !important;
+  display: list-item !important;
+  line-height: 1.6 !important;
+}

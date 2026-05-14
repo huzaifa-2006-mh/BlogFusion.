@@ -106,6 +106,10 @@ export default function CreatePost() {
       replacement = `<no-u>${selectedText || 'non-underlined text'}</no-u>`;
     } else if (tagType === 'code') {
       replacement = `<code>${selectedText || '// write your code here'}</code>`;
+    } else if (tagType === 'bullet-list') {
+      replacement = `<ul>\n  <li>${selectedText || 'Item 1'}</li>\n  <li>Item 2</li>\n</ul>`;
+    } else if (tagType === 'number-list') {
+      replacement = `<ol>\n  <li>${selectedText || 'Item 1'}</li>\n  <li>Item 2</li>\n</ol>`;
     }
 
     const newContent = text.substring(0, start) + replacement + text.substring(end);
@@ -205,6 +209,8 @@ export default function CreatePost() {
             </button>
             <button type="button" onClick={() => insertTag('link')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer' }}>🔗 Link</button>
             <button type="button" onClick={() => insertTag('code')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer' }}>💻 Code</button>
+            <button type="button" onClick={() => insertTag('bullet-list')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer' }}>• List</button>
+            <button type="button" onClick={() => insertTag('number-list')} style={{ padding: '0.4rem 0.8rem', cursor: 'pointer' }}>1. List</button>
             
             <div style={{ borderLeft: '1px solid #ccc', height: '20px', margin: '0 0.5rem' }}></div>
             
