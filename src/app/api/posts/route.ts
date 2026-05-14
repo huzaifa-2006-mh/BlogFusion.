@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -45,10 +43,16 @@ export async function POST(request: Request) {
       });
     }
 
+    // Generate a clean slug
+    const baseSlug = title.toLowerCase().trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
     const post = await prisma.post.create({
       data: {
         title,
-        slug: title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '') + '-' + Date.now(),
+        slug: baseSlug,
         content,
         excerpt: content.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...',
         categoryId,
