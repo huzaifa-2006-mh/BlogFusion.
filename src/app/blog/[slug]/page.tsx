@@ -2,6 +2,34 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: any): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  
+  const post = await prisma.post.findUnique({
+    where: { slug }
+  });
+
+  if (!post) {
+    return {
+      title: 'Post Not Found - BlogFusion'
+    };
+  }
+
+  return {
+    title: post.metaTitle || `${post.title} - BlogFusion`,
+    description: post.metaDescription || post.excerpt,
+    keywords: post.focusKeywords || undefined,
+    openGraph: {
+      title: post.metaTitle || post.title,
+      description: post.metaDescription || post.excerpt,
+      images: post.coverImage ? [post.coverImage] : [],
+      type: 'article',
+    }
+  };
+}
 
 export default async function BlogPostPage({ params }: any) {
   // @ts-ignore

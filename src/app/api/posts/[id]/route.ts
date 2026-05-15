@@ -47,6 +47,9 @@ export async function PATCH(
       content,
       categoryId,
       excerpt: content.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...',
+      metaTitle: (formData.get('metaTitle') as string) || null,
+      metaDescription: (formData.get('metaDescription') as string) || null,
+      focusKeywords: (formData.get('focusKeywords') as string) || null,
     };
 
     // Handle new images if uploaded

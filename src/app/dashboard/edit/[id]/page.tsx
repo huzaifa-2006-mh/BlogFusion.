@@ -15,6 +15,9 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [previews, setPreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [metaTitle, setMetaTitle] = useState('');
+  const [metaDescription, setMetaDescription] = useState('');
+  const [focusKeywords, setFocusKeywords] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,6 +34,9 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           setCategories(catData);
           setTitle(postData.title || '');
           setCategoryId(postData.categoryId || '');
+          setMetaTitle(postData.metaTitle || '');
+          setMetaDescription(postData.metaDescription || '');
+          setFocusKeywords(postData.focusKeywords || '');
           
           let rawContent = postData.content || '';
           const fontSettingsMatch = rawContent.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
@@ -87,6 +93,9 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       const formData = new FormData();
       formData.append('title', title);
       formData.append('categoryId', categoryId);
+      formData.append('metaTitle', metaTitle);
+      formData.append('metaDescription', metaDescription);
+      formData.append('focusKeywords', focusKeywords);
       
       const contentWithSettings = `<post-settings size="${fontSize}" family="${fontFamily}" />\n` + content;
       formData.append('content', contentWithSettings);
@@ -309,6 +318,43 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
             }}
             required
           ></textarea>
+        </div>
+
+        {/* SEO Settings Section */}
+        <div className="form-group" style={{ marginTop: '2rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '8px', border: '1px solid #eee' }}>
+          <h3 style={{ marginBottom: '1rem', color: 'var(--primary-color)' }}>SEO Settings</h3>
+          
+          <div className="form-group">
+            <label>Meta Title</label>
+            <input 
+              type="text" 
+              value={metaTitle} 
+              onChange={(e) => setMetaTitle(e.target.value)} 
+              placeholder="SEO Title (leave blank to use blog title)" 
+              style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Meta Description</label>
+            <textarea 
+              value={metaDescription} 
+              onChange={(e) => setMetaDescription(e.target.value)} 
+              placeholder="Brief summary for search engines..." 
+              style={{ minHeight: '100px', padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}
+            ></textarea>
+          </div>
+
+          <div className="form-group">
+            <label>Focus Keywords</label>
+            <input 
+              type="text" 
+              value={focusKeywords} 
+              onChange={(e) => setFocusKeywords(e.target.value)} 
+              placeholder="e.g. technology, health, coding (comma separated)" 
+              style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}
+            />
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>

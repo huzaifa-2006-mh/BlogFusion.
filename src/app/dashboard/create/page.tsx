@@ -10,6 +10,9 @@ export default function CreatePost() {
   const [categories, setCategories] = useState<{ id: string, name: string }[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [metaTitle, setMetaTitle] = useState('');
+  const [metaDescription, setMetaDescription] = useState('');
+  const [focusKeywords, setFocusKeywords] = useState('');
 
   useEffect(() => {
     fetch('/api/categories')
@@ -46,6 +49,9 @@ export default function CreatePost() {
       const formData = new FormData();
       formData.append('title', title);
       formData.append('categoryId', categoryId);
+      formData.append('metaTitle', metaTitle);
+      formData.append('metaDescription', metaDescription);
+      formData.append('focusKeywords', focusKeywords);
       
       const contentWithSettings = `<post-settings size="${fontSize}" family="${fontFamily}" />\n` + content;
       formData.append('content', contentWithSettings);
@@ -64,6 +70,9 @@ export default function CreatePost() {
         setTitle('');
         setContent('');
         setCategoryId('');
+        setMetaTitle('');
+        setMetaDescription('');
+        setFocusKeywords('');
         setImageFiles([]);
         setPreviews([]);
       } else {
@@ -261,6 +270,41 @@ export default function CreatePost() {
             }}
             required
           ></textarea>
+        </div>
+        
+        {/* SEO Settings Section */}
+        <div className="form-group" style={{ marginTop: '2rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '8px', border: '1px solid #eee' }}>
+          <h3 style={{ marginBottom: '1rem', color: 'var(--primary-color)' }}>SEO Settings</h3>
+          
+          <div className="form-group">
+            <label>Meta Title</label>
+            <input 
+              type="text" 
+              value={metaTitle} 
+              onChange={(e) => setMetaTitle(e.target.value)} 
+              placeholder="SEO Title (leave blank to use blog title)" 
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Meta Description</label>
+            <textarea 
+              value={metaDescription} 
+              onChange={(e) => setMetaDescription(e.target.value)} 
+              placeholder="Brief summary for search engines..." 
+              style={{ minHeight: '100px' }}
+            ></textarea>
+          </div>
+
+          <div className="form-group">
+            <label>Focus Keywords</label>
+            <input 
+              type="text" 
+              value={focusKeywords} 
+              onChange={(e) => setFocusKeywords(e.target.value)} 
+              placeholder="e.g. technology, health, coding (comma separated)" 
+            />
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '1rem' }}>
