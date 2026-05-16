@@ -52,6 +52,35 @@ export default function CreatePost() {
     setFaqs(updatedFaqs);
   };
 
+  const insertTag = (tagType: string) => {
+    const textarea = document.getElementById('blog-content-area') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+
+    let replacement = '';
+    if (tagType === 'bold') replacement = `<b>${selectedText || 'bold text'}</b>`;
+    else if (tagType === 'underline') replacement = `<u>${selectedText || 'underlined text'}</u>`;
+    else if (tagType === 'link') {
+      const url = prompt('Enter the URL:', 'https://');
+      if (url === null) return;
+      replacement = `<back href="${url}">${selectedText || 'link text'}</back>`;
+    } else if (tagType === 'code') replacement = `<code>${selectedText || '// code here'}</code>`;
+    else if (tagType === 'bullet-list') replacement = `<ul>\n  <li>${selectedText || 'Item'}</li>\n</ul>`;
+
+    const newContent = text.substring(0, start) + replacement + text.substring(end);
+    setContent(newContent);
+    
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + replacement.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -121,13 +150,25 @@ export default function CreatePost() {
 
                 <div className="form-group">
                     <label style={{ fontWeight: '700', fontSize: '0.9rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.75rem', display: 'block' }}>Content</label>
+                    
+                    {/* Toolbar Re-added */}
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', padding: '0.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                        <button type="button" onClick={() => insertTag('bold')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontWeight: 'bold' }}>B</button>
+                        <button type="button" onClick={() => insertTag('underline')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', textDecoration: 'underline' }}>U</button>
+                        <button type="button" onClick={() => insertTag('link')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer' }}>🔗 Link</button>
+                        <button type="button" onClick={() => insertTag('code')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer' }}>💻 Code</button>
+                        <button type="button" onClick={() => insertTag('bullet-list')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer' }}>• List</button>
+                    </div>
+
                     <textarea 
+                        id="blog-content-area"
                         value={content} 
                         onChange={(e) => setContent(e.target.value)} 
                         placeholder="Start writing your heart out..." 
                         style={{ width: '100%', minHeight: '500px', padding: '1.25rem', border: '1px solid #e2e8f0', borderRadius: '16px', lineHeight: '1.8', fontSize: '1.1rem' }} 
                         required
                     ></textarea>
+                    <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.5rem' }}>💡 Tip: Use [IMAGE] to place uploaded photos in text.</p>
                 </div>
             </div>
 

@@ -212,9 +212,10 @@ p {
 /* Minimal Footer Styles */
 .footer-minimal {
   background-color: #fff;
-  padding: 4rem 0 2rem;
+  padding: 2.5rem 0 1.5rem;
   border-top: 1px solid #f3f4f6;
   text-align: center;
+  margin-top: 3rem;
 }
 
 .footer-nav {
