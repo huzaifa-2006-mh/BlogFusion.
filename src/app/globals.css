@@ -1,11 +1,12 @@
 :root {
-  --primary-color: #0A192F;
-  --secondary-color: #64FFDA;
+  --primary-color: #0f172a;
+  --secondary-color: #e11d48;
   --background-color: #ffffff;
-  --text-primary: #0A192F;
-  --text-secondary: #555555;
-  --accent-color: #64FFDA;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --accent-color: #e11d48;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --heading-font: 'Outfit', sans-serif;
 }
 
 * {
@@ -34,9 +35,10 @@ ul {
 
 /* SEO Friendly Typography */
 h1, h2, h3, h4, h5, h6 {
-  color: var(--primary-color);
+  color: var(--text-primary);
   margin-bottom: 1rem;
   font-weight: 700;
+  font-family: var(--heading-font);
 }
 
 h1 {
@@ -110,14 +112,14 @@ p {
 
 /* Header/Navbar Styles */
 .header {
-  background: rgba(10, 25, 47, 0.95);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
-  color: white;
-  padding: 1rem 0;
+  color: var(--text-primary);
+  padding: 1.5rem 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .nav {
@@ -148,73 +150,161 @@ p {
 
 /* Hero Section */
 .hero {
-  padding: 8rem 0 4rem;
-  text-align: center;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 6rem 0;
+  text-align: left;
+  background: #fff;
 }
 
 .hero h1 {
-  max-width: 900px;
-  margin: 0 auto 2rem;
-}
-
-.hero p {
-  max-width: 700px;
-  margin: 0 auto 3rem;
-  font-size: 1.25rem;
-}
-
-/* Footer */
-.footer {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 4rem 0 2rem;
-  margin-top: 4rem;
-}
-
-.footer-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 3rem;
-  margin-bottom: 3rem;
-}
-
-.footer-logo {
-  font-size: 2rem;
-  color: var(--secondary-color);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
   margin-bottom: 1.5rem;
-  display: block;
+  line-height: 1;
 }
 
-.footer h4 {
-  color: var(--secondary-color);
-  margin-bottom: 1.5rem;
+.hero p.lead {
+  max-width: 650px;
+  margin: 0 0 3rem;
+  font-size: 1.35rem;
+  color: var(--text-secondary);
 }
 
-.footer-links a {
-  display: block;
-  margin-bottom: 0.8rem;
-  color: #a8b2d1;
-}
-
-.footer-links a:hover {
-  color: var(--secondary-color);
-}
-
-.footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 2rem;
-  text-align: center;
-  color: #8892b0;
+.hero-label {
+  color: var(--accent-color);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
-/* Card Styles */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+.quote-box {
+  border-left: 4px solid var(--accent-color);
+  padding-left: 2rem;
   margin: 3rem 0;
+}
+
+.quote-text {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.founder-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.founder-details h4 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.founder-details p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* Minimal Footer Styles */
+.footer-minimal {
+  background-color: #fff;
+  padding: 4rem 0 2rem;
+  border-top: 1px solid #f3f4f6;
+  text-align: center;
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.footer-nav a {
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.footer-nav a:hover {
+  color: var(--text-primary);
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  font-size: 1.5rem;
+  color: #64748b;
+}
+
+.footer-social a:hover {
+  color: var(--accent-color);
+}
+
+.footer-copy {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+/* Blog Grid */
+.blog-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 4rem;
+  margin: 4rem 0;
+}
+
+.featured-post {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.featured-post .card-category {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border: 2px solid var(--text-primary);
+  font-weight: 800;
+  font-size: 0.8rem;
+  width: fit-content;
+}
+
+.featured-post h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+}
+
+.secondary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.secondary-item {
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 1.5rem;
+}
+
+.secondary-item:last-child {
+  border-bottom: none;
+}
+
+.secondary-item h3 {
+  font-size: 1.3rem;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+.secondary-item p {
+  font-size: 1rem;
+  margin-bottom: 0;
 }
 
 .card {

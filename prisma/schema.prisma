@@ -27,9 +27,12 @@ model Post {
   images      String[] // Support for multiple images
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  String
-  author      User     @relation(fields: [authorId], references: [id])
-  authorId    String
+  author          User     @relation(fields: [authorId], references: [id])
+  authorId        String
   published       Boolean  @default(false)
+  showOnHome      Boolean  @default(true)
+  shortDescription String? // Dedicated field for title subtext
+  faqs            Json?    // Stores Question/Answer pairs
   views           Int      @default(0)
   metaTitle       String?
   metaDescription String?

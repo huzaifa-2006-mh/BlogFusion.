@@ -6,8 +6,7 @@ const Navbar = () => {
       <div className="container nav">
         <Link href="/" className="logo-link">
           <div className="logo-container">
-            <img src="/logo.png" alt="BlogFusion" className="logo-img" />
-            <span className="logo-fallback">BlogFusion<span className="highlight">.</span></span>
+            <span className="logo-fallback" style={{ color: 'var(--text-primary)' }}>Blog <span className="highlight" style={{ color: 'var(--secondary-color)' }}>Fusion</span></span>
           </div>
         </Link>
         
@@ -25,9 +24,6 @@ const Navbar = () => {
           <Link href="/category">Topics</Link>
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>
-          <Link href="/dashboard" className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-            Dashboard
-          </Link>
         </nav>
       </div>
     </header>

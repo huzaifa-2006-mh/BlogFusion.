@@ -150,6 +150,25 @@ export default async function BlogPostPage({ params }: any) {
           <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
 
+        {/* FAQ Section */}
+        {post.faqs && (post.faqs as any[]).length > 0 && (
+          <div style={{ marginTop: '5rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+            <h2 style={{ marginBottom: '2rem', fontSize: '2rem', color: 'var(--primary-color)', textAlign: 'center' }}>Frequently Asked Questions</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {(post.faqs as any[]).map((faq, index) => (
+                <div key={index} style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                  <h4 style={{ color: 'var(--text-primary)', fontSize: '1.15rem', marginBottom: '0.75rem', display: 'flex', gap: '0.75rem' }}>
+                    <span style={{ color: 'var(--accent-color)' }}>Q:</span> {faq.question}
+                  </h4>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6', margin: 0 }}>
+                    {faq.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Display remaining gallery images at the bottom if not used inline */}
         {imageIndex < inlineImages.length && (
           <div style={{ marginTop: '4rem' }}>
