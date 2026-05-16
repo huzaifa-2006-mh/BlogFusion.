@@ -15,11 +15,12 @@ export default async function Home() {
           published: true,
           showOnHome: true
         },
-        take: 8,
+        take: 10, // Fetch enough to show 2 blocks of (1+4)
         include: { category: true },
         orderBy: { createdAt: 'desc' }
       }),
       prisma.category.findMany({
+          where: { showOnHome: true },
           take: 10
       })
     ]);
@@ -27,10 +28,10 @@ export default async function Home() {
     console.error('Failed to fetch data:', error);
   }
 
-  // Split posts into blocks of 4 (1 featured + 3 secondary)
+  // Split posts into blocks of 5 (1 featured + 4 secondary)
   const blocks: any[][] = [];
-  for (let i = 0; i < posts.length; i += 4) {
-    blocks.push(posts.slice(i, i + 4));
+  for (let i = 0; i < posts.length; i += 5) {
+    blocks.push(posts.slice(i, i + 5));
   }
 
   return (
@@ -96,7 +97,7 @@ export default async function Home() {
           </div>
       </section>
 
-      {/* Blog Blocks Section (Repeating 1 Featured + 3 Secondary) */}
+      {/* Blog Blocks Section (Repeating 1 Featured + 4 Secondary) */}
       <section className="section">
         <div className="container">
           {blocks.length > 0 ? (
@@ -134,21 +135,21 @@ export default async function Home() {
                   </div>
                 )}
 
-                {/* Secondary Posts (List Right) */}
+                {/* Secondary Posts (List Right - 4 items) */}
                 <div className="secondary-list">
                   {block.slice(1).map((post) => (
-                    <article key={post.id} style={{ paddingBottom: '2rem', marginBottom: '2rem', borderBottom: '1px solid #f1f5f9' }}>
+                    <article key={post.id} style={{ paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: '1px solid #f1f5f9' }}>
                       <Link href={`/blog/${post.slug}`}>
-                        <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem', lineHeight: '1.3' }}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '0.4rem', lineHeight: '1.3' }}>
                           {post.title}
                         </h3>
                         {post.shortDescription && (
-                            <p style={{ fontSize: '0.9rem', color: '#475569', fontWeight: '600', marginBottom: '0.75rem' }}>
+                            <p style={{ fontSize: '0.85rem', color: '#475569', fontWeight: '600', marginBottom: '0.5rem' }}>
                                 {post.shortDescription}
                             </p>
                         )}
                       </Link>
-                      <p style={{ fontSize: '0.95rem', color: '#64748b', lineHeight: '1.5' }}>{post.excerpt}</p>
+                      <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: '1.4' }}>{post.excerpt}</p>
                     </article>
                   ))}
                 </div>

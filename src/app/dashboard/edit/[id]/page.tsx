@@ -13,6 +13,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const router = useRouter();
   
   const [title, setTitle] = useState('');
+  const [shortDescription, setShortDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [content, setContent] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -20,11 +21,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [previews, setPreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [metaTitle, setMetaTitle] = useState('');
-  const [metaDescription, setMetaDescription] = useState('');
-  const [focusKeywords, setFocusKeywords] = useState('');
   const [showOnHome, setShowOnHome] = useState(true);
-  const [shortDescription, setShortDescription] = useState('');
   const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   useEffect(() => {
@@ -42,9 +39,6 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           setCategories(catData);
           setTitle(postData.title || '');
           setCategoryId(postData.categoryId || '');
-          setMetaTitle(postData.metaTitle || '');
-          setMetaDescription(postData.metaDescription || '');
-          setFocusKeywords(postData.focusKeywords || '');
           setShowOnHome(postData.showOnHome ?? true);
           setShortDescription(postData.shortDescription || '');
           setFaqs(postData.faqs || []);
@@ -52,8 +46,6 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           let rawContent = postData.content || '';
           const fontSettingsMatch = rawContent.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
           if (fontSettingsMatch) {
-            setFontSize(fontSettingsMatch[1]);
-            setFontFamily(fontSettingsMatch[2]);
             rawContent = rawContent.replace(/<post-settings .*? \/>\n?/, '');
           }
           setContent(rawContent);
@@ -102,16 +94,11 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
     try {
       const formData = new FormData();
       formData.append('title', title);
-      formData.append('categoryId', categoryId);
-      formData.append('metaTitle', metaTitle);
-      formData.append('metaDescription', metaDescription);
-      formData.append('focusKeywords', focusKeywords);
-      formData.append('showOnHome', String(showOnHome));
       formData.append('shortDescription', shortDescription);
+      formData.append('categoryId', categoryId);
+      formData.append('showOnHome', String(showOnHome));
       formData.append('faqs', JSON.stringify(faqs));
-      
-      const contentWithSettings = `<post-settings size="${fontSize}" family="${fontFamily}" />\n` + content;
-      formData.append('content', contentWithSettings);
+      formData.append('content', content);
       imageFiles.forEach(file => formData.append('images', file));
 
       const response = await fetch(`/api/posts/${id}`, { method: 'PATCH', body: formData });
@@ -129,82 +116,71 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
     }
   };
 
-  const [fontSize, setFontSize] = useState('16px');
-  const [fontFamily, setFontFamily] = useState('Inter');
-  const [textColor, setTextColor] = useState('#000000');
-
-  const insertTag = (tagType: string) => {
-    const textarea = document.getElementById('blog-content-area') as HTMLTextAreaElement;
-    if (!textarea) return;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selectedText = text.substring(start, end);
-    let replacement = '';
-    if (tagType === 'bold') replacement = `<b>${selectedText || 'bold text'}</b>`;
-    else if (tagType === 'link') {
-      const url = prompt('Enter the URL:', 'https://');
-      if (url) replacement = `<back href="${url}">${selectedText || 'link text'}</back>`;
-    } else if (tagType === 'color') replacement = `<color val="${textColor}">${selectedText || 'colored text'}</color>`;
-    else if (tagType === 'underline') replacement = `<u>${selectedText || 'underlined text'}</u>`;
-
-    if (replacement) {
-      const newContent = text.substring(0, start) + replacement + text.substring(end);
-      setContent(newContent);
-    }
-  };
-
   if (isLoading) return <div style={{ padding: '4rem', textAlign: 'center' }}>Loading post data...</div>;
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1>Edit Blog</h1>
-        <button onClick={() => router.back()} className="btn btn-outline">Back</button>
+    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+        <div>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>Edit Blog</h1>
+            <p style={{ color: '#64748b' }}>Update your post and refine its content.</p>
+        </div>
+        <button onClick={() => router.back()} style={{ padding: '0.75rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', fontWeight: '600', cursor: 'pointer' }}>Back</button>
       </div>
       
-      <form onSubmit={handleSubmit} className="contact-form" style={{ background: 'white', padding: '2rem', borderRadius: '12px' }}>
-        <div className="form-group">
-          <label>Blog Title</label>
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        </div>
-
-        <div className="form-group">
-          <label>Short Description (Sub-title)</label>
-          <input type="text" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} placeholder="A brief catchphrase for the home page..." />
-        </div>
-
-        <div className="form-group">
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-            <input type="checkbox" checked={showOnHome} onChange={(e) => setShowOnHome(e.target.checked)} style={{ width: 'auto' }} />
-            Show on Home Page
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label>Content</label>
-          <div style={{ display: 'flex', gap: '0.5rem', padding: '0.5rem', background: '#f1f1f1', borderRadius: '4px 4px 0 0' }}>
-            <button type="button" onClick={() => insertTag('bold')}>B</button>
-            <button type="button" onClick={() => insertTag('underline')}>U</button>
-            <button type="button" onClick={() => insertTag('link')}>🔗 Link</button>
-          </div>
-          <textarea id="blog-content-area" value={content} onChange={(e) => setContent(e.target.value)} style={{ minHeight: '400px', fontSize, fontFamily }} required></textarea>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="form-group" style={{ marginTop: '2rem', padding: '1.5rem', background: '#fff', borderRadius: '8px', border: '1px solid #eee' }}>
-          <h3 style={{ marginBottom: '1rem' }}>FAQs</h3>
-          {faqs.map((faq, index) => (
-            <div key={index} style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #f1f1f1', borderRadius: '8px' }}>
-                <input type="text" placeholder="Question" value={faq.question} onChange={(e) => updateFAQ(index, 'question', e.target.value)} />
-                <textarea placeholder="Answer" value={faq.answer} onChange={(e) => updateFAQ(index, 'answer', e.target.value)} style={{ minHeight: '80px', marginTop: '0.5rem' }}></textarea>
-                <button type="button" onClick={() => removeFAQ(index)} style={{ color: 'red', marginTop: '0.5rem' }}>Remove</button>
+      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+                <div style={{ marginBottom: '2rem' }}>
+                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Blog Title</label>
+                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} style={{ width: '100%', padding: '1rem', fontSize: '1.25rem', fontWeight: '700', borderRadius: '12px', border: '1px solid #e2e8f0' }} required />
+                </div>
+                <div style={{ marginBottom: '2rem' }}>
+                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Short Description</label>
+                    <input type="text" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
+                </div>
+                <div>
+                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Content</label>
+                    <textarea value={content} onChange={(e) => setContent(e.target.value)} style={{ width: '100%', minHeight: '500px', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', lineHeight: '1.7' }} required></textarea>
+                </div>
             </div>
-          ))}
-          <button type="button" onClick={addFAQ} className="btn btn-outline" style={{ fontSize: '0.9rem' }}>+ Add FAQ</button>
+            {/* FAQ Section */}
+            <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ fontWeight: '800' }}>FAQs</h3>
+                    <button type="button" onClick={addFAQ} style={{ color: '#ff4b91', fontWeight: '700', background: 'none', border: 'none' }}>+ Add Question</button>
+                </div>
+                {faqs.map((faq, index) => (
+                    <div key={index} style={{ marginBottom: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '12px', position: 'relative' }}>
+                        <button type="button" onClick={() => removeFAQ(index)} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', color: '#ef4444' }}>✕</button>
+                        <input type="text" placeholder="Question" value={faq.question} onChange={(e) => updateFAQ(index, 'question', e.target.value)} style={{ width: '100%', marginBottom: '0.5rem', fontWeight: '700', border: 'none', background: 'transparent' }} />
+                        <textarea placeholder="Answer" value={faq.answer} onChange={(e) => updateFAQ(index, 'answer', e.target.value)} style={{ width: '100%', border: 'none', background: 'transparent' }}></textarea>
+                    </div>
+                ))}
+            </div>
         </div>
-
-        <button type="submit" className="btn btn-primary" disabled={isUpdating}>{isUpdating ? 'Saving...' : 'Save Changes'}</button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Category</label>
+                    <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', border: '1px solid #e2e8f0' }} required>
+                        <option value="">Select Category</option>
+                        {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: '600' }}>
+                        <input type="checkbox" checked={showOnHome} onChange={(e) => setShowOnHome(e.target.checked)} />
+                        Show on Home Page
+                    </label>
+                </div>
+                <button type="submit" disabled={isUpdating} style={{ width: '100%', padding: '1rem', background: '#0f172a', color: 'white', borderRadius: '12px', fontWeight: '700' }}>
+                    {isUpdating ? 'Saving...' : 'Save Changes'}
+                </button>
+            </div>
+        </div>
       </form>
     </div>
   );

@@ -31,55 +31,44 @@ export default function DashboardLayout({
   return (
     <div className="dashboard-container">
       <button className="mobile-nav-toggle" onClick={toggleSidebar}>
-        {isSidebarOpen ? '✖' : '☰'}
+        {isSidebarOpen ? '✕' : '☰'}
       </button>
 
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <Link href="/" className="logo-link">
-          <div className="logo-container" style={{ marginBottom: '2rem' }}>
-            <img src="/logo.png" alt="BlogFusion" className="logo-img" />
-            <span className="logo-fallback">BlogFusion<span className="highlight">.</span></span>
+          <div className="logo-container" style={{ marginBottom: '2.5rem' }}>
+            <span className="logo-fallback" style={{ fontSize: '1.25rem', color: '#0f172a' }}>
+              Blog Fusion<span style={{ color: '#ff4b91' }}>.</span>
+            </span>
           </div>
         </Link>
         
-        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '2rem' }}>
-          <p style={{ color: '#8892b0', fontSize: '0.8rem' }}>Logged in as</p>
-          <p style={{ fontWeight: '600', color: 'var(--secondary-color)' }}>{username}</p>
+        <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px', marginBottom: '2rem', border: '1px solid #e2e8f0' }}>
+          <p style={{ color: '#64748b', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Admin</p>
+          <p style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.9rem' }}>{username || 'Huzaifa'}</p>
         </div>
 
         <nav className="sidebar-nav">
-          <Link href="/dashboard" className={pathname === '/dashboard' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
-            📊 Overview
+          <Link href="/dashboard" className={pathname === '/dashboard' ? 'active' : ''}>
+             Overview
           </Link>
-          <Link href="/dashboard/create" className={pathname === '/dashboard/create' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
-            ✍️ Write Blog
+          <Link href="/dashboard/create" className={pathname === '/dashboard/create' ? 'active' : ''}>
+             Write Blog
           </Link>
-          <Link href="/dashboard/posts" className={pathname === '/dashboard/posts' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
-            📚 My Blogs
+          <Link href="/dashboard/posts" className={pathname === '/dashboard/posts' ? 'active' : ''}>
+             My Blogs
           </Link>
-          <Link href="/dashboard/categories" className={pathname === '/dashboard/categories' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
-            📁 Categories
+          <Link href="/dashboard/categories" className={pathname === '/dashboard/categories' ? 'active' : ''}>
+             Categories
           </Link>
-          <Link href="/dashboard/settings" className={pathname === '/dashboard/settings' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
-            ⚙️ Settings
-          </Link>
-          <button 
-            onClick={handleLogout}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              color: '#ff4d4d', 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '1rem', 
-              padding: '1rem', 
-              width: '100%',
-              cursor: 'pointer',
-              marginTop: 'auto'
-            }}
-          >
-            Logout
-          </button>
+          <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
+            <button 
+              onClick={handleLogout}
+              style={{ color: '#ef4444' }}
+            >
+              Logout
+            </button>
+          </div>
         </nav>
       </aside>
 
@@ -97,8 +86,9 @@ export default function DashboardLayout({
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
-            zIndex: 1001
+            background: 'rgba(15, 23, 42, 0.4)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 99
           }}
         />
       )}

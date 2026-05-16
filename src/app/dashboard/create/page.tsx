@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface FAQ {
   question: string;
@@ -8,18 +9,16 @@ interface FAQ {
 }
 
 export default function CreatePost() {
+  const router = useRouter();
   const [title, setTitle] = useState('');
+  const [shortDescription, setShortDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [content, setContent] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [categories, setCategories] = useState<{ id: string, name: string }[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [metaTitle, setMetaTitle] = useState('');
-  const [metaDescription, setMetaDescription] = useState('');
-  const [focusKeywords, setFocusKeywords] = useState('');
   const [showOnHome, setShowOnHome] = useState(true);
-  const [shortDescription, setShortDescription] = useState('');
   const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   useEffect(() => {
@@ -32,12 +31,9 @@ export default function CreatePost() {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setImageFiles(prev => [...prev, ...files]);
-      
       files.forEach(file => {
         const reader = new FileReader();
-        reader.onload = (event) => {
-          setPreviews(prev => [...prev, event.target?.result as string]);
-        };
+        reader.onload = (event) => setPreviews(prev => [...prev, event.target?.result as string]);
         reader.readAsDataURL(file);
       });
     }
@@ -48,14 +44,8 @@ export default function CreatePost() {
     setPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
-  const addFAQ = () => {
-    setFaqs([...faqs, { question: '', answer: '' }]);
-  };
-
-  const removeFAQ = (index: number) => {
-    setFaqs(faqs.filter((_, i) => i !== index));
-  };
-
+  const addFAQ = () => setFaqs([...faqs, { question: '', answer: '' }]);
+  const removeFAQ = (index: number) => setFaqs(faqs.filter((_, i) => i !== index));
   const updateFAQ = (index: number, field: 'question' | 'answer', value: string) => {
     const updatedFaqs = [...faqs];
     updatedFaqs[index][field] = value;
@@ -69,42 +59,20 @@ export default function CreatePost() {
     try {
       const formData = new FormData();
       formData.append('title', title);
-      formData.append('categoryId', categoryId);
-      formData.append('metaTitle', metaTitle);
-      formData.append('metaDescription', metaDescription);
-      formData.append('focusKeywords', focusKeywords);
-      formData.append('showOnHome', String(showOnHome));
       formData.append('shortDescription', shortDescription);
+      formData.append('categoryId', categoryId);
+      formData.append('showOnHome', String(showOnHome));
       formData.append('faqs', JSON.stringify(faqs));
-      
-      const contentWithSettings = `<post-settings size="${fontSize}" family="${fontFamily}" />\n` + content;
-      formData.append('content', contentWithSettings);
-      
-      imageFiles.forEach(file => {
-        formData.append('images', file);
-      });
+      formData.append('content', content);
+      imageFiles.forEach(file => formData.append('images', file));
 
-      const response = await fetch('/api/posts', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetch('/api/posts', { method: 'POST', body: formData });
 
       if (response.ok) {
         alert('Blog published successfully!');
-        setTitle('');
-        setContent('');
-        setCategoryId('');
-        setMetaTitle('');
-        setMetaDescription('');
-        setFocusKeywords('');
-        setImageFiles([]);
-        setPreviews([]);
-        setShowOnHome(true);
-        setShortDescription('');
-        setFaqs([]);
+        router.push('/dashboard/posts');
       } else {
-        const error = await response.json();
-        alert(`Failed to publish blog: ${error.error}`);
+        alert('Failed to publish blog.');
       }
     } catch (error) {
       alert('An error occurred while publishing.');
@@ -113,139 +81,127 @@ export default function CreatePost() {
     }
   };
 
-  const [fontSize, setFontSize] = useState('16px');
-  const [fontFamily, setFontFamily] = useState('Inter');
-  const [textColor, setTextColor] = useState('#000000');
-
-  const insertTag = (tagType: string) => {
-    const textarea = document.getElementById('blog-content-area') as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const selectedText = text.substring(start, end);
-
-    let replacement = '';
-    if (tagType === 'bold') replacement = `<b>${selectedText || 'bold text'}</b>`;
-    else if (tagType === 'link') {
-      const url = prompt('Enter the URL:', 'https://');
-      if (url === null) return;
-      replacement = `<back href="${url}">${selectedText || 'link text'}</back>`;
-    } else if (tagType === 'color') replacement = `<color val="${textColor}">${selectedText || 'colored text'}</color>`;
-    else if (tagType === 'underline') replacement = `<u>${selectedText || 'underlined text'}</u>`;
-    else if (tagType === 'no-underline') replacement = `<no-u>${selectedText || 'non-underlined text'}</no-u>`;
-    else if (tagType === 'code') replacement = `<code>${selectedText || '// write your code here'}</code>`;
-    else if (tagType === 'bullet-list') replacement = `<ul>\n  <li>${selectedText || 'Item 1'}</li>\n  <li>Item 2</li>\n</ul>`;
-    else if (tagType === 'number-list') replacement = `<ol>\n  <li>${selectedText || 'Item 1'}</li>\n  <li>Item 2</li>\n</ol>`;
-
-    const newContent = text.substring(0, start) + replacement + text.substring(end);
-    setContent(newContent);
-    
-    setTimeout(() => {
-      textarea.focus();
-      const newCursorPos = start + replacement.length;
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
-    }, 0);
-  };
-
   return (
-    <div>
-      <h1 className="mb-4">Write a New Masterpiece</h1>
+    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+        <div>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>Create New Blog</h1>
+            <p style={{ color: '#64748b' }}>Share your wisdom with the world in a premium style.</p>
+        </div>
+        <button onClick={() => router.back()} style={{ padding: '0.75rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+      </div>
       
-      <form onSubmit={handleSubmit} className="contact-form" style={{ background: 'white' }}>
-        <div className="form-group">
-          <label>Blog Title</label>
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter a catchy title..." required />
-        </div>
-
-        <div className="form-group">
-          <label>Short Description (Sub-title)</label>
-          <input type="text" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} placeholder="A brief catchphrase for the home page..." />
-        </div>
-
-        <div className="form-group">
-          <label>Category</label>
-          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ddd' }} required>
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-            <input type="checkbox" checked={showOnHome} onChange={(e) => setShowOnHome(e.target.checked)} style={{ width: 'auto' }} />
-            Show on Home Page
-          </label>
-        </div>
-
-        <div className="form-group">
-          <label>Upload Images</label>
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-            {previews.map((preview, i) => (
-              <div key={i} style={{ position: 'relative' }}>
-                <img src={preview} alt="preview" style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #eee' }} />
-                <button type="button" onClick={() => removeImage(i)} style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#ff4d4d', color: 'white', border: 'none', borderRadius: '50%', width: '25px', height: '25px', cursor: 'pointer' }}>x</button>
-              </div>
-            ))}
-            <label style={{ width: '120px', height: '120px', border: '2px dashed #ccc', borderRadius: '8px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-              <span style={{ fontSize: '1.5rem' }}>+</span>
-              Add Photo
-              <input type="file" hidden multiple onChange={handleImageChange} accept="image/*" />
-            </label>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>Content</label>
-          <div style={{ display: 'flex', gap: '0.5rem', padding: '0.5rem', background: '#f1f1f1', border: '1px solid #ddd', borderRadius: '4px 4px 0 0', flexWrap: 'wrap', alignItems: 'center' }}>
-            <button type="button" onClick={() => insertTag('bold')} style={{ padding: '0.4rem 0.8rem', fontWeight: 'bold' }}>B</button>
-            <button type="button" onClick={() => insertTag('underline')} style={{ padding: '0.4rem 0.8rem', textDecoration: 'underline' }}>U</button>
-            <button type="button" onClick={() => insertTag('link')} style={{ padding: '0.4rem 0.8rem' }}>🔗 Link</button>
-            <button type="button" onClick={() => insertTag('code')} style={{ padding: '0.4rem 0.8rem' }}>💻 Code</button>
-            <button type="button" onClick={() => insertTag('bullet-list')} style={{ padding: '0.4rem 0.8rem' }}>• List</button>
-            <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} style={{ width: '30px', height: '25px' }} />
-            <button type="button" onClick={() => insertTag('color')} style={{ fontSize: '0.8rem' }}>Apply Color</button>
-            <select value={fontSize} onChange={(e) => setFontSize(e.target.value)}>
-              {['12px', '14px', '16px', '18px', '20px', '24px', '32px'].map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
-          <textarea id="blog-content-area" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Write your blog content here..." style={{ minHeight: '400px', fontSize, fontFamily }} required></textarea>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="form-group" style={{ marginTop: '2rem', padding: '1.5rem', background: '#fff', borderRadius: '8px', border: '1px solid #eee' }}>
-          <h3 style={{ marginBottom: '1rem' }}>Frequently Asked Questions (FAQs)</h3>
-          {faqs.map((faq, index) => (
-            <div key={index} style={{ marginBottom: '1.5rem', padding: '1rem', border: '1px solid #f1f1f1', borderRadius: '8px', position: 'relative' }}>
-                <button type="button" onClick={() => removeFAQ(index)} style={{ position: 'absolute', top: '10px', right: '10px', color: 'red', border: 'none', background: 'none', cursor: 'pointer' }}>Remove</button>
-                <input 
-                    type="text" 
-                    placeholder="Question" 
-                    value={faq.question} 
-                    onChange={(e) => updateFAQ(index, 'question', e.target.value)} 
-                    style={{ marginBottom: '0.5rem', fontWeight: 'bold' }}
-                />
-                <textarea 
-                    placeholder="Answer" 
-                    value={faq.answer} 
-                    onChange={(e) => updateFAQ(index, 'answer', e.target.value)} 
-                    style={{ minHeight: '80px' }}
-                ></textarea>
-            </div>
-          ))}
-          <button type="button" onClick={addFAQ} className="btn btn-outline" style={{ fontSize: '0.9rem' }}>+ Add FAQ</button>
-        </div>
+      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2.5rem' }}>
         
-        <div className="form-group" style={{ marginTop: '2rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '8px' }}>
-          <h3 style={{ marginBottom: '1rem' }}>SEO Settings</h3>
-          <input type="text" value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} placeholder="SEO Title" style={{ marginBottom: '1rem' }} />
-          <textarea value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} placeholder="SEO Description" style={{ minHeight: '100px' }}></textarea>
+        {/* Left Column: Main Content */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                <div className="form-group" style={{ marginBottom: '2rem' }}>
+                    <label style={{ fontWeight: '700', fontSize: '0.9rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.75rem', display: 'block' }}>Blog Title</label>
+                    <input 
+                        type="text" 
+                        value={title} 
+                        onChange={(e) => setTitle(e.target.value)} 
+                        placeholder="Mastering the Art of Tech Guides..." 
+                        style={{ width: '100%', padding: '1.25rem', fontSize: '1.5rem', fontWeight: '700', border: 'none', background: '#f8fafc', borderRadius: '16px' }} 
+                        required 
+                    />
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '2rem' }}>
+                    <label style={{ fontWeight: '700', fontSize: '0.9rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.75rem', display: 'block' }}>Short Description</label>
+                    <input 
+                        type="text" 
+                        value={shortDescription} 
+                        onChange={(e) => setShortDescription(e.target.value)} 
+                        placeholder="A catchy sub-title for the home page..." 
+                        style={{ width: '100%', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px' }} 
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label style={{ fontWeight: '700', fontSize: '0.9rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.75rem', display: 'block' }}>Content</label>
+                    <textarea 
+                        value={content} 
+                        onChange={(e) => setContent(e.target.value)} 
+                        placeholder="Start writing your heart out..." 
+                        style={{ width: '100%', minHeight: '500px', padding: '1.25rem', border: '1px solid #e2e8f0', borderRadius: '16px', lineHeight: '1.8', fontSize: '1.1rem' }} 
+                        required
+                    ></textarea>
+                </div>
+            </div>
+
+            {/* FAQ Section */}
+            <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ fontWeight: '800' }}>FAQs</h3>
+                    <button type="button" onClick={addFAQ} style={{ color: '#ff4b91', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer' }}>+ Add Question</button>
+                </div>
+                {faqs.map((faq, index) => (
+                    <div key={index} style={{ marginBottom: '1.5rem', padding: '1.5rem', background: '#f8fafc', borderRadius: '16px', position: 'relative' }}>
+                        <button type="button" onClick={() => removeFAQ(index)} style={{ position: 'absolute', top: '1rem', right: '1rem', color: '#ef4444' }}>✕</button>
+                        <input 
+                            type="text" 
+                            placeholder="Question" 
+                            value={faq.question} 
+                            onChange={(e) => updateFAQ(index, 'question', e.target.value)} 
+                            style={{ marginBottom: '0.75rem', fontWeight: '700', border: 'none', background: 'transparent', width: '90%' }}
+                        />
+                        <textarea 
+                            placeholder="Answer" 
+                            value={faq.answer} 
+                            onChange={(e) => updateFAQ(index, 'answer', e.target.value)} 
+                            style={{ width: '100%', border: 'none', background: 'transparent', minHeight: '60px' }}
+                        ></textarea>
+                    </div>
+                ))}
+            </div>
         </div>
 
-        <button type="submit" className="btn btn-primary" disabled={isLoading}>{isLoading ? 'Publishing...' : 'Publish Post'}</button>
+        {/* Right Column: Settings */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ marginBottom: '1.5rem', fontWeight: '800' }}>Publishing Settings</h4>
+                
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Category</label>
+                    <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', border: '1px solid #e2e8f0' }} required>
+                        <option value="">Select Category</option>
+                        {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontWeight: '600' }}>
+                        <input type="checkbox" checked={showOnHome} onChange={(e) => setShowOnHome(e.target.checked)} style={{ width: '1.2rem', height: '1.2rem' }} />
+                        Show on Home Page
+                    </label>
+                </div>
+
+                <button type="submit" disabled={isLoading} style={{ width: '100%', padding: '1rem', background: '#0f172a', color: 'white', border: 'none', borderRadius: '12px', fontWeight: '700', fontSize: '1.1rem', cursor: 'pointer' }}>
+                    {isLoading ? 'Publishing...' : 'Publish Now'}
+                </button>
+            </div>
+
+            <div style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
+                <h4 style={{ marginBottom: '1.5rem', fontWeight: '800' }}>Visuals</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+                    {previews.map((preview, i) => (
+                        <div key={i} style={{ position: 'relative', aspectRatio: '1/1' }}>
+                            <img src={preview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }} />
+                            <button type="button" onClick={() => removeImage(i)} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(255,255,255,0.9)', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>✕</button>
+                        </div>
+                    ))}
+                    <label style={{ aspectRatio: '1/1', border: '2px dashed #e2e8f0', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
+                        <span style={{ fontSize: '1.5rem' }}>+</span>
+                        <input type="file" hidden multiple onChange={handleImageChange} accept="image/*" />
+                    </label>
+                </div>
+            </div>
+        </div>
+
       </form>
     </div>
   );
