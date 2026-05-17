@@ -115,7 +115,7 @@ export default function CreatePost() {
   };
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '1rem 0' }}>
+    <div style={{ padding: '1rem 0' }}>
       {/* Top Banner Header */}
       <div style={{ 
         display: 'flex', 
@@ -162,13 +162,7 @@ export default function CreatePost() {
           {/* Left Column: Main Content */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {/* Core Blog Editor Card */}
-            <div style={{ 
-              background: 'white', 
-              padding: '2.5rem', 
-              borderRadius: '16px', 
-              border: '1px solid #e2e8f0', 
-              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' 
-            }}>
+            <div className="dashboard-card" style={{ padding: '2.5rem' }}>
               <div style={{ marginBottom: '1.8rem' }}>
                 <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Blog Title</label>
                 <input 
@@ -483,13 +477,7 @@ export default function CreatePost() {
           {/* Right Column: Settings Sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {/* Publisher Box */}
-            <div style={{ 
-              background: 'white', 
-              padding: '2rem', 
-              borderRadius: '16px', 
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' 
-            }}>
+            <div className="dashboard-card" style={{ padding: '2rem' }}>
               <h4 style={{ margin: '0 0 1.2rem 0', fontWeight: '900', fontSize: '1.1rem', color: '#0f172a' }}>Publish Settings</h4>
               
               <div style={{ marginBottom: '1.5rem' }}>
@@ -562,13 +550,7 @@ export default function CreatePost() {
             </div>
 
             {/* Media Upload Card */}
-            <div style={{ 
-              background: 'white', 
-              padding: '2rem', 
-              borderRadius: '16px', 
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' 
-            }}>
+            <div className="dashboard-card" style={{ padding: '2rem' }}>
               <h4 style={{ margin: '0 0 0.3rem 0', fontWeight: '900', fontSize: '1.1rem', color: '#0f172a' }}>Blog Visuals</h4>
               <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 1.2rem 0' }}>Upload image graphics for your guide's cover and bodies.</p>
               

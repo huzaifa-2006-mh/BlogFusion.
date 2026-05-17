@@ -93,7 +93,7 @@ export default function CategoriesPage() {
       <h1 style={{ marginBottom: '2rem', fontSize: '2rem', fontWeight: '800' }}>Manage Categories</h1>
       
       {/* Create Category Section */}
-      <div style={{ background: 'white', padding: '2rem', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '2.5rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+      <div className="dashboard-card" style={{ padding: '2rem', marginBottom: '2.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', color: '#0f172a' }}>Create New Category</h2>
         <form onSubmit={handleCreateCategory} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
           <div style={{ flex: '1', minWidth: '250px' }}>
@@ -140,7 +140,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Categories Table Section */}
-      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+      <div className="dashboard-card" style={{ padding: '0', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '500px' }}>
             <thead>

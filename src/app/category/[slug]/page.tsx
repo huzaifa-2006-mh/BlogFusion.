@@ -55,31 +55,46 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               <div key={blockIdx} className="blog-layout" style={{ marginBottom: '3rem' }}>
                 {/* Left Column: Featured + Post 3 */}
                 <div className="featured-column" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-                  {/* Featured Post (Large Left) */}
-                  {block[0] && (
-                    <div className="featured-post">
-                      <Link href={`/blog/${block[0].slug}`}>
-                        <span style={{ 
-                          display: 'inline-block', 
-                          padding: '0.4rem 1.2rem', 
-                          border: '2px solid black', 
-                          fontWeight: '800', 
-                          textTransform: 'uppercase', 
-                          fontSize: '0.75rem',
-                          marginBottom: '1.5rem',
-                          boxShadow: '4px 4px 0px rgba(0,0,0,1)'
-                        }}>
-                          {block[0].category.name} &rarr;
-                        </span>
-                        <h2 style={{ fontSize: '2.5rem', lineHeight: '1.1', marginBottom: '0.5rem', fontWeight: '800' }}>
-                          {block[0].title}
-                        </h2>
-                        {block[0].shortDescription && (
-                          <p style={{ fontSize: '1.2rem', color: '#334155', fontWeight: '600', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-                              {block[0].shortDescription}
-                          </p>
-                        )}
-                      </Link>
+                      {/* Featured Post (Large Left) */}
+                      {block[0] && (
+                        <div className="featured-post">
+                          <Link href={`/category/${block[0].category.slug}`} style={{ textDecoration: 'none' }}>
+                            <span style={{ 
+                              display: 'inline-block', 
+                              padding: '0.4rem 1.2rem', 
+                              border: '2px solid black', 
+                              fontWeight: '800', 
+                              textTransform: 'uppercase', 
+                              fontSize: '0.75rem',
+                              marginBottom: '1.5rem',
+                              boxShadow: '4px 4px 0px rgba(0,0,0,1)',
+                              background: 'white',
+                              color: 'black',
+                              cursor: 'pointer',
+                              transition: 'transform 0.1s, box-shadow 0.1s'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                              e.currentTarget.style.boxShadow = '6px 6px 0px rgba(0,0,0,1)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = 'none';
+                              e.currentTarget.style.boxShadow = '4px 4px 0px rgba(0,0,0,1)';
+                            }}
+                            >
+                              {block[0].category.name} &rarr;
+                            </span>
+                          </Link>
+                          <Link href={`/blog/${block[0].slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <h2 style={{ fontSize: '2.5rem', lineHeight: '1.1', marginBottom: '0.5rem', fontWeight: '800' }}>
+                              {block[0].title}
+                            </h2>
+                            {block[0].shortDescription && (
+                              <p style={{ fontSize: '1.2rem', color: '#334155', fontWeight: '600', marginBottom: '1.5rem', fontStyle: 'italic' }}>
+                                  {block[0].shortDescription}
+                              </p>
+                            )}
+                          </Link>
                       <p style={{ fontSize: '1.1rem', color: '#64748b', lineHeight: '1.6' }}>{block[0].excerpt}</p>
                       {block[0].coverImage && (
                         <img src={block[0].coverImage} alt={block[0].title} style={{ width: '100%', borderRadius: '4px', marginTop: '2rem' }} />

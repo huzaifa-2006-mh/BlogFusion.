@@ -551,6 +551,22 @@ p {
   padding-left: 2rem;
 }
 
+/* Dashboard Card Component */
+.dashboard-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .dashboard-card {
+    padding: 1.25rem !important;
+    border-radius: 12px !important;
+  }
+}
+
 /* Dashboard Sidebar */
 .dashboard-container {
   display: grid;
@@ -705,8 +721,7 @@ p {
 .dashboard-main {
   flex: 1;
   padding: 2.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .mobile-nav-toggle {

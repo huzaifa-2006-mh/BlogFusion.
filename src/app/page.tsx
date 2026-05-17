@@ -86,7 +86,7 @@ export default async function Home() {
                       {/* Featured Post (Large Left) */}
                       {block[0] && (
                         <div className="featured-post">
-                          <Link href={`/blog/${block[0].slug}`}>
+                          <Link href={`/category/${category.slug}`} style={{ textDecoration: 'none' }}>
                             <span style={{ 
                               display: 'inline-block', 
                               padding: '0.4rem 1.2rem', 
@@ -96,10 +96,24 @@ export default async function Home() {
                               fontSize: '0.75rem',
                               marginBottom: '1.5rem',
                               boxShadow: '4px 4px 0px rgba(0,0,0,1)',
-                              background: 'white'
-                            }}>
+                              background: 'white',
+                              color: 'black',
+                              cursor: 'pointer',
+                              transition: 'transform 0.1s, box-shadow 0.1s'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = 'translate(-2px, -2px)';
+                              e.currentTarget.style.boxShadow = '6px 6px 0px rgba(0,0,0,1)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = 'none';
+                              e.currentTarget.style.boxShadow = '4px 4px 0px rgba(0,0,0,1)';
+                            }}
+                            >
                               {category.name} &rarr;
                             </span>
+                          </Link>
+                          <Link href={`/blog/${block[0].slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                             <h2 style={{ fontSize: '2.5rem', lineHeight: '1.1', marginBottom: '0.5rem', fontWeight: '800' }}>
                               {block[0].title}
                             </h2>
