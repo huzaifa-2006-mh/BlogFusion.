@@ -1,6 +1,13 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
+  const pathname = usePathname();
+  
+  if (pathname.startsWith('/dashboard') || pathname === '/login') return null;
+
   return (
     <header className="header">
       <div className="container nav">
