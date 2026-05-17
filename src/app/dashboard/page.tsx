@@ -68,45 +68,45 @@ export default async function DashboardHome() {
       <p className="mb-4">Here&apos;s a detailed look at your platform&apos;s performance.</p>
 
       {/* Main Stats Grid */}
-      <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
-        <div className="stats-card">
-          <p style={{ color: '#888', fontSize: '0.9rem' }}>Total Visitors</p>
-          <h3>{stats.totalVisitors}</h3>
+      <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1.5rem' }}>
+        <div className="stats-card" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', border: '1px solid #e2e8f0' }}>
+          <p style={{ color: '#64748b', fontSize: '0.95rem', fontWeight: 600 }}>Total Visitors</p>
+          <h3 style={{ color: '#0f172a' }}>{stats.totalVisitors}</h3>
         </div>
-        <div className="stats-card">
-          <p style={{ color: '#888', fontSize: '0.9rem' }}>Total Blog Reads</p>
-          <h3>{stats.totalReads}</h3>
+        <div className="stats-card" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', border: '1px solid #e2e8f0' }}>
+          <p style={{ color: '#64748b', fontSize: '0.95rem', fontWeight: 600 }}>Total Blog Reads</p>
+          <h3 style={{ color: '#0f172a' }}>{stats.totalReads}</h3>
         </div>
-        <div className="stats-card">
-          <p style={{ color: '#888', fontSize: '0.9rem' }}>Avg. Time Spent</p>
-          <h3>{formatTime(stats.avgTimeSpent)}</h3>
+        <div className="stats-card" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', border: '1px solid #e2e8f0' }}>
+          <p style={{ color: '#64748b', fontSize: '0.95rem', fontWeight: 600 }}>Avg. Time Spent</p>
+          <h3 style={{ color: '#0f172a' }}>{formatTime(stats.avgTimeSpent)}</h3>
         </div>
-        <div className="stats-card">
-          <p style={{ color: '#888', fontSize: '0.9rem' }}>Emails Collected</p>
-          <h3>{stats.uniqueEmails}</h3>
+        <div className="stats-card" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', border: '1px solid #e2e8f0' }}>
+          <p style={{ color: '#64748b', fontSize: '0.95rem', fontWeight: 600 }}>Emails Collected</p>
+          <h3 style={{ color: '#0f172a' }}>{stats.uniqueEmails}</h3>
         </div>
       </div>
 
-      <div className="card-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', marginTop: '1.5rem' }}>
-        <div className="stats-card" style={{ padding: '1.5rem' }}>
-          <p style={{ color: '#888', margin: 0 }}>Blogs Written</p>
-          <h3 style={{ fontSize: '2rem' }}>{stats.postCount}</h3>
+      <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+        <div className="stats-card" style={{ padding: '1.5rem', background: '#0f172a', color: 'white' }}>
+          <p style={{ color: '#94a3b8', margin: 0, fontWeight: 600 }}>Blogs Written</p>
+          <h3 style={{ fontSize: '2.5rem', color: 'white', marginTop: '0.5rem' }}>{stats.postCount}</h3>
         </div>
-        <div className="stats-card" style={{ padding: '1.5rem' }}>
-          <p style={{ color: '#888', margin: 0 }}>Active Categories</p>
-          <h3 style={{ fontSize: '2rem' }}>{stats.categoryCount}</h3>
+        <div className="stats-card" style={{ padding: '1.5rem', background: '#e11d48', color: 'white' }}>
+          <p style={{ color: '#ffe4e6', margin: 0, fontWeight: 600 }}>Active Categories</p>
+          <h3 style={{ fontSize: '2.5rem', color: 'white', marginTop: '0.5rem' }}>{stats.categoryCount}</h3>
         </div>
-        <div className="stats-card" style={{ padding: '1.5rem' }}>
-          <p style={{ color: '#888', margin: 0 }}>Platform Status</p>
-          <h3 style={{ fontSize: '2rem', color: '#10b981' }}>Live</h3>
+        <div className="stats-card" style={{ padding: '1.5rem', background: '#10b981', color: 'white' }}>
+          <p style={{ color: '#d1fae5', margin: 0, fontWeight: 600 }}>Platform Status</p>
+          <h3 style={{ fontSize: '2.5rem', color: 'white', marginTop: '0.5rem' }}>Live</h3>
         </div>
       </div>
 
       {/* Recent Activity Section */}
       <div className="section" style={{ padding: '2rem 0' }}>
-        <h2 className="mb-4">Recent Visitor Activity</h2>
-        <div className="card" style={{ padding: '0', overflowX: 'auto', border: '1px solid rgba(0,0,0,0.05)' }}>
-          <div style={{ minWidth: '600px' }}> {/* Ensure table doesn't squish too much */}
+        <h2 className="mb-4" style={{ fontSize: '1.5rem' }}>Recent Visitor Activity</h2>
+        <div className="card" style={{ padding: '0', overflowX: 'auto', WebkitOverflowScrolling: 'touch', border: '1px solid #e2e8f0', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+          <div style={{ minWidth: '700px' }}> {/* Ensure table doesn't squish too much */}
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
                 <tr style={{ background: 'rgba(10, 25, 47, 0.05)', borderBottom: '1px solid #eee' }}>

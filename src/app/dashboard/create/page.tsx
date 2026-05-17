@@ -19,11 +19,8 @@ export default function CreatePost() {
   const [previews, setPreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showOnHome, setShowOnHome] = useState(true);
-  const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
-  const [fontSize, setFontSize] = useState('');
-  const [fontFamily, setFontFamily] = useState('');
 
   useEffect(() => {
     fetch('/api/categories')
@@ -88,6 +85,37 @@ export default function CreatePost() {
     }, 0);
   };
 
+  const insertInlineStyle = (type: 'font-size' | 'font-family', value: string) => {
+    const textarea = document.getElementById('blog-content-area') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+
+    if (!selectedText) {
+      alert('Please select some text first to apply the style.');
+      return;
+    }
+
+    let replacement = '';
+    if (type === 'font-size') {
+      replacement = `<span style="font-size: ${value}px;">${selectedText}</span>`;
+    } else if (type === 'font-family') {
+      replacement = `<span style="font-family: ${value};">${selectedText}</span>`;
+    }
+
+    const newContent = text.substring(0, start) + replacement + text.substring(end);
+    setContent(newContent);
+    
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + replacement.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -99,12 +127,7 @@ export default function CreatePost() {
       formData.append('categoryId', categoryId);
       formData.append('showOnHome', String(showOnHome));
       formData.append('faqs', JSON.stringify(faqs));
-      
-      let finalContent = content;
-      if (fontSize || fontFamily) {
-        finalContent = `<post-settings size="${fontSize || '1.05rem'}" family="${fontFamily || 'inherit'}" />\n` + finalContent;
-      }
-      formData.append('content', finalContent);
+      formData.append('content', content);
       formData.append('metaTitle', metaTitle);
       formData.append('metaDescription', metaDescription);
       imageFiles.forEach(file => formData.append('images', file));
@@ -283,19 +306,23 @@ export default function CreatePost() {
                   ))}
                   </div>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <select value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.85rem' }}>
-                      <option value="">Default Font</option>
+                    <select value="" onChange={(e) => { if(e.target.value) insertInlineStyle('font-family', e.target.value) }} style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.85rem' }}>
+                      <option value="">Font Style</option>
                       <option value="Arial, sans-serif">Arial</option>
                       <option value="'Times New Roman', serif">Times New Roman</option>
                       <option value="'Courier New', monospace">Courier New</option>
                       <option value="Georgia, serif">Georgia</option>
+                      <option value="Verdana, sans-serif">Verdana</option>
+                      <option value="Tahoma, sans-serif">Tahoma</option>
+                      <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                      <option value="Impact, sans-serif">Impact</option>
+                      <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
                     </select>
-                    <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.85rem' }}>
-                      <option value="">Default Size</option>
-                      <option value="0.9rem">Small</option>
-                      <option value="1.05rem">Normal</option>
-                      <option value="1.15rem">Medium</option>
-                      <option value="1.3rem">Large</option>
+                    <select value="" onChange={(e) => { if(e.target.value) insertInlineStyle('font-size', e.target.value) }} style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.85rem' }}>
+                      <option value="">Size</option>
+                      {[12, 14, 16, 18, 20, 24, 28, 32, 36, 42, 48, 56, 64, 72].map(size => (
+                        <option key={size} value={size}>{size}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -312,9 +339,9 @@ export default function CreatePost() {
                     border: '1px solid #cbd5e1', 
                     borderRadius: '0 0 10px 10px', 
                     lineHeight: '1.75', 
-                    fontSize: fontSize || '1.05rem',
+                    fontSize: '1.05rem',
                     outline: 'none',
-                    fontFamily: fontFamily || 'inherit',
+                    fontFamily: 'inherit',
                     transition: 'border-color 0.2s'
                   }} 
                   onFocus={(e) => e.target.style.borderColor = '#0f172a'}
