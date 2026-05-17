@@ -1255,6 +1255,21 @@ p {
   background: #fdf2f8; /* Soft light-pink highlight matching the brand identity */
 }
 
+/* Responsive Editor Grid Layout for Create/Edit Blog Pages */
+.responsive-editor-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .responsive-editor-grid {
+    grid-template-columns: 2.3fr 1fr; /* Content editor (left) is 2.3x wider than sidebar settings (right) */
+    align-items: start;
+  }
+}
+
 .blog-content li {
   margin-bottom: 0.8rem !important;
   padding-left: 0.5rem !important;
