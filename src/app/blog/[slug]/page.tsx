@@ -132,68 +132,54 @@ export default async function BlogPostPage({ params }: any) {
           &larr; Back to Home
         </Link>
         
-        {/* Dynamic Detail Header (Beautifully Centered) */}
-        <header style={{ marginBottom: '3.5rem', textAlign: 'center' }}>
-          {/* Centered Date */}
-          <span style={{ 
-            fontSize: '0.875rem', 
-            color: '#64748b', 
-            fontWeight: '600', 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.05em', 
-            marginBottom: '0.8rem', 
-            display: 'block' 
-          }}>
-            {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-          </span>
-          
-          {/* Centered Title */}
+        {/* Dynamic Detail Header */}
+        <header style={{ marginBottom: '3rem', textAlign: 'left' }}>
+          {/* Left-aligned Category Tag Row */}
+          <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
+            <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
+              <span className="blog-detail-category-tag" style={{ marginBottom: 0 }}>#{post.category.slug}</span>
+            </Link>
+          </div>
+
+          {/* Title */}
           <h1 style={{ 
-            fontSize: 'clamp(2.2rem, 5vw, 3.2rem)', 
+            fontSize: 'clamp(1.7rem, 4vw, 2.4rem)', 
             fontWeight: '800', 
             color: '#0f172a',
             lineHeight: '1.25',
-            letterSpacing: '-0.03em',
-            margin: '0 auto 1.2rem auto',
-            maxWidth: '750px'
+            letterSpacing: '-0.02em',
+            marginBottom: '1rem',
+            maxWidth: '100%'
           }}>
             {post.title}
           </h1>
           
           {post.excerpt && (
             <p style={{ 
-              fontSize: '1.15rem', 
+              fontSize: '1.05rem', 
               color: '#475569', 
               lineHeight: '1.5', 
               fontWeight: '500',
-              margin: '0 auto 1.5rem auto',
-              maxWidth: '620px'
+              marginBottom: '1.5rem',
+              maxWidth: '100%'
             }}>
               {post.excerpt}
             </p>
           )}
 
-          {/* Centered Category Tag Row */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-            <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
-              <span className="blog-detail-category-tag" style={{ marginBottom: 0 }}>#{post.category.slug}</span>
-            </Link>
-          </div>
-
-          {/* Centered Author Meta Badge */}
+          {/* Left-Aligned Date & Author Meta Badge */}
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            justifyContent: 'center', 
-            gap: '0.8rem', 
+            justifyContent: 'flex-start', 
+            gap: '1rem', 
             borderTop: '1px solid #f1f5f9', 
             paddingTop: '1.25rem',
-            maxWidth: '450px',
-            margin: '0 auto'
+            maxWidth: '100%'
           }}>
             <div style={{ 
-              width: '38px', 
-              height: '38px', 
+              width: '42px', 
+              height: '42px', 
               borderRadius: '50%', 
               background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', 
               overflow: 'hidden', 
@@ -202,15 +188,21 @@ export default async function BlogPostPage({ params }: any) {
               justifyContent: 'center', 
               color: 'white', 
               fontWeight: '800',
-              fontSize: '0.95rem',
+              fontSize: '1rem',
               boxShadow: '0 4px 10px rgba(236,72,153,0.15)'
             }}>
-              {authorInitial}
+              {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
+                <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                authorInitial
+              )}
             </div>
             <div style={{ textAlign: 'left' }}>
-              <p style={{ margin: 0, fontWeight: '700', color: '#0f172a', fontSize: '0.9rem' }}>{authorName}</p>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: '500', marginTop: '0.05rem' }}>
-                {Math.ceil(post.content.length / 500)} min read
+              <p style={{ margin: 0, fontWeight: '600', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>
+                {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              </p>
+              <p style={{ margin: 0, fontWeight: '700', color: '#0f172a', fontSize: '0.95rem' }}>
+                Written by <span style={{ color: '#ec4899' }}>{authorName}</span>
               </p>
             </div>
           </div>
