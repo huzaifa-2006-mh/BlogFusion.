@@ -27,7 +27,7 @@ export default function MyPosts() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h1>My Blogs</h1>
         <Link href="/dashboard/create" className="btn btn-primary">
           + Write New Blog

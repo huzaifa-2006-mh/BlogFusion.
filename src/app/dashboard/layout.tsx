@@ -37,8 +37,8 @@ export default function DashboardLayout({
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <Link href="/" className="logo-link">
           <div className="logo-container" style={{ marginBottom: '2.5rem' }}>
-            <span className="logo-fallback" style={{ fontSize: '1.25rem', color: '#0f172a' }}>
-              Blog Fusion<span style={{ color: '#ff4b91' }}>.</span>
+            <span className="logo-text" style={{ fontSize: '1.5rem', background: 'linear-gradient(135deg, #ffffff 30%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Blog<span className="logo-accent">Fusion</span>
             </span>
           </div>
         </Link>

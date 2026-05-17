@@ -128,11 +128,46 @@ p {
   align-items: center;
 }
 
-.logo {
+.logo-text {
+  font-family: var(--heading-font);
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--secondary-color);
-  letter-spacing: -1px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--text-primary) 30%, #4f46e5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.logo-accent {
+  background: linear-gradient(135deg, var(--secondary-color) 30%, #ff4b91 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-text::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--secondary-color), #ff4b91);
+  transition: width 0.3s ease;
+}
+
+.logo-link:hover .logo-text {
+  transform: scale(1.02);
+}
+
+.logo-link:hover .logo-text::after {
+  width: 100%;
+}
+
+.nav-toggle-label {
+  display: none;
 }
 
 .nav-links {
@@ -210,25 +245,26 @@ p {
 }
 
 /* Minimal Footer Styles */
+/* Minimal Footer Styles (Compact - Reduced Height by 120px) */
 .footer-minimal {
   background-color: #fff;
-  padding: 2.5rem 0 1.5rem;
+  padding: 1.25rem 0;
   border-top: 1px solid #f3f4f6;
   text-align: center;
-  margin-top: 3rem;
+  margin-top: 1.5rem;
 }
 
 .footer-nav {
   display: flex;
   justify-content: center;
-  gap: 2rem;
-  margin-bottom: 2.5rem;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
 }
 
 .footer-nav a {
   color: #64748b;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
@@ -239,9 +275,9 @@ p {
 .footer-social {
   display: flex;
   justify-content: center;
-  gap: 2rem;
-  margin-bottom: 2.5rem;
-  font-size: 1.5rem;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
   color: #64748b;
 }
 
@@ -574,8 +610,39 @@ p {
 }
 
 .sidebar-nav a.active {
-  background-color: #0f172a;
+  background-color: #1e293b;
   color: #ffffff;
+}
+
+/* Responsive grids for Dashboard Forms and Home */
+.dashboard-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2.5rem;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 5rem;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .blog-layout {
+    grid-template-columns: 1fr !important;
+    gap: 3rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-grid {
+    gap: 2rem;
+  }
 }
 
 .dashboard-main {
@@ -750,15 +817,30 @@ p {
     background: var(--primary-color);
     flex-direction: column;
     align-items: center;
-    padding: 0;
-    padding-top: 1rem;
+    padding: 2rem 0;
+    padding-top: 5rem;
     transition: 0.3s;
     z-index: 999;
+  }
+
+  .nav-links a {
+    color: white !important;
+    font-size: 1.25rem;
+    padding: 1rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-links a:hover {
+    color: var(--secondary-color) !important;
   }
   
   .nav-close {
     display: block;
     width: 100%;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
   }
   
   #nav-toggle:checked ~ .nav-links {
@@ -774,8 +856,8 @@ p {
   .nav-toggle-label span::before,
   .nav-toggle-label span::after {
     display: block;
-    background: white;
-    height: 2px;
+    background: var(--text-primary);
+    height: 2.5px;
     width: 25px;
     position: relative;
     transition: 0.2s;
@@ -787,8 +869,8 @@ p {
     position: absolute;
   }
   
-  .nav-toggle-label span::before { bottom: 7px; }
-  .nav-toggle-label span::after { top: 7px; }
+  .nav-toggle-label span::before { bottom: 8px; }
+  .nav-toggle-label span::after { top: 8px; }
 
   .hero h1 {
     font-size: 2.2rem;

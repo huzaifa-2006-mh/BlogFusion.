@@ -6,7 +6,9 @@ const Navbar = () => {
       <div className="container nav">
         <Link href="/" className="logo-link">
           <div className="logo-container">
-            <span className="logo-fallback" style={{ color: 'var(--text-primary)' }}>Blog <span className="highlight" style={{ color: 'var(--secondary-color)' }}>Fusion</span></span>
+            <span className="logo-text">
+              Blog<span className="logo-accent">Fusion</span>
+            </span>
           </div>
         </Link>
         

@@ -20,6 +20,8 @@ export default function CreatePost() {
   const [isLoading, setIsLoading] = useState(false);
   const [showOnHome, setShowOnHome] = useState(true);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [metaTitle, setMetaTitle] = useState('');
+  const [metaDescription, setMetaDescription] = useState('');
 
   useEffect(() => {
     fetch('/api/categories')
@@ -93,6 +95,8 @@ export default function CreatePost() {
       formData.append('showOnHome', String(showOnHome));
       formData.append('faqs', JSON.stringify(faqs));
       formData.append('content', content);
+      formData.append('metaTitle', metaTitle);
+      formData.append('metaDescription', metaDescription);
       imageFiles.forEach(file => formData.append('images', file));
 
       const response = await fetch('/api/posts', { method: 'POST', body: formData });
@@ -120,7 +124,7 @@ export default function CreatePost() {
         <button onClick={() => router.back()} style={{ padding: '0.75rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
       </div>
       
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2.5rem' }}>
+      <form onSubmit={handleSubmit} className="dashboard-form-grid">
         
         {/* Left Column: Main Content */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -169,6 +173,30 @@ export default function CreatePost() {
                         required
                     ></textarea>
                     <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.5rem' }}>💡 Tip: Use [IMAGE] to place uploaded photos in text.</p>
+                </div>
+            </div>
+
+            {/* SEO Settings Card */}
+            <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                <h3 style={{ fontWeight: '800', marginBottom: '1.5rem', color: '#0f172a' }}>SEO & Search Engine Metadata</h3>
+                <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                    <label style={{ fontWeight: '700', fontSize: '0.9rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.75rem', display: 'block' }}>Meta Title</label>
+                    <input 
+                        type="text" 
+                        value={metaTitle} 
+                        onChange={(e) => setMetaTitle(e.target.value)} 
+                        placeholder="SEO Title (defaults to blog title if left empty)" 
+                        style={{ width: '100%', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px' }} 
+                    />
+                </div>
+                <div className="form-group">
+                    <label style={{ fontWeight: '700', fontSize: '0.9rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.75rem', display: 'block' }}>Meta Description</label>
+                    <textarea 
+                        value={metaDescription} 
+                        onChange={(e) => setMetaDescription(e.target.value)} 
+                        placeholder="SEO Description snippet for Google search results..." 
+                        style={{ width: '100%', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px', minHeight: '80px', fontFamily: 'inherit' }} 
+                    ></textarea>
                 </div>
             </div>
 

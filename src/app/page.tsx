@@ -37,15 +37,15 @@ export default async function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="hero" style={{ padding: '4rem 0' }}>
+      <section className="hero" style={{ padding: '3rem 0' }}>
         <div className="container">
           <span className="hero-label">Tech à la carte</span>
-          <h1 style={{ fontSize: '3rem', marginBottom: '1.2rem' }}>Blog Fusion</h1>
-          <p className="lead" style={{ marginBottom: '3rem', fontSize: '1.1rem' }}>
+          <h1 style={{ marginBottom: '1.2rem' }}>Blog Fusion</h1>
+          <p className="lead" style={{ marginBottom: '2rem', fontSize: '1.1rem' }}>
             Trusted tech guides and practical software tools. Helping millions work smarter since 2020.
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '5rem', alignItems: 'start' }}>
+          <div className="hero-grid">
             {/* Left Column: Description */}
             <div style={{ fontSize: '1rem', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
                 <p style={{ marginBottom: '1.5rem' }}>

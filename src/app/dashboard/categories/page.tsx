@@ -44,7 +44,8 @@ export default function CategoriesPage() {
       <h1 style={{ marginBottom: '2rem', fontSize: '2rem', fontWeight: '800' }}>Manage Categories</h1>
       
       <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '500px' }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
               <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#64748b' }}>Category Name</th>
@@ -72,6 +73,7 @@ export default function CategoriesPage() {
             ))}
           </tbody>
         </table>
+        </div>
         {categories.length === 0 && (
           <div style={{ padding: '4rem', textAlign: 'center', color: '#94a3b8' }}>
             No categories found.
