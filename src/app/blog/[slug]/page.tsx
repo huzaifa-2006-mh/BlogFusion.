@@ -132,24 +132,30 @@ export default async function BlogPostPage({ params }: any) {
           &larr; Back to Home
         </Link>
         
-        {/* Dynamic Detail Header */}
-        <header style={{ marginBottom: '3rem', textAlign: 'left' }}>
-          {/* Left-aligned Category Tag Row */}
-          <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
-            <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
-              <span className="blog-detail-category-tag" style={{ marginBottom: 0 }}>#{post.category.slug}</span>
-            </Link>
-          </div>
-
-          {/* Title */}
+        {/* Dynamic Detail Header (Beautifully Centered) */}
+        <header style={{ marginBottom: '3.5rem', textAlign: 'center' }}>
+          {/* Centered Date */}
+          <span style={{ 
+            fontSize: '0.875rem', 
+            color: '#64748b', 
+            fontWeight: '600', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.05em', 
+            marginBottom: '0.8rem', 
+            display: 'block' 
+          }}>
+            {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </span>
+          
+          {/* Centered Title */}
           <h1 style={{ 
-            fontSize: 'clamp(1.7rem, 4vw, 2.4rem)', 
+            fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', 
             fontWeight: '800', 
             color: '#0f172a',
             lineHeight: '1.25',
-            letterSpacing: '-0.02em',
-            marginBottom: '1rem',
-            maxWidth: '100%'
+            letterSpacing: '-0.03em',
+            margin: '0 auto 1.2rem auto',
+            maxWidth: '750px'
           }}>
             {post.title}
           </h1>
@@ -160,51 +166,18 @@ export default async function BlogPostPage({ params }: any) {
               color: '#475569', 
               lineHeight: '1.5', 
               fontWeight: '500',
-              marginBottom: '1.5rem',
-              maxWidth: '100%'
+              margin: '0 auto 1.5rem auto',
+              maxWidth: '620px'
             }}>
               {post.excerpt}
             </p>
           )}
 
-          {/* Left-Aligned Date & Author Meta Badge */}
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'flex-start', 
-            gap: '1rem', 
-            borderTop: '1px solid #f1f5f9', 
-            paddingTop: '1.25rem',
-            maxWidth: '100%'
-          }}>
-            <div style={{ 
-              width: '42px', 
-              height: '42px', 
-              borderRadius: '50%', 
-              background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', 
-              overflow: 'hidden', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              color: 'white', 
-              fontWeight: '800',
-              fontSize: '1rem',
-              boxShadow: '0 4px 10px rgba(236,72,153,0.15)'
-            }}>
-              {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
-                <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                authorInitial
-              )}
-            </div>
-            <div style={{ textAlign: 'left' }}>
-              <p style={{ margin: 0, fontWeight: '600', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.2rem' }}>
-                {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-              </p>
-              <p style={{ margin: 0, fontWeight: '700', color: '#0f172a', fontSize: '0.95rem' }}>
-                Written by <span style={{ color: '#ec4899' }}>{authorName}</span>
-              </p>
-            </div>
+          {/* Centered Category Tag Row */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
+              <span className="blog-detail-category-tag" style={{ marginBottom: 0 }}>#{post.category.slug}</span>
+            </Link>
           </div>
         </header>
 
@@ -245,6 +218,52 @@ export default async function BlogPostPage({ params }: any) {
             </div>
           </div>
         )}
+
+        {/* Premium Author Bio Box */}
+        <div style={{ 
+          marginTop: '5rem', 
+          padding: '2rem', 
+          background: '#f8fafc', 
+          borderRadius: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '1.5rem',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
+        }}>
+          <div style={{ 
+            width: '75px', 
+            height: '75px', 
+            borderRadius: '50%', 
+            background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', 
+            overflow: 'hidden', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: 'white', 
+            fontWeight: '800',
+            fontSize: '1.8rem',
+            boxShadow: '0 8px 20px rgba(236,72,153,0.2)',
+            flexShrink: 0
+          }}>
+            {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
+              <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              authorInitial
+            )}
+          </div>
+          <div>
+            <h3 style={{ margin: '0 0 0.4rem 0', fontWeight: '800', color: '#0f172a', fontSize: '1.3rem' }}>
+              Written by <span style={{ color: '#ec4899' }}>{authorName}</span>
+            </h3>
+            <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
+              {authorName.toLowerCase().includes('marium') ? 
+                "Marium is an expert author and contributor at Digital Inspiration, bringing you the best insights and guides." :
+                "Huzaifa is a passionate developer and the lead voice behind Digital Inspiration. He loves exploring new technologies and sharing his knowledge."
+              }
+            </p>
+          </div>
+        </div>
 
         {/* Sharing Ribbon */}
         <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f1f5f9', marginTop: '4rem' }}>
