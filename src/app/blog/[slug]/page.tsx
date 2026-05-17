@@ -4,6 +4,18 @@ import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
 
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const posts = await prisma.post.findMany({
+    where: { published: true },
+    select: { slug: true }
+  });
+  return posts.map((post) => ({
+    slug: post.slug
+  }));
+}
+
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
@@ -14,12 +26,12 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
   if (!post) {
     return {
-      title: 'Post Not Found - BlogFusion'
+      title: 'Post Not Found - Digital Inspiration'
     };
   }
 
   return {
-    title: post.metaTitle || `${post.title} - BlogFusion`,
+    title: post.metaTitle || `${post.title} - Digital Inspiration`,
     description: post.metaDescription || post.excerpt,
     keywords: post.focusKeywords || undefined,
     openGraph: {
@@ -32,7 +44,6 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 }
 
 export default async function BlogPostPage({ params }: any) {
-  // @ts-ignore
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
 
@@ -49,17 +60,14 @@ export default async function BlogPostPage({ params }: any) {
   }
 
   // Increment view count in background
-  // @ts-ignore
   prisma.post.update({
     where: { id: post.id },
     data: { views: { increment: 1 } }
   }).catch(err => console.error("Error updating views:", err));
 
-  // Ensure author exists before accessing
   const authorName = post.author?.username || "Admin";
-  const authorInitial = authorName[0]?.toUpperCase() || "A";
+  const authorInitial = authorName[0]?.toUpperCase() || "D";
 
-  // Logic to handle custom tags and font styles
   let content = post.content;
   
   // Extract font settings if present: <post-settings size="20px" family="Arial" />
@@ -70,23 +78,21 @@ export default async function BlogPostPage({ params }: any) {
       fontSize: fontSettingsMatch[1],
       fontFamily: fontSettingsMatch[2]
     };
-    // Remove the settings tag from content
     content = content.replace(/<post-settings .*? \/>/, '');
   }
 
   // Replace <back href="..."> with <a>
-  let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: inherit;">$2</a>');
+  let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
   
   // Handle <color val="..."> tag
   processedContent = processedContent.replace(/<color val="(.*?)">(.*?)<\/color>/g, '<span style="color: $1">$2</span>');
 
-  // Handle <u> (underline) and <no-u> (remove underline)
+  // Handle <u> and <no-u>
   processedContent = processedContent.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline">$1</span>');
   processedContent = processedContent.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none">$1</span>');
 
-  // Handle <b> (already standard, but ensuring it's not messed up)
   // Replace Markdown-like headings
-  processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2 style="margin-top: 2rem; margin-bottom: 1rem; font-size: 1.8rem; color: var(--primary-color);">$1</h2>');
+  processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
 
   // Handle <code> tags with newline preservation
   const codeBlocks: string[] = [];
@@ -109,7 +115,7 @@ export default async function BlogPostPage({ params }: any) {
   let imageIndex = 0;
   while (processedContent.includes('[IMAGE]') && imageIndex < inlineImages.length) {
     const imgHtml = `
-      <div class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+      <div class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
         <img src="${inlineImages[imageIndex]}" alt="Blog image ${imageIndex + 1}" style="width: 100%; height: auto; display: block;" />
       </div>
     `;
@@ -118,49 +124,87 @@ export default async function BlogPostPage({ params }: any) {
   }
 
   return (
-    <article className="section">
-      <div className="container" style={{ maxWidth: '900px' }}>
-        <Link href="/" className="highlight" style={{ marginBottom: '2rem', display: 'inline-block' }}>
+    <article className="section" style={{ padding: '4rem 0 6rem 0' }}>
+      <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1.5rem' }}>
+        
+        {/* Compact Back Button */}
+        <Link href="/" className="back-link">
           &larr; Back to Home
         </Link>
         
-        <header className="mb-4">
-          <span className="card-category">{post.category.name}</span>
-          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', marginTop: '1rem', lineHeight: '1.2' }}>{post.title}</h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
-            <div style={{ width: '45px', height: '45px', borderRadius: '50%', background: 'var(--primary-color)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
+        {/* Dynamic Detail Header */}
+        <header style={{ marginBottom: '2.5rem' }}>
+          <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
+            <span className="blog-detail-category-tag">#{post.category.slug}</span>
+          </Link>
+          
+          <h1 style={{ 
+            fontSize: 'clamp(2rem, 4.5vw, 3rem)', 
+            fontWeight: '800',
+            marginTop: '0.5rem', 
+            color: '#0f172a',
+            lineHeight: '1.2',
+            letterSpacing: '-0.03em'
+          }}>
+            {post.title}
+          </h1>
+          
+          {post.excerpt && (
+            <p style={{ fontSize: '1.15rem', color: '#475569', marginTop: '0.8rem', lineHeight: '1.5', fontWeight: '500' }}>
+              {post.excerpt}
+            </p>
+          )}
+
+          {/* Premium Author Meta Badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
+            <div style={{ 
+              width: '46px', 
+              height: '46px', 
+              borderRadius: '50%', 
+              background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', 
+              overflow: 'hidden', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              color: 'white', 
+              fontWeight: '800',
+              fontSize: '1.1rem',
+              boxShadow: '0 4px 10px rgba(236,72,153,0.2)'
+            }}>
               {authorInitial}
             </div>
             <div>
-              <p style={{ margin: 0, fontWeight: '600', color: 'var(--primary-color)' }}>{authorName}</p>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#888' }}>
+              <p style={{ margin: 0, fontWeight: '700', color: '#0f172a', fontSize: '0.95rem' }}>{authorName}</p>
+              <p style={{ margin: 0, fontSize: '0.825rem', color: '#64748b', fontWeight: '500', marginTop: '0.1rem' }}>
                 {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} • {Math.ceil(post.content.length / 500)} min read
               </p>
             </div>
           </div>
         </header>
 
+        {/* Sleek Hero Cover Image */}
         {post.coverImage && (
-          <div className="featured-image" style={{ width: '100%', height: 'auto', maxHeight: '500px', marginBottom: '3rem', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}>
+          <div className="featured-image" style={{ width: '100%', height: 'auto', maxHeight: '480px', marginBottom: '3rem', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 12px 30px rgba(0,0,0,0.06)' }}>
             <img src={post.coverImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
         )}
 
-        <div className="blog-content" style={{ fontSize: '1.25rem', lineHeight: '1.8', color: '#333', ...customStyles }}>
+        {/* Clean Reading Box */}
+        <div className="blog-content" style={{ ...customStyles }}>
           <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
 
-        {/* FAQ Section */}
+        {/* Premium FAQ Card Accordions */}
         {post.faqs && (post.faqs as any[]).length > 0 && (
-          <div style={{ marginTop: '5rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-            <h2 style={{ marginBottom: '2rem', fontSize: '2rem', color: 'var(--primary-color)', textAlign: 'center' }}>Frequently Asked Questions</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ marginTop: '4.5rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+            <h2 style={{ marginBottom: '1.8rem', fontSize: '1.6rem', color: '#0f172a', textAlign: 'center', fontWeight: '800', letterSpacing: '-0.02em' }}>Frequently Asked Questions</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {(post.faqs as any[]).map((faq, index) => (
-                <div key={index} style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-                  <h4 style={{ color: 'var(--text-primary)', fontSize: '1.15rem', marginBottom: '0.75rem', display: 'flex', gap: '0.75rem' }}>
-                    <span style={{ color: 'var(--accent-color)' }}>Q:</span> {faq.question}
+                <div key={index} style={{ background: 'white', padding: '1.25rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
+                  <h4 style={{ color: '#0f172a', fontWeight: '700', fontSize: '1.02rem', marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                    <span style={{ color: '#ec4899', fontWeight: '800' }}>Q:</span> {faq.question}
                   </h4>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6', margin: 0 }}>
+                  <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.5', margin: 0, fontWeight: '500' }}>
                     {faq.answer}
                   </p>
                 </div>
@@ -169,13 +213,13 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         )}
 
-        {/* Display remaining gallery images at the bottom if not used inline */}
+        {/* Remaining Gallery Display */}
         {imageIndex < inlineImages.length && (
           <div style={{ marginTop: '4rem' }}>
-            <h3>Gallery</h3>
-            <div className="card-grid" style={{ marginTop: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.5rem' }}>Post Gallery</h3>
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
               {inlineImages.slice(imageIndex).map((img, index) => (
-                <div key={index} className="card" style={{ height: '250px' }}>
+                <div key={index} style={{ height: '220px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
                   <img src={img} alt={`Gallery ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ))}
@@ -183,8 +227,9 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         )}
 
-        <div className="mt-4 pt-4" style={{ borderTop: '1px solid #eee', marginTop: '5rem' }}>
-          <h3>Share this wisdom:</h3>
+        {/* Sharing Ribbon */}
+        <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f1f5f9', marginTop: '4rem' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginBottom: '1rem' }}>Share this post:</h3>
           <ShareButtons title={post.title} />
         </div>
       </div>
