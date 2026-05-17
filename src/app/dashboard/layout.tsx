@@ -30,41 +30,57 @@ export default function DashboardLayout({
 
   return (
     <div className="dashboard-container">
-      <button className="mobile-nav-toggle" onClick={toggleSidebar}>
-        {isSidebarOpen ? '✕' : '☰'}
-      </button>
+      {/* Mobile Top Header Bar */}
+      <header className="dashboard-mobile-header">
+        <Link href="/" className="logo-link">
+          <span className="logo-text" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'white' }}>
+            Blog<span style={{ color: '#e11d48' }}>Fusion</span>
+          </span>
+        </Link>
+        <button className="dashboard-mobile-menu-btn" onClick={toggleSidebar} aria-label="Toggle Navigation">
+          {isSidebarOpen ? '✕' : '☰'}
+        </button>
+      </header>
 
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <Link href="/" className="logo-link">
-          <div className="logo-container" style={{ marginBottom: '2.5rem' }}>
-            <span className="logo-text" style={{ fontSize: '1.5rem', background: 'linear-gradient(135deg, #ffffff 30%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Blog<span className="logo-accent">Fusion</span>
-            </span>
-          </div>
-        </Link>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+          <Link href="/" className="logo-link" onClick={() => setIsSidebarOpen(false)}>
+            <div className="logo-container">
+              <span className="logo-text" style={{ fontSize: '1.5rem', background: 'linear-gradient(135deg, #ffffff 30%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Blog<span style={{ color: '#e11d48' }}>Fusion</span>
+              </span>
+            </div>
+          </Link>
+          <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)} aria-label="Close Navigation">
+            ✕
+          </button>
+        </div>
         
-        <div style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px', marginBottom: '2rem', border: '1px solid #e2e8f0' }}>
-          <p style={{ color: '#64748b', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Admin</p>
-          <p style={{ fontWeight: '700', color: '#0f172a', fontSize: '0.9rem' }}>{username || 'Huzaifa'}</p>
+        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Admin</p>
+          <p style={{ fontWeight: '700', color: '#ffffff', fontSize: '0.9rem' }}>{username || 'Huzaifa'}</p>
         </div>
 
         <nav className="sidebar-nav">
-          <Link href="/dashboard" className={pathname === '/dashboard' ? 'active' : ''}>
+          <Link href="/dashboard" className={pathname === '/dashboard' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
              Overview
           </Link>
-          <Link href="/dashboard/create" className={pathname === '/dashboard/create' ? 'active' : ''}>
+          <Link href="/dashboard/create" className={pathname === '/dashboard/create' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
              Write Blog
           </Link>
-          <Link href="/dashboard/posts" className={pathname === '/dashboard/posts' ? 'active' : ''}>
+          <Link href="/dashboard/posts" className={pathname === '/dashboard/posts' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
              My Blogs
           </Link>
-          <Link href="/dashboard/categories" className={pathname === '/dashboard/categories' ? 'active' : ''}>
+          <Link href="/dashboard/categories" className={pathname === '/dashboard/categories' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
              Categories
           </Link>
           <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
             <button 
-              onClick={handleLogout}
-              style={{ color: '#ef4444' }}
+              onClick={() => {
+                setIsSidebarOpen(false);
+                handleLogout();
+              }}
+              style={{ color: '#ef4444', width: '100%', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
               Logout
             </button>
@@ -76,7 +92,7 @@ export default function DashboardLayout({
         {children}
       </main>
 
-      {/* Overlay for mobile */}
+      {/* Backdrop overlay for mobile sidebar */}
       {isSidebarOpen && (
         <div 
           onClick={() => setIsSidebarOpen(false)}
@@ -86,9 +102,9 @@ export default function DashboardLayout({
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(15, 23, 42, 0.4)',
-            backdropFilter: 'blur(4px)',
-            zIndex: 99
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(5px)',
+            zIndex: 999
           }}
         />
       )}

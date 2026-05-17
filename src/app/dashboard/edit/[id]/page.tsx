@@ -196,7 +196,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       
       <form onSubmit={handleSubmit} className="dashboard-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem' }}>
         {/* Responsive Grid layout for Dashboard Forms */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: '2rem' }} className="responsive-editor-grid">
+        <div className="responsive-editor-grid">
           
           {/* Left Column: Main Content */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
