@@ -84,6 +84,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       replacement = `<back href="${url}">${selectedText || 'link text'}</back>`;
     } else if (tagType === 'code') replacement = `<code>${selectedText || '// code here'}</code>`;
     else if (tagType === 'bullet-list') replacement = `<ul>\n  <li>${selectedText || 'Item'}</li>\n</ul>`;
+    else if (tagType === 'space') replacement = `<spacer />`;
 
     const newContent = text.substring(0, start) + replacement + text.substring(end);
     setContent(newContent);
@@ -272,7 +273,8 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                     { label: 'U', tag: 'underline', title: 'Underlined Text' },
                     { label: '🔗 Link', tag: 'link', title: 'Insert Backlink' },
                     { label: '💻 Code', tag: 'code', title: 'Insert Code Block' },
-                    { label: '• List', tag: 'bullet-list', title: 'Unordered List' }
+                    { label: '• List', tag: 'bullet-list', title: 'Unordered List' },
+                    { label: '↕ Space', tag: 'space', title: 'Insert Vertical Space' }
                   ].map((btn) => (
                     <button 
                       key={btn.tag}

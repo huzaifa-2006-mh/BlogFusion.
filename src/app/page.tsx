@@ -101,7 +101,6 @@ export default async function Home() {
                               </p>
                             )}
                           </Link>
-                          <p style={{ fontSize: '1.1rem', color: '#64748b', lineHeight: '1.6' }}>{block[0].excerpt}</p>
                           {block[0].coverImage && (
                             <img src={block[0].coverImage} alt={block[0].title} style={{ width: '100%', borderRadius: '4px', marginTop: '2rem' }} />
                           )}
@@ -121,7 +120,6 @@ export default async function Home() {
                                 </p>
                             )}
                           </Link>
-                          <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: '1.4' }}>{block[3].excerpt}</p>
                         </article>
                       )}
                     </div>
@@ -140,7 +138,6 @@ export default async function Home() {
                                 </p>
                             )}
                           </Link>
-                          <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: '1.4' }}>{post.excerpt}</p>
                         </article>
                       ))}
                     </div>

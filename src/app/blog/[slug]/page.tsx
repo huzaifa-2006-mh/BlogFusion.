@@ -91,6 +91,9 @@ export default async function BlogPostPage({ params }: any) {
   processedContent = processedContent.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline">$1</span>');
   processedContent = processedContent.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none">$1</span>');
 
+  // Handle <spacer /> tag
+  processedContent = processedContent.replace(/<spacer \/>/g, '<div style="height: 1.5rem;" class="blog-spacer"></div>');
+
   // Replace Markdown-like headings
   processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
 
@@ -149,18 +152,18 @@ export default async function BlogPostPage({ params }: any) {
           
           {/* Centered Title */}
           <h1 style={{ 
-            fontSize: 'clamp(1.8rem, 4.5vw, 2.8rem)', 
+            fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)', 
             fontWeight: '800', 
             color: '#0f172a',
             lineHeight: '1.25',
-            letterSpacing: '-0.03em',
+            letterSpacing: '-0.02em',
             margin: '0 auto 1.2rem auto',
             maxWidth: '750px'
           }}>
             {post.title}
           </h1>
           
-          {post.excerpt && (
+          {post.shortDescription && (
             <p style={{ 
               fontSize: '1.05rem', 
               color: '#475569', 
@@ -169,7 +172,7 @@ export default async function BlogPostPage({ params }: any) {
               margin: '0 auto 1.5rem auto',
               maxWidth: '620px'
             }}>
-              {post.excerpt}
+              {post.shortDescription}
             </p>
           )}
 
