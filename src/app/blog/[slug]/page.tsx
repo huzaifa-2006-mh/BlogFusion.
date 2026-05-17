@@ -95,6 +95,8 @@ export default async function BlogPostPage({ params }: any) {
   processedContent = processedContent.replace(/<spacer \/>/g, '<div style="height: 1.5rem;" class="blog-spacer"></div>');
 
   // Replace Markdown-like headings
+  processedContent = processedContent.replace(/^###\s+(.*)$/gm, '<h4>$1</h4>');
+  processedContent = processedContent.replace(/^##\s+(.*)$/gm, '<h3>$1</h3>');
   processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
 
   // Handle <code> tags with newline preservation

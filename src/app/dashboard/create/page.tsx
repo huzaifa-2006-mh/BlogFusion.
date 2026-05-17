@@ -22,6 +22,8 @@ export default function CreatePost() {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
+  const [fontSize, setFontSize] = useState('');
+  const [fontFamily, setFontFamily] = useState('');
 
   useEffect(() => {
     fetch('/api/categories')
@@ -64,7 +66,9 @@ export default function CreatePost() {
     const selectedText = text.substring(start, end);
 
     let replacement = '';
-    if (tagType === 'bold') replacement = `<b>${selectedText || 'bold text'}</b>`;
+    if (tagType === 'h2') replacement = `# ${selectedText || 'Heading'}`;
+    else if (tagType === 'h3') replacement = `## ${selectedText || 'Subheading'}`;
+    else if (tagType === 'bold') replacement = `<b>${selectedText || 'bold text'}</b>`;
     else if (tagType === 'underline') replacement = `<u>${selectedText || 'underlined text'}</u>`;
     else if (tagType === 'link') {
       const url = prompt('Enter the URL:', 'https://');
@@ -95,7 +99,12 @@ export default function CreatePost() {
       formData.append('categoryId', categoryId);
       formData.append('showOnHome', String(showOnHome));
       formData.append('faqs', JSON.stringify(faqs));
-      formData.append('content', content);
+      
+      let finalContent = content;
+      if (fontSize || fontFamily) {
+        finalContent = `<post-settings size="${fontSize || '1.05rem'}" family="${fontFamily || 'inherit'}" />\n` + finalContent;
+      }
+      formData.append('content', finalContent);
       formData.append('metaTitle', metaTitle);
       formData.append('metaDescription', metaDescription);
       imageFiles.forEach(file => formData.append('images', file));
@@ -221,16 +230,22 @@ export default function CreatePost() {
                 {/* Custom Rich Text Action Bar */}
                 <div style={{ 
                   display: 'flex', 
-                  gap: '0.4rem', 
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-between',
+                  gap: '1rem',
+                  alignItems: 'center',
                   marginBottom: '0.5rem', 
-                  padding: '0.4rem', 
+                  padding: '0.6rem', 
                   background: '#f1f5f9', 
                   borderRadius: '8px 8px 0 0', 
                   border: '1px solid #cbd5e1',
                   borderBottom: 'none'
                 }}>
-                  {[
-                    { label: 'B', tag: 'bold', title: 'Bold Text' },
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                    {[
+                      { label: 'H2', tag: 'h2', title: 'Large Heading' },
+                      { label: 'H3', tag: 'h3', title: 'Small Heading' },
+                      { label: 'B', tag: 'bold', title: 'Bold Text' },
                     { label: 'U', tag: 'underline', title: 'Underlined Text' },
                     { label: '🔗 Link', tag: 'link', title: 'Insert Backlink' },
                     { label: '💻 Code', tag: 'code', title: 'Insert Code Block' },
@@ -266,6 +281,23 @@ export default function CreatePost() {
                       {btn.label}
                     </button>
                   ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <select value={fontFamily} onChange={(e) => setFontFamily(e.target.value)} style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.85rem' }}>
+                      <option value="">Default Font</option>
+                      <option value="Arial, sans-serif">Arial</option>
+                      <option value="'Times New Roman', serif">Times New Roman</option>
+                      <option value="'Courier New', monospace">Courier New</option>
+                      <option value="Georgia, serif">Georgia</option>
+                    </select>
+                    <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.85rem' }}>
+                      <option value="">Default Size</option>
+                      <option value="0.9rem">Small</option>
+                      <option value="1.05rem">Normal</option>
+                      <option value="1.15rem">Medium</option>
+                      <option value="1.3rem">Large</option>
+                    </select>
+                  </div>
                 </div>
 
                 <textarea 
@@ -280,9 +312,9 @@ export default function CreatePost() {
                     border: '1px solid #cbd5e1', 
                     borderRadius: '0 0 10px 10px', 
                     lineHeight: '1.75', 
-                    fontSize: '1.05rem',
+                    fontSize: fontSize || '1.05rem',
                     outline: 'none',
-                    fontFamily: 'inherit',
+                    fontFamily: fontFamily || 'inherit',
                     transition: 'border-color 0.2s'
                   }} 
                   onFocus={(e) => e.target.style.borderColor = '#0f172a'}
