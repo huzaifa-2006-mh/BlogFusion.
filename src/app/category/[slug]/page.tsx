@@ -3,6 +3,17 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { Metadata } from 'next';
 
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const categories = await prisma.category.findMany({
+    select: { slug: true }
+  });
+  return categories.map((cat) => ({
+    slug: cat.slug
+  }));
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const category = await prisma.category.findUnique({ where: { slug } });
@@ -34,28 +45,28 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const posts = category.posts;
 
   return (
-    <div className="category-detail-page" style={{ padding: '6rem 0 8rem 0', background: 'transparent' }}>
-      <div className="container" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 1.5rem' }}>
+    <div className="category-detail-page" style={{ padding: '4rem 0 6rem 0', background: 'transparent' }}>
+      <div className="container" style={{ maxWidth: '850px', margin: '0 auto', padding: '0 1.5rem' }}>
         
-        {/* Sleek Centered Header */}
-        <header className="category-header fade-in" style={{ marginBottom: '5rem', textAlign: 'center' }}>
+        {/* Sleek Compact Centered Header */}
+        <header className="category-header fade-in" style={{ marginBottom: '3.5rem', textAlign: 'center' }}>
           <h1 style={{ 
-            fontSize: '4.5rem', 
-            fontWeight: '900', 
-            marginBottom: '0.6rem', 
+            fontSize: '2.5rem', 
+            fontWeight: '800', 
+            marginBottom: '0.4rem', 
             color: '#0f172a',
-            letterSpacing: '-0.04em',
-            lineHeight: '1.05'
+            letterSpacing: '-0.03em',
+            lineHeight: '1.1'
           }}>
             {category.name}
           </h1>
           <p style={{ 
-            maxWidth: '650px', 
+            maxWidth: '580px', 
             margin: '0 auto', 
             color: '#475569', 
-            fontSize: '1.3rem', 
+            fontSize: '1.02rem', 
             fontWeight: '500', 
-            lineHeight: '1.5',
+            lineHeight: '1.4',
             letterSpacing: '-0.01em'
           }}>
             {category.description || `Tips and tutorials for ${category.name}`}
@@ -63,7 +74,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         </header>
 
         {/* Elegant Numbered Posts List */}
-        <div className="fade-in" style={{ animationDelay: '0.15s' }}>
+        <div className="fade-in" style={{ animationDelay: '0.1s' }}>
           {posts.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {posts.map((post, idx) => (
@@ -74,7 +85,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     display: 'flex', 
                     justifyContent: 'space-between', 
                     alignItems: 'center', 
-                    padding: '1.4rem 0', 
+                    padding: '1.1rem 0', 
                     borderBottom: '1px solid #f1f5f9', 
                     textDecoration: 'none', 
                     transition: 'all 0.25s ease' 
@@ -82,19 +93,19 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                   className="category-post-row"
                 >
                   {/* Left Side: Number + Title */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', flex: '1', paddingRight: '2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: '1', paddingRight: '2rem' }}>
                     <span style={{ 
-                      color: '#ec4899', // Premium pink/rose color matching the screenshot
+                      color: '#ec4899', 
                       fontWeight: '800', 
-                      fontSize: '1.15rem',
-                      minWidth: '2rem',
+                      fontSize: '1.02rem',
+                      minWidth: '1.6rem',
                       fontFamily: 'var(--font-heading), sans-serif'
                     }}>
                       {idx + 1}.
                     </span>
                     <span className="category-post-title" style={{ 
                       color: '#0f172a', 
-                      fontSize: '1.15rem', 
+                      fontSize: '1.02rem', 
                       fontWeight: '600', 
                       lineHeight: '1.4',
                       letterSpacing: '-0.01em',
@@ -107,7 +118,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                   {/* Right Side: Date */}
                   <span style={{ 
                     color: '#94a3b8', 
-                    fontSize: '0.95rem', 
+                    fontSize: '0.85rem', 
                     fontWeight: '600',
                     whiteSpace: 'nowrap',
                     fontFamily: 'monospace',
@@ -119,8 +130,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               ))}
             </div>
           ) : (
-            <div className="text-center" style={{ padding: '6rem 0', opacity: 0.5 }}>
-              <p style={{ fontSize: '1.2rem', color: '#64748b' }}>No blogs found in {category.name} yet.</p>
+            <div className="text-center" style={{ padding: '4rem 0', opacity: 0.5 }}>
+              <p style={{ fontSize: '1.1rem', color: '#64748b' }}>No blogs found in {category.name} yet.</p>
               <Link href="/" className="btn btn-outline mt-4">Back to Home</Link>
             </div>
           )}
