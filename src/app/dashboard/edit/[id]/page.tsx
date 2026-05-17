@@ -151,104 +151,529 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
     }
   };
 
-  if (isLoading) return <div style={{ padding: '4rem', textAlign: 'center' }}>Loading post data...</div>;
+  if (isLoading) return <div style={{ padding: '4rem', textAlign: 'center', color: '#64748b', fontWeight: '600' }}>Loading post data...</div>;
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '1rem 0' }}>
+      {/* Top Banner Header */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: '2.5rem',
+        paddingBottom: '1.5rem',
+        borderBottom: '1px solid #e2e8f0'
+      }}>
         <div>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>Edit Blog</h1>
-            <p style={{ color: '#64748b' }}>Update your post and refine its content.</p>
+            <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.03em', marginBottom: '0.5rem' }}>Edit Blog</h1>
+            <p style={{ color: '#64748b', fontSize: '1rem', fontWeight: '500' }}>Update, refine, and publish changes to your blog post.</p>
         </div>
-        <button onClick={() => router.back()} style={{ padding: '0.75rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', background: 'white', fontWeight: '600', cursor: 'pointer' }}>Back</button>
+        <button 
+          onClick={() => router.back()} 
+          style={{ 
+            padding: '0.6rem 1.2rem', 
+            borderRadius: '8px', 
+            border: '1px solid #cbd5e1', 
+            background: 'white', 
+            fontWeight: '700', 
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            color: '#334155',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.backgroundColor = '#f8fafc';
+            e.currentTarget.style.borderColor = '#94a3b8';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = 'white';
+            e.currentTarget.style.borderColor = '#cbd5e1';
+          }}
+        >
+          Back
+        </button>
       </div>
       
-      <form onSubmit={handleSubmit} className="dashboard-form-grid">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
-                <div style={{ marginBottom: '2rem' }}>
-                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Blog Title</label>
-                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} style={{ width: '100%', padding: '1rem', fontSize: '1.25rem', fontWeight: '700', borderRadius: '12px', border: '1px solid #e2e8f0' }} required />
-                </div>
-                <div style={{ marginBottom: '2rem' }}>
-                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Short Description</label>
-                    <input type="text" value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} style={{ width: '100%', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0' }} />
-                </div>
-                <div>
-                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Content</label>
-                    
-                    {/* Toolbar Re-added */}
-                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', padding: '0.5rem', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                        <button type="button" onClick={() => insertTag('bold')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', fontWeight: 'bold' }}>B</button>
-                        <button type="button" onClick={() => insertTag('underline')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', textDecoration: 'underline' }}>U</button>
-                        <button type="button" onClick={() => insertTag('link')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer' }}>🔗 Link</button>
-                        <button type="button" onClick={() => insertTag('code')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer' }}>💻 Code</button>
-                        <button type="button" onClick={() => insertTag('bullet-list')} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer' }}>• List</button>
-                    </div>
+      <form onSubmit={handleSubmit} className="dashboard-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2.5rem' }}>
+        {/* Responsive Grid layout for Dashboard Forms */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: '2rem' }} className="responsive-editor-grid">
+          
+          {/* Left Column: Main Content */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Core Blog Editor Card */}
+            <div style={{ 
+              background: 'white', 
+              padding: '2.5rem', 
+              borderRadius: '16px', 
+              border: '1px solid #e2e8f0', 
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' 
+            }}>
+              <div style={{ marginBottom: '1.8rem' }}>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Blog Title</label>
+                <input 
+                  type="text" 
+                  value={title} 
+                  onChange={(e) => setTitle(e.target.value)} 
+                  placeholder="Mastering the Art of Tech Guides..." 
+                  style={{ 
+                    width: '100%', 
+                    padding: '1rem 1.2rem', 
+                    fontSize: '1.35rem', 
+                    fontWeight: '700', 
+                    border: '1px solid #cbd5e1', 
+                    background: '#f8fafc', 
+                    borderRadius: '10px',
+                    outline: 'none',
+                    transition: 'all 0.2s'
+                  }} 
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#0f172a';
+                    e.target.style.background = 'white';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.background = '#f8fafc';
+                  }}
+                  required 
+                />
+              </div>
 
-                    <textarea id="blog-content-area" value={content} onChange={(e) => setContent(e.target.value)} style={{ width: '100%', minHeight: '500px', padding: '1rem', borderRadius: '12px', border: '1px solid #e2e8f0', lineHeight: '1.7' }} required></textarea>
+              <div style={{ marginBottom: '1.8rem' }}>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Short Description</label>
+                <input 
+                  type="text" 
+                  value={shortDescription} 
+                  onChange={(e) => setShortDescription(e.target.value)} 
+                  placeholder="A catchy, brief sub-title to hook home page readers..." 
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.85rem 1rem', 
+                    border: '1px solid #cbd5e1', 
+                    borderRadius: '8px',
+                    outline: 'none',
+                    fontSize: '0.95rem',
+                    transition: 'border-color 0.2s'
+                  }} 
+                  onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Content</label>
+                
+                {/* Custom Rich Text Action Bar */}
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '0.4rem', 
+                  marginBottom: '0.5rem', 
+                  padding: '0.4rem', 
+                  background: '#f1f5f9', 
+                  borderRadius: '8px 8px 0 0', 
+                  border: '1px solid #cbd5e1',
+                  borderBottom: 'none'
+                }}>
+                  {[
+                    { label: 'B', tag: 'bold', title: 'Bold Text' },
+                    { label: 'U', tag: 'underline', title: 'Underlined Text' },
+                    { label: '🔗 Link', tag: 'link', title: 'Insert Backlink' },
+                    { label: '💻 Code', tag: 'code', title: 'Insert Code Block' },
+                    { label: '• List', tag: 'bullet-list', title: 'Unordered List' }
+                  ].map((btn) => (
+                    <button 
+                      key={btn.tag}
+                      type="button" 
+                      onClick={() => insertTag(btn.tag)} 
+                      title={btn.title}
+                      style={{ 
+                        padding: '0.4rem 0.8rem', 
+                        borderRadius: '6px', 
+                        border: '1px solid #cbd5e1', 
+                        background: 'white', 
+                        cursor: 'pointer', 
+                        fontWeight: btn.tag === 'bold' ? 'bold' : 'normal',
+                        textDecoration: btn.tag === 'underline' ? 'underline' : 'none',
+                        fontSize: '0.85rem',
+                        color: '#334155',
+                        transition: 'all 0.15s'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f8fafc';
+                        e.currentTarget.style.borderColor = '#0f172a';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = 'white';
+                        e.currentTarget.style.borderColor = '#cbd5e1';
+                      }}
+                    >
+                      {btn.label}
+                    </button>
+                  ))}
                 </div>
+
+                <textarea 
+                  id="blog-content-area"
+                  value={content} 
+                  onChange={(e) => setContent(e.target.value)} 
+                  placeholder="Start writing your premium tech guide here..." 
+                  style={{ 
+                    width: '100%', 
+                    minHeight: '450px', 
+                    padding: '1.2rem', 
+                    border: '1px solid #cbd5e1', 
+                    borderRadius: '0 0 10px 10px', 
+                    lineHeight: '1.75', 
+                    fontSize: '1.05rem',
+                    outline: 'none',
+                    fontFamily: 'inherit',
+                    transition: 'border-color 0.2s'
+                  }} 
+                  onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                  required
+                ></textarea>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.6rem' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>💡 Tip: Use `[IMAGE]` to embed uploaded images inline.</span>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Supports robust HTML formatting tags</span>
+                </div>
+              </div>
             </div>
 
             {/* SEO Settings Card */}
-            <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
-                <h3 style={{ fontWeight: '800', marginBottom: '1.5rem', color: '#0f172a' }}>SEO & Search Engine Metadata</h3>
-                <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Meta Title</label>
-                    <input 
-                        type="text" 
-                        value={metaTitle} 
-                        onChange={(e) => setMetaTitle(e.target.value)} 
-                        placeholder="SEO Title (defaults to blog title if left empty)" 
-                        style={{ width: '100%', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px' }} 
-                    />
-                </div>
-                <div className="form-group">
-                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Meta Description</label>
-                    <textarea 
-                        value={metaDescription} 
-                        onChange={(e) => setMetaDescription(e.target.value)} 
-                        placeholder="SEO Description snippet for Google search results..." 
-                        style={{ width: '100%', padding: '1rem', border: '1px solid #e2e8f0', borderRadius: '12px', minHeight: '80px', fontFamily: 'inherit' }} 
-                    ></textarea>
-                </div>
+            <div style={{ 
+              background: 'white', 
+              padding: '2.5rem', 
+              borderRadius: '16px', 
+              border: '1px solid #e2e8f0', 
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' 
+            }}>
+              <div style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '0.8rem', marginBottom: '1.5rem' }}>
+                <h3 style={{ fontWeight: '900', fontSize: '1.2rem', color: '#0f172a', letterSpacing: '-0.02em' }}>SEO & Search Engine Metadata</h3>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0.2rem 0 0 0' }}>Configure tags to optimize your post visibility on Google.</p>
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Meta Title</label>
+                <input 
+                  type="text" 
+                  value={metaTitle} 
+                  onChange={(e) => setMetaTitle(e.target.value)} 
+                  placeholder="SEO Title (defaults to blog title if left empty)" 
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.85rem 1rem', 
+                    border: '1px solid #cbd5e1', 
+                    borderRadius: '8px',
+                    outline: 'none',
+                    fontSize: '0.95rem',
+                    transition: 'border-color 0.2s'
+                  }} 
+                  onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                />
+              </div>
+
+              <div>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Meta Description</label>
+                <textarea 
+                  value={metaDescription} 
+                  onChange={(e) => setMetaDescription(e.target.value)} 
+                  placeholder="Summarize the post for Google search results (recommended length: 150-160 characters)..." 
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.85rem 1rem', 
+                    border: '1px solid #cbd5e1', 
+                    borderRadius: '8px', 
+                    minHeight: '80px', 
+                    outline: 'none',
+                    fontSize: '0.95rem',
+                    fontFamily: 'inherit',
+                    lineHeight: '1.5',
+                    transition: 'border-color 0.2s'
+                  }} 
+                  onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                ></textarea>
+              </div>
             </div>
-            {/* FAQ Section */}
-            <div style={{ background: 'white', padding: '2.5rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontWeight: '800' }}>FAQs</h3>
-                    <button type="button" onClick={addFAQ} style={{ color: '#ff4b91', fontWeight: '700', background: 'none', border: 'none' }}>+ Add Question</button>
+
+            {/* Premium FAQ Card Section */}
+            <div style={{ 
+              background: 'white', 
+              padding: '2.5rem', 
+              borderRadius: '16px', 
+              border: '1px solid #e2e8f0', 
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' 
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.8rem', marginBottom: '1.5rem' }}>
+                <div>
+                  <h3 style={{ fontWeight: '900', fontSize: '1.2rem', color: '#0f172a', letterSpacing: '-0.02em', margin: '0' }}>FAQs Section</h3>
+                  <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0.2rem 0 0 0' }}>Add answers to commonly asked questions about this guide.</p>
                 </div>
-                {faqs.map((faq, index) => (
-                    <div key={index} style={{ marginBottom: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '12px', position: 'relative' }}>
-                        <button type="button" onClick={() => removeFAQ(index)} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', color: '#ef4444' }}>✕</button>
-                        <input type="text" placeholder="Question" value={faq.question} onChange={(e) => updateFAQ(index, 'question', e.target.value)} style={{ width: '100%', marginBottom: '0.5rem', fontWeight: '700', border: 'none', background: 'transparent' }} />
-                        <textarea placeholder="Answer" value={faq.answer} onChange={(e) => updateFAQ(index, 'answer', e.target.value)} style={{ width: '100%', border: 'none', background: 'transparent' }}></textarea>
-                    </div>
-                ))}
-            </div>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            <div style={{ background: 'white', padding: '2rem', borderRadius: '24px', border: '1px solid #e2e8f0' }}>
-                <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ fontWeight: '700', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block' }}>Category</label>
-                    <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', border: '1px solid #e2e8f0' }} required>
-                        <option value="">Select Category</option>
-                        {categories.map((cat) => (
-                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                        ))}
-                    </select>
-                </div>
-                <div style={{ marginBottom: '1.5rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: '600' }}>
-                        <input type="checkbox" checked={showOnHome} onChange={(e) => setShowOnHome(e.target.checked)} />
-                        Show on Home Page
-                    </label>
-                </div>
-                <button type="submit" disabled={isUpdating} style={{ width: '100%', padding: '1rem', background: '#0f172a', color: 'white', borderRadius: '12px', fontWeight: '700' }}>
-                    {isUpdating ? 'Saving...' : 'Save Changes'}
+                <button 
+                  type="button" 
+                  onClick={addFAQ} 
+                  style={{ 
+                    color: '#ff4b91', 
+                    fontWeight: '800', 
+                    background: 'rgba(255,75,145,0.05)', 
+                    border: '1px solid rgba(255,75,145,0.2)', 
+                    borderRadius: '6px',
+                    padding: '0.4rem 0.8rem',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,75,145,0.1)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,75,145,0.05)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  + Add FAQ
                 </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                {faqs.map((faq, index) => (
+                  <div 
+                    key={index} 
+                    style={{ 
+                      padding: '1.25rem', 
+                      background: '#f8fafc', 
+                      borderRadius: '10px', 
+                      border: '1px solid #e2e8f0',
+                      position: 'relative',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.8rem'
+                    }}
+                  >
+                    <button 
+                      type="button" 
+                      onClick={() => removeFAQ(index)} 
+                      title="Remove FAQ"
+                      style={{ 
+                        position: 'absolute', 
+                        top: '0.75rem', 
+                        right: '0.75rem', 
+                        color: '#64748b',
+                        background: 'transparent',
+                        border: 'none',
+                        fontSize: '1rem',
+                        cursor: 'pointer',
+                        transition: 'color 0.2s'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.color = '#ef4444'}
+                      onMouseOut={(e) => e.currentTarget.style.color = '#64748b'}
+                    >
+                      ✕
+                    </button>
+
+                    <div style={{ width: '92%' }}>
+                      <input 
+                        type="text" 
+                        placeholder="FAQ Question..." 
+                        value={faq.question} 
+                        onChange={(e) => updateFAQ(index, 'question', e.target.value)} 
+                        style={{ 
+                          fontWeight: '700', 
+                          border: 'none', 
+                          borderBottom: '1px solid #e2e8f0', 
+                          background: 'transparent', 
+                          width: '100%',
+                          fontSize: '0.95rem',
+                          paddingBottom: '0.3rem',
+                          outline: 'none'
+                        }}
+                      />
+                    </div>
+                    <textarea 
+                      placeholder="FAQ Answer Detail..." 
+                      value={faq.answer} 
+                      onChange={(e) => updateFAQ(index, 'answer', e.target.value)} 
+                      style={{ 
+                        width: '100%', 
+                        border: 'none', 
+                        background: 'transparent', 
+                        minHeight: '60px',
+                        outline: 'none',
+                        fontFamily: 'inherit',
+                        fontSize: '0.9rem',
+                        lineHeight: '1.5',
+                        resize: 'vertical'
+                      }}
+                    ></textarea>
+                  </div>
+                ))}
+
+                {faqs.length === 0 && (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8', border: '1px dashed #cbd5e1', borderRadius: '10px' }}>
+                    No FAQs added. Click "+ Add FAQ" above to add interactive answers.
+                  </div>
+                )}
+              </div>
             </div>
+          </div>
+
+          {/* Right Column: Settings Sidebar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Publisher Box */}
+            <div style={{ 
+              background: 'white', 
+              padding: '2rem', 
+              borderRadius: '16px', 
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' 
+            }}>
+              <h4 style={{ margin: '0 0 1.2rem 0', fontWeight: '900', fontSize: '1.1rem', color: '#0f172a' }}>Publish Settings</h4>
+              
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ fontWeight: '800', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', marginBottom: '0.5rem', display: 'block', letterSpacing: '0.05em' }}>Category</label>
+                <select 
+                  value={categoryId} 
+                  onChange={(e) => setCategoryId(e.target.value)} 
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.75rem', 
+                    borderRadius: '8px', 
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    fontWeight: '600',
+                    color: '#334155',
+                    background: '#f8fafc',
+                    cursor: 'pointer'
+                  }} 
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '1.8rem' }}>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.6rem', 
+                  cursor: 'pointer', 
+                  fontWeight: '600',
+                  fontSize: '0.9rem',
+                  color: '#334155'
+                }}>
+                  <input 
+                    type="checkbox" 
+                    checked={showOnHome} 
+                    onChange={(e) => setShowOnHome(e.target.checked)} 
+                    style={{ width: '1.15rem', height: '1.15rem', cursor: 'pointer' }} 
+                  />
+                  Show on Home Page
+                </label>
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={isUpdating} 
+                style={{ 
+                  width: '100%', 
+                  padding: '0.85rem', 
+                  background: '#0f172a', 
+                  color: 'white', 
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  fontWeight: '700', 
+                  fontSize: '1rem', 
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 6px -1px rgba(15,23,42,0.15)',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1e293b'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#0f172a'}
+              >
+                {isUpdating ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+
+            {/* Media Upload Card */}
+            <div style={{ 
+              background: 'white', 
+              padding: '2rem', 
+              borderRadius: '16px', 
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03)' 
+            }}>
+              <h4 style={{ margin: '0 0 0.3rem 0', fontWeight: '900', fontSize: '1.1rem', color: '#0f172a' }}>Blog Visuals</h4>
+              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 1.2rem 0' }}>Upload image graphics for your guide's cover and bodies.</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+                {previews.map((preview, i) => (
+                  <div key={i} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+                    <img src={preview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <button 
+                      type="button" 
+                      onClick={() => removeImage(i)} 
+                      title="Remove Image"
+                      style={{ 
+                        position: 'absolute', 
+                        top: '0.3rem', 
+                        right: '0.3rem', 
+                        background: 'rgba(255,255,255,0.92)', 
+                        border: 'none', 
+                        borderRadius: '50%', 
+                        width: '20px', 
+                        height: '20px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        cursor: 'pointer',
+                        fontSize: '0.7rem',
+                        fontWeight: 'bold',
+                        color: '#64748b',
+                        transition: 'color 0.2s'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.color = '#ef4444'}
+                      onMouseOut={(e) => e.currentTarget.style.color = '#64748b'}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+                
+                <label style={{ 
+                  aspectRatio: '1/1', 
+                  border: '2px dashed #cbd5e1', 
+                  borderRadius: '8px', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  cursor: 'pointer', 
+                  color: '#64748b',
+                  backgroundColor: '#f8fafc',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.borderColor = '#0f172a';
+                  e.currentTarget.style.backgroundColor = '#f1f5f9';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.borderColor = '#cbd5e1';
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                }}
+                >
+                  <span style={{ fontSize: '1.6rem', fontWeight: 'bold' }}>+</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: '600' }}>Add Photo</span>
+                  <input type="file" hidden multiple onChange={handleImageChange} accept="image/*" />
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
       </form>
     </div>
