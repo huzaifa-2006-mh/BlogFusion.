@@ -73,71 +73,67 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Category List Section */}
-      <section style={{ background: '#f8f9fa', padding: '1.5rem 0', borderTop: '1px solid #eee', borderBottom: '1px solid #eee' }}>
-          <div className="container" style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', whiteSpace: 'nowrap', alignItems: 'center' }}>
-              <span style={{ fontWeight: '700', fontSize: '0.9rem', textTransform: 'uppercase', color: '#64748b' }}>Topics:</span>
-              {categories.map(cat => (
-                  <Link 
-                    key={cat.id} 
-                    href={`/category/${cat.slug}`}
-                    style={{ 
-                        color: 'var(--text-primary)', 
-                        fontWeight: '600', 
-                        fontSize: '0.95rem',
-                        padding: '0.3rem 0.8rem',
-                        borderRadius: '4px',
-                        background: 'white',
-                        border: '1px solid #e2e8f0'
-                    }}
-                  >
-                      {cat.name}
-                  </Link>
-              ))}
-          </div>
-      </section>
-
-      {/* Blog Blocks Section (Repeating 1 Featured + 4 Secondary) */}
-      <section className="section">
+      {/* Blog Blocks Section (Repeating 1 Featured + 1 Regular Left, 3 Regular Right) */}
+      <section className="section" style={{ paddingBottom: '1rem' }}>
         <div className="container">
           {blocks.length > 0 ? (
             blocks.map((block, blockIdx) => (
-              <div key={blockIdx} className="blog-layout" style={{ marginBottom: '4rem' }}>
-                {/* Featured Post (Large Left) */}
-                {block[0] && (
-                  <div className="featured-post">
-                    <Link href={`/blog/${block[0].slug}`}>
-                      <span style={{ 
-                        display: 'inline-block', 
-                        padding: '0.4rem 1.2rem', 
-                        border: '2px solid black', 
-                        fontWeight: '800', 
-                        textTransform: 'uppercase', 
-                        fontSize: '0.75rem',
-                        marginBottom: '1.5rem',
-                        boxShadow: '4px 4px 0px rgba(0,0,0,1)'
-                      }}>
-                        {block[0].category.name} &rarr;
-                      </span>
-                      <h2 style={{ fontSize: '2.5rem', lineHeight: '1.1', marginBottom: '0.5rem', fontWeight: '800' }}>
-                        {block[0].title}
-                      </h2>
-                      {block[0].shortDescription && (
-                        <p style={{ fontSize: '1.2rem', color: '#334155', fontWeight: '600', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-                            {block[0].shortDescription}
-                        </p>
+              <div key={blockIdx} className="blog-layout" style={{ marginBottom: '3rem' }}>
+                {/* Left Column: Featured + Post 3 */}
+                <div className="featured-column" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+                  {/* Featured Post (Large Left) */}
+                  {block[0] && (
+                    <div className="featured-post">
+                      <Link href={`/blog/${block[0].slug}`}>
+                        <span style={{ 
+                          display: 'inline-block', 
+                          padding: '0.4rem 1.2rem', 
+                          border: '2px solid black', 
+                          fontWeight: '800', 
+                          textTransform: 'uppercase', 
+                          fontSize: '0.75rem',
+                          marginBottom: '1.5rem',
+                          boxShadow: '4px 4px 0px rgba(0,0,0,1)'
+                        }}>
+                          {block[0].category.name} &rarr;
+                        </span>
+                        <h2 style={{ fontSize: '2.5rem', lineHeight: '1.1', marginBottom: '0.5rem', fontWeight: '800' }}>
+                          {block[0].title}
+                        </h2>
+                        {block[0].shortDescription && (
+                          <p style={{ fontSize: '1.2rem', color: '#334155', fontWeight: '600', marginBottom: '1.5rem', fontStyle: 'italic' }}>
+                              {block[0].shortDescription}
+                          </p>
+                        )}
+                      </Link>
+                      <p style={{ fontSize: '1.1rem', color: '#64748b', lineHeight: '1.6' }}>{block[0].excerpt}</p>
+                      {block[0].coverImage && (
+                        <img src={block[0].coverImage} alt={block[0].title} style={{ width: '100%', borderRadius: '4px', marginTop: '2rem' }} />
                       )}
-                    </Link>
-                    <p style={{ fontSize: '1.1rem', color: '#64748b', lineHeight: '1.6' }}>{block[0].excerpt}</p>
-                    {block[0].coverImage && (
-                      <img src={block[0].coverImage} alt={block[0].title} style={{ width: '100%', borderRadius: '4px', marginTop: '2rem' }} />
-                    )}
-                  </div>
-                )}
+                    </div>
+                  )}
 
-                {/* Secondary Posts (List Right - 4 items) */}
+                  {/* Secondary Post 3 (rendered inside left column to balance height) */}
+                  {block[3] && (
+                    <article key={block[3].id} style={{ paddingBottom: '1.5rem', borderBottom: '1px solid #f1f5f9' }}>
+                      <Link href={`/blog/${block[3].slug}`}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '0.4rem', lineHeight: '1.3' }}>
+                          {block[3].title}
+                        </h3>
+                        {block[3].shortDescription && (
+                            <p style={{ fontSize: '0.85rem', color: '#475569', fontWeight: '600', marginBottom: '0.5rem' }}>
+                                {block[3].shortDescription}
+                            </p>
+                        )}
+                      </Link>
+                      <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: '1.4' }}>{block[3].excerpt}</p>
+                    </article>
+                  )}
+                </div>
+
+                {/* Secondary Posts (List Right) */}
                 <div className="secondary-list">
-                  {block.slice(1).map((post) => (
+                  {[block[1], block[2], block[4]].filter(Boolean).map((post) => (
                     <article key={post.id} style={{ paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: '1px solid #f1f5f9' }}>
                       <Link href={`/blog/${post.slug}`}>
                         <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '0.4rem', lineHeight: '1.3' }}>
