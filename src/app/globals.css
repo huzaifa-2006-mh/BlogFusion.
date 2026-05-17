@@ -1232,6 +1232,29 @@ p {
   color: #ec4899 !important;
 }
 
+/* Homepage Category Tag Hover Interactive Styling */
+.homepage-category-tag {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  border: 2px solid black;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 4px 4px 0px rgba(0,0,0,1);
+  background: white;
+  color: black;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  font-family: var(--font-heading), sans-serif;
+}
+
+.homepage-category-tag:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px rgba(0,0,0,1);
+  background: #fdf2f8; /* Soft light-pink highlight matching the brand identity */
+}
+
 .blog-content li {
   margin-bottom: 0.8rem !important;
   padding-left: 0.5rem !important;

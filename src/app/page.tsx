@@ -87,29 +87,7 @@ export default async function Home() {
                       {block[0] && (
                         <div className="featured-post">
                           <Link href={`/category/${category.slug}`} style={{ textDecoration: 'none' }}>
-                            <span style={{ 
-                              display: 'inline-block', 
-                              padding: '0.4rem 1.2rem', 
-                              border: '2px solid black', 
-                              fontWeight: '800', 
-                              textTransform: 'uppercase', 
-                              fontSize: '0.75rem',
-                              marginBottom: '1.5rem',
-                              boxShadow: '4px 4px 0px rgba(0,0,0,1)',
-                              background: 'white',
-                              color: 'black',
-                              cursor: 'pointer',
-                              transition: 'transform 0.1s, box-shadow 0.1s'
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.transform = 'translate(-2px, -2px)';
-                              e.currentTarget.style.boxShadow = '6px 6px 0px rgba(0,0,0,1)';
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.transform = 'none';
-                              e.currentTarget.style.boxShadow = '4px 4px 0px rgba(0,0,0,1)';
-                            }}
-                            >
+                            <span className="homepage-category-tag">
                               {category.name} &rarr;
                             </span>
                           </Link>
