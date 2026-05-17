@@ -110,7 +110,7 @@ export default async function BlogPostPage({ params }: any) {
   });
   
   const gallery = [...(post.images || [])];
-  const inlineImages = gallery.slice(1);
+  const inlineImages = [...gallery];
   
   let imageIndex = 0;
   while (processedContent.includes('[IMAGE]') && imageIndex < inlineImages.length) {
@@ -132,34 +132,68 @@ export default async function BlogPostPage({ params }: any) {
           &larr; Back to Home
         </Link>
         
-        {/* Dynamic Detail Header */}
-        <header style={{ marginBottom: '2.5rem' }}>
-          <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
-            <span className="blog-detail-category-tag">#{post.category.slug}</span>
-          </Link>
+        {/* Dynamic Detail Header (Beautifully Centered) */}
+        <header style={{ marginBottom: '3.5rem', textAlign: 'center' }}>
+          {/* Centered Date */}
+          <span style={{ 
+            fontSize: '0.875rem', 
+            color: '#64748b', 
+            fontWeight: '600', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.05em', 
+            marginBottom: '0.8rem', 
+            display: 'block' 
+          }}>
+            {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </span>
           
+          {/* Centered Title */}
           <h1 style={{ 
-            fontSize: 'clamp(2rem, 4.5vw, 3rem)', 
-            fontWeight: '800',
-            marginTop: '0.5rem', 
+            fontSize: 'clamp(2.2rem, 5vw, 3.2rem)', 
+            fontWeight: '800', 
             color: '#0f172a',
-            lineHeight: '1.2',
-            letterSpacing: '-0.03em'
+            lineHeight: '1.25',
+            letterSpacing: '-0.03em',
+            margin: '0 auto 1.2rem auto',
+            maxWidth: '750px'
           }}>
             {post.title}
           </h1>
           
           {post.excerpt && (
-            <p style={{ fontSize: '1.15rem', color: '#475569', marginTop: '0.8rem', lineHeight: '1.5', fontWeight: '500' }}>
+            <p style={{ 
+              fontSize: '1.15rem', 
+              color: '#475569', 
+              lineHeight: '1.5', 
+              fontWeight: '500',
+              margin: '0 auto 1.5rem auto',
+              maxWidth: '620px'
+            }}>
               {post.excerpt}
             </p>
           )}
 
-          {/* Premium Author Meta Badge */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.25rem' }}>
+          {/* Centered Category Tag Row */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
+              <span className="blog-detail-category-tag" style={{ marginBottom: 0 }}>#{post.category.slug}</span>
+            </Link>
+          </div>
+
+          {/* Centered Author Meta Badge */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: '0.8rem', 
+            borderTop: '1px solid #f1f5f9', 
+            paddingTop: '1.25rem',
+            maxWidth: '450px',
+            margin: '0 auto'
+          }}>
             <div style={{ 
-              width: '46px', 
-              height: '46px', 
+              width: '38px', 
+              height: '38px', 
               borderRadius: '50%', 
               background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', 
               overflow: 'hidden', 
@@ -168,26 +202,19 @@ export default async function BlogPostPage({ params }: any) {
               justifyContent: 'center', 
               color: 'white', 
               fontWeight: '800',
-              fontSize: '1.1rem',
-              boxShadow: '0 4px 10px rgba(236,72,153,0.2)'
+              fontSize: '0.95rem',
+              boxShadow: '0 4px 10px rgba(236,72,153,0.15)'
             }}>
               {authorInitial}
             </div>
-            <div>
-              <p style={{ margin: 0, fontWeight: '700', color: '#0f172a', fontSize: '0.95rem' }}>{authorName}</p>
-              <p style={{ margin: 0, fontSize: '0.825rem', color: '#64748b', fontWeight: '500', marginTop: '0.1rem' }}>
-                {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} • {Math.ceil(post.content.length / 500)} min read
+            <div style={{ textAlign: 'left' }}>
+              <p style={{ margin: 0, fontWeight: '700', color: '#0f172a', fontSize: '0.9rem' }}>{authorName}</p>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b', fontWeight: '500', marginTop: '0.05rem' }}>
+                {Math.ceil(post.content.length / 500)} min read
               </p>
             </div>
           </div>
         </header>
-
-        {/* Sleek Hero Cover Image */}
-        {post.coverImage && (
-          <div className="featured-image" style={{ width: '100%', height: 'auto', maxHeight: '480px', marginBottom: '3rem', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 12px 30px rgba(0,0,0,0.06)' }}>
-            <img src={post.coverImage} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-        )}
 
         {/* Clean Reading Box */}
         <div className="blog-content" style={{ ...customStyles }}>
