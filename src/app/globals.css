@@ -1320,12 +1320,12 @@ p {
   line-height: 1.8;
 }
 
-.blog-content h2, .blog-content h3 {
+.blog-content h2, .blog-content h3, .blog-content h4 {
   color: #0f172a;
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin-top: 1.25rem;
-  margin-bottom: 0.2rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0rem;
   font-family: var(--font-heading), sans-serif;
 }
 
