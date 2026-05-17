@@ -107,6 +107,10 @@ export default async function BlogPostPage({ params }: any) {
 
   processedContent = processedContent.replace(/\n/g, '<br/>');
 
+  // Clean up <br/> around block elements to prevent excessive spacing
+  processedContent = processedContent.replace(/(<\/h[1-6]>)(?:<br\/>)+/g, '$1');
+  processedContent = processedContent.replace(/(?:<br\/>)+(<h[1-6]>)/g, '$1');
+
   // Restore code blocks
   codeBlocks.forEach((block, index) => {
     processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
