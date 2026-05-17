@@ -1222,6 +1222,16 @@ p {
   list-style-type: decimal !important;
 }
 
+/* Category List Row Interactive Styling */
+.category-post-row:hover {
+  border-bottom-color: #ec4899 !important;
+  padding-left: 0.5rem !important;
+}
+
+.category-post-row:hover .category-post-title {
+  color: #ec4899 !important;
+}
+
 .blog-content li {
   margin-bottom: 0.8rem !important;
   padding-left: 0.5rem !important;

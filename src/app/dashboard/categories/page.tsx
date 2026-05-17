@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<{ id: string, name: string, slug: string, showOnHome: boolean }[]>([]);
+  const [categories, setCategories] = useState<{ id: string, name: string, slug: string, showOnHome: boolean, description?: string }[]>([]);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryDescription, setNewCategoryDescription] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -33,13 +34,17 @@ export default function CategoriesPage() {
       const res = await fetch('/api/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newCategoryName.trim() })
+        body: JSON.stringify({ 
+          name: newCategoryName.trim(), 
+          description: newCategoryDescription.trim() 
+        })
       });
 
       if (res.ok) {
         const createdCat = await res.json();
         setCategories([...categories, createdCat].sort((a, b) => a.name.localeCompare(b.name)));
         setNewCategoryName('');
+        setNewCategoryDescription('');
       } else {
         const errData = await res.json();
         alert(errData.error || 'Failed to create category.');
@@ -95,26 +100,49 @@ export default function CategoriesPage() {
       {/* Create Category Section */}
       <div className="dashboard-card" style={{ padding: '2rem', marginBottom: '2.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem', color: '#0f172a' }}>Create New Category</h2>
-        <form onSubmit={handleCreateCategory} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-          <div style={{ flex: '1', minWidth: '250px' }}>
-            <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#475569', marginBottom: '0.5rem' }}>Category Name</label>
-            <input 
-              type="text"
-              placeholder="e.g. Python, Machine Learning"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
-                border: '1px solid #cbd5e1',
-                fontSize: '0.95rem',
-                outline: 'none',
-                transition: 'border-color 0.2s',
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#0f172a'}
-              onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
-            />
+        <form onSubmit={handleCreateCategory} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1', minWidth: '250px' }}>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#475569', marginBottom: '0.5rem' }}>Category Name</label>
+              <input 
+                type="text"
+                placeholder="e.g. Python, Machine Learning"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+              />
+            </div>
+            
+            <div style={{ flex: '2', minWidth: '350px' }}>
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#475569', marginBottom: '0.5rem' }}>Category Description (Subtext)</label>
+              <input 
+                type="text"
+                placeholder="e.g. Tips and tutorials for Python"
+                value={newCategoryDescription}
+                onChange={(e) => setNewCategoryDescription(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+              />
+            </div>
           </div>
           <button 
             type="submit"
@@ -129,6 +157,7 @@ export default function CategoriesPage() {
               cursor: 'pointer',
               fontSize: '0.95rem',
               transition: 'background-color 0.2s',
+              alignSelf: 'flex-start',
               minWidth: '150px'
             }}
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1e293b'}
@@ -142,10 +171,11 @@ export default function CategoriesPage() {
       {/* Categories Table Section */}
       <div className="dashboard-card" style={{ padding: '0', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '500px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
                 <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#64748b' }}>Category Name</th>
+                <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#64748b' }}>Description</th>
                 <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#64748b' }}>Slug</th>
                 <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#64748b' }}>Show on Home Page</th>
                 <th style={{ padding: '1rem 1.5rem', fontWeight: '600', color: '#64748b', textAlign: 'right' }}>Actions</th>
@@ -155,6 +185,7 @@ export default function CategoriesPage() {
               {categories.map((cat) => (
                 <tr key={cat.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
                   <td style={{ padding: '1rem 1.5rem', fontWeight: '600' }}>{cat.name}</td>
+                  <td style={{ padding: '1rem 1.5rem', color: '#64748b', fontSize: '0.9rem', fontStyle: 'italic' }}>{cat.description || '—'}</td>
                   <td style={{ padding: '1rem 1.5rem', color: '#64748b' }}>{cat.slug}</td>
                   <td style={{ padding: '1rem 1.5rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>

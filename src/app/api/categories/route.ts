@@ -23,11 +23,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { name } = await request.json();
+    const { name, description } = await request.json();
     const slug = name.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
 
     const category = await prisma.category.create({
-      data: { name, slug },
+      data: { name, slug, description: description || null },
     });
 
     revalidatePath('/', 'layout');
