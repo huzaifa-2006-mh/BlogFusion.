@@ -25,11 +25,16 @@ export default function Settings() {
 
   const handlePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image size should be less than 2MB.");
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event) => {
         setProfilePic(event.target?.result as string);
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     }
   };
 

@@ -27,14 +27,30 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const username = session.value;
-  const body = await request.json();
-  const { image } = body;
+  try {
+    const username = session.value;
+    const body = await request.json();
+    const { image } = body;
 
-  const user = await prisma.user.update({
-    where: { username },
-    data: { image }
-  });
+    let user = await prisma.user.findUnique({ where: { username } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          username,
+          password: 'hardcoded_password_placeholder',
+          image
+        }
+      });
+    } else {
+      user = await prisma.user.update({
+        where: { username },
+        data: { image }
+      });
+    }
 
-  return NextResponse.json({ success: true, image: user.image });
+    return NextResponse.json({ success: true, image: user.image });
+  } catch (error: any) {
+    console.error("Profile update error:", error);
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
+  }
 }
