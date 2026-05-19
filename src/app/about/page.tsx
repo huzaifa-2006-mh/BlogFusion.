@@ -1,39 +1,95 @@
-export default function About() {
+'use client';
+
+import Link from 'next/link';
+
+export const metadata = {
+  title: 'About Us – Blog Fusion',
+  description: 'Learn about Blog Fusion, our mission, and the talented team behind the platform.'
+};
+
+export default function AboutPage() {
   return (
-    <div>
-      <section className="about-hero">
-        <div className="container">
-          <h1>About BlogFusion</h1>
-          <p>Professional Multi-Niche Blogging Platform</p>
+    <section style={{ padding: '4rem 0', backgroundColor: '#f8fafc' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1.5rem' }}>
+        <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: '900', color: '#0f172a', textAlign: 'center', marginBottom: '2rem' }}>
+          About Us – Blog Fusion
+        </h1>
+        <p style={{ fontSize: '1.05rem', lineHeight: '1.8', color: '#475569', marginBottom: '2rem' }}>
+          Welcome to Blog Fusion, a modern platform created to share knowledge, creativity, technology, and innovation with readers worldwide. Our goal is to provide valuable, easy‑to‑understand, and engaging content that helps people learn, grow, and stay updated with the digital world.
+        </p>
+        <p style={{ fontSize: '1.05rem', lineHeight: '1.8', color: '#475569', marginBottom: '2rem' }}>
+          At Blog Fusion, we believe that technology and creativity together can build powerful ideas. Behind this platform is a dedicated team passionate about web development, data analytics, and modern digital solutions.
+        </p>
+        <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', marginTop: '2rem', marginBottom: '1rem' }}>
+          Meet Our Team
+        </h2>
+        <h3 style={{ fontSize: '1.4rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.5rem' }}>
+          Marium Waseem – CEO of Blog Fusion
+        </h3>
+        <p style={{ fontSize: '1rem', lineHeight: '1.7', color: '#475569', marginBottom: '1rem' }}>
+          Marium Waseem is the CEO of Blog Fusion and plays a leading role in managing and growing the platform. She is a skilled Data Analyst and Web Developer with a strong passion for technology, analytics, and creative digital experiences.
+        </p>
+        <p style={{ fontSize: '1rem', lineHeight: '1.7', color: '#475569', marginBottom: '1rem' }}>
+          She specializes in transforming data into meaningful insights and building modern, responsive, and user‑friendly websites.
+        </p>
+        <h4 style={{ fontSize: '1.2rem', fontWeight: '600', color: '#0f172a', marginTop: '1rem', marginBottom: '0.5rem' }}>Skills &amp; Expertise</h4>
+        <ul style={{ columns: '2', columnGap: '2rem', listStyle: 'disc', paddingLeft: '1.2rem', color: '#475569' }}>
+          <li>Data Analytics</li>
+          <li>HTML5 &amp; CSS3</li>
+          <li>JavaScript</li>
+          <li>PHP</li>
+          <li>WordPress</li>
+          <li>React.js</li>
+          <li>SQL</li>
+          <li>Data Visualization</li>
+          <li>Dashboard Reporting</li>
+          <li>Microsoft Excel</li>
+          <li>Responsive Web Design</li>
+          <li>UI/UX Understanding</li>
+          <li>Website Management</li>
+          <li>Research &amp; Data Interpretation</li>
+          <li>Problem Solving &amp; Team Management</li>
+        </ul>
+        <p style={{ fontSize: '1rem', lineHeight: '1.7', color: '#475569', marginTop: '1rem' }}>
+          Marium Waseem is dedicated to innovation, continuous learning, and delivering impactful digital solutions through creativity and analytical thinking.
+        </p>
+        <h3 style={{ fontSize: '1.4rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.5rem', marginTop: '2rem' }}>
+          Muhammad Huzaifa – Boss &amp; Lead Developer
+        </h3>
+        <p style={{ fontSize: '1rem', lineHeight: '1.7', color: '#475569', marginBottom: '1rem' }}>
+          Muhammad Huzaifa is the Boss and Lead Developer at Blog Fusion. He is passionate about modern technologies, programming, and full‑stack web development. With over 1 year of experience in web development, he has worked on various projects involving front‑end interfaces, back‑end systems, databases, and scalable web applications.
+        </p>
+        <h4 style={{ fontSize: '1.2rem', fontWeight: '600', color: '#0f172a', marginTop: '1rem', marginBottom: '0.5rem' }}>Skills &amp; Expertise</h4>
+        <ul style={{ columns: '2', columnGap: '2rem', listStyle: 'disc', paddingLeft: '1.2rem', color: '#475569' }}>
+          <li>Oracle Database</li>
+          <li>WordPress Development</li>
+          <li>Java</li>
+          <li>DSA in Java</li>
+          <li>JavaScript</li>
+          <li>HTML5 &amp; CSS3</li>
+          <li>Tailwind CSS</li>
+          <li>PHP</li>
+          <li>C#</li>
+          <li>Python</li>
+          <li>Node.js</li>
+          <li>Express.js</li>
+          <li>Next.js</li>
+          <li>MySQL</li>
+          <li>MongoDB</li>
+          <li>REST API Development</li>
+          <li>Full Stack Web Development</li>
+          <li>Responsive Web Design</li>
+          <li>Database Management</li>
+        </ul>
+        <p style={{ fontSize: '1rem', lineHeight: '1.7', color: '#475569', marginTop: '1rem' }}>
+          Muhammad Huzaifa focuses on building efficient, scalable, and modern web solutions while continuously exploring new technologies and development trends.
+        </p>
+        <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+          <Link href="/" style={{ textDecoration: 'none', color: '#0f172a', fontWeight: '600', fontSize: '1.1rem' }}>
+            ← Back to Home
+          </Link>
         </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="about-content">
-            <h2>👤 About Us</h2>
-            <p>
-              Welcome to <strong>BlogFusion</strong>, a professional multi-niche blogging platform dedicated to delivering high-quality content across various domains including technology, online earning, programming, and entertainment.
-            </p>
-            
-            <p>Our mission is to help individuals:</p>
-            <ul style={{ marginLeft: '1.5rem', marginBottom: '2rem' }}>
-              <li style={{ marginBottom: '0.8rem' }}>Learn modern digital skills</li>
-              <li style={{ marginBottom: '0.8rem' }}>Stay updated with industry trends</li>
-              <li style={{ marginBottom: '0.8rem' }}>Discover online earning opportunities</li>
-              <li style={{ marginBottom: '0.8rem' }}>Improve their knowledge through well-researched articles</li>
-            </ul>
-
-            <p>
-              We believe in quality over quantity, and every article published on this website is created with proper research and user intent in mind.
-            </p>
-            
-            <p>
-              Our team is passionate about sharing knowledge and helping people grow in the digital world. We focus on providing accurate, helpful, and beginner-friendly information that helps users learn new skills, build careers, and earn money online.
-            </p>
-          </div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }
