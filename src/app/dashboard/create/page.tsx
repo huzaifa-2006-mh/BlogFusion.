@@ -21,6 +21,7 @@ export default function CreatePost() {
   const [showOnHome, setShowOnHome] = useState(true);
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   useEffect(() => {
     fetch('/api/categories')

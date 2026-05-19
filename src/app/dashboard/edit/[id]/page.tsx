@@ -24,6 +24,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [showOnHome, setShowOnHome] = useState(true);
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
