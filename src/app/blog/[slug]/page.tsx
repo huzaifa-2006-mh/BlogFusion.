@@ -267,8 +267,8 @@ export default async function BlogPostPage({ params }: any) {
             </h3>
             <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
               {authorName.toLowerCase().includes('marium') ? 
-                "Marium is an expert author and contributor at Digital Inspiration, bringing you the best insights and guides." :
-                "Huzaifa is a passionate developer and the lead voice behind Digital Inspiration. He loves exploring new technologies and sharing his knowledge."
+                "Marium Waseem is a passionate developer and the lead voice behind Blog Fusion. She loves exploring new technologies and sharing her knowledge." :
+                "Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge."
               }
             </p>
           </div>

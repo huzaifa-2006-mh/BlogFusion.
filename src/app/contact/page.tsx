@@ -19,6 +19,7 @@ export default function Contact() {
               
               <div className="mt-4">
                 <p><strong>📧 Email:</strong> huzaifamm70@gmail.com</p>
+                <p style={{ marginTop: '0.5rem' }}><strong>📧 Email:</strong> mwaseem0488@gmail.com</p>
               </div>
 
               <div className="mt-4">
