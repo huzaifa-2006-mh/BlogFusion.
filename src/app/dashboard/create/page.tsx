@@ -85,7 +85,7 @@ export default function CreatePost() {
     }, 0);
   };
 
-  const insertInlineStyle = (type: 'font-size' | 'font-family', value: string) => {
+  const insertInlineStyle = (type: 'font-size' | 'font-family' | 'color' | 'background-color', value: string) => {
     const textarea = document.getElementById('blog-content-area') as HTMLTextAreaElement;
     if (!textarea) return;
 
@@ -104,6 +104,10 @@ export default function CreatePost() {
       replacement = `<span style="font-size: ${value}px;">${selectedText}</span>`;
     } else if (type === 'font-family') {
       replacement = `<span style="font-family: ${value};">${selectedText}</span>`;
+    } else if (type === 'color') {
+      replacement = `<span style="color: ${value};">${selectedText}</span>`;
+    } else if (type === 'background-color') {
+      replacement = `<span style="background-color: ${value};">${selectedText}</span>`;
     }
 
     const newContent = text.substring(0, start) + replacement + text.substring(end);
@@ -305,7 +309,15 @@ export default function CreatePost() {
                     </button>
                   ))}
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.8rem', cursor: 'pointer', background: 'white', border: '1px solid #cbd5e1', padding: '0.2rem 0.5rem', borderRadius: '6px' }} title="Text Color">
+                      <span style={{ fontWeight: 'bold', color: '#ff4b91' }}>A</span>
+                      <input type="color" onChange={(e) => insertInlineStyle('color', e.target.value)} style={{ padding: '0', border: 'none', width: '24px', height: '24px', cursor: 'pointer', background: 'transparent' }} />
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.8rem', cursor: 'pointer', background: 'white', border: '1px solid #cbd5e1', padding: '0.2rem 0.5rem', borderRadius: '6px' }} title="Highlight Background Color">
+                      <span style={{ fontWeight: 'bold', background: '#fef08a', padding: '0 2px' }}>A</span>
+                      <input type="color" defaultValue="#fef08a" onChange={(e) => insertInlineStyle('background-color', e.target.value)} style={{ padding: '0', border: 'none', width: '24px', height: '24px', cursor: 'pointer', background: 'transparent' }} />
+                    </label>
                     <select value="" onChange={(e) => { if(e.target.value) insertInlineStyle('font-family', e.target.value) }} style={{ padding: '0.4rem', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none', fontSize: '0.85rem' }}>
                       <option value="">Font Style</option>
                       <option value="Arial, sans-serif">Arial</option>

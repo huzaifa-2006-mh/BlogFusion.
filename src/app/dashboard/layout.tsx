@@ -12,12 +12,23 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [username, setUsername] = useState('');
+  const [userImage, setUserImage] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const session = document.cookie.split('; ').find(row => row.startsWith('auth_session='));
     if (session) {
       setUsername(session.split('=')[1]);
+      
+      // Fetch user profile for image
+      fetch('/api/user/profile')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.image) {
+            setUserImage(data.image);
+          }
+        })
+        .catch(err => console.error('Failed to fetch user profile:', err));
     }
   }, []);
 
@@ -56,9 +67,29 @@ export default function DashboardLayout({
           </button>
         </div>
         
-        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Admin</p>
-          <p style={{ fontWeight: '700', color: '#ffffff', fontSize: '0.9rem' }}>{username || 'Huzaifa'}</p>
+        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.04)', borderRadius: '12px', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            overflow: 'hidden',
+            background: '#e11d48',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: 'bold'
+          }}>
+            {userImage ? (
+              <img src={userImage} alt={username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              username ? username[0].toUpperCase() : 'A'
+            )}
+          </div>
+          <div>
+            <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Admin</p>
+            <p style={{ fontWeight: '700', color: '#ffffff', fontSize: '0.9rem' }}>{username || 'Huzaifa'}</p>
+          </div>
         </div>
 
         <nav className="sidebar-nav">
@@ -73,6 +104,9 @@ export default function DashboardLayout({
           </Link>
           <Link href="/dashboard/categories" className={pathname === '/dashboard/categories' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
              Categories
+          </Link>
+          <Link href="/dashboard/settings" className={pathname === '/dashboard/settings' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
+             Settings
           </Link>
           <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>
             <button 

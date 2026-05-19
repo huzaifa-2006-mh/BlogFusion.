@@ -5,12 +5,22 @@ import { useState, useEffect } from 'react';
 export default function Settings() {
   const [username, setUsername] = useState('');
   const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const session = document.cookie.split('; ').find(row => row.startsWith('auth_session='));
-    if (session) {
-      setUsername(session.split('=')[1]);
-    }
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch('/api/user/profile');
+        if (res.ok) {
+          const data = await res.json();
+          setUsername(data.username);
+          if (data.image) setProfilePic(data.image);
+        }
+      } catch (error) {
+        console.error('Failed to fetch profile', error);
+      }
+    };
+    fetchProfile();
   }, []);
 
   const handlePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,6 +30,30 @@ export default function Settings() {
         setProfilePic(event.target?.result as string);
       };
       reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch('/api/user/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ image: profilePic }),
+      });
+      if (res.ok) {
+        alert('Profile saved successfully! Reloading...');
+        window.location.reload();
+      } else {
+        alert('Failed to save profile.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -60,10 +94,12 @@ export default function Settings() {
 
         <div className="form-group">
           <label>Display Name</label>
-          <input type="text" placeholder={username.charAt(0).toUpperCase() + username.slice(1)} />
+          <input type="text" placeholder={username ? username.charAt(0).toUpperCase() + username.slice(1) : ''} disabled style={{ background: '#f0f0f0' }} />
         </div>
 
-        <button className="btn btn-primary" style={{ width: '100%' }}>Save Changes</button>
+        <button className="btn btn-primary" onClick={handleSave} disabled={isSaving} style={{ width: '100%' }}>
+          {isSaving ? 'Saving...' : 'Save Changes'}
+        </button>
       </div>
     </div>
   );
