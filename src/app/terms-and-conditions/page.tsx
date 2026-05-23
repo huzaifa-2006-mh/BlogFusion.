@@ -22,10 +22,10 @@ export default function TermsAndConditions() {
         </ul>
 
         <h2 className="mt-4">4. Your Content</h2>
-        <p>In these Website Standard Terms and Conditions, "Your Content" shall mean any audio, video text, images or other material you choose to display on this website. By displaying Your Content, you grant BlogFusion a non-exclusive, worldwide irrevocable, sub licensable license to use, reproduce, adapt, publish, translate and distribute it in any and all media.</p>
+        <p>In these Website Standard Terms and Conditions, &quot;Your Content&quot; shall mean any audio, video text, images or other material you choose to display on this website. By displaying Your Content, you grant BlogFusion a non-exclusive, worldwide irrevocable, sub licensable license to use, reproduce, adapt, publish, translate and distribute it in any and all media.</p>
 
         <h2 className="mt-4">5. Disclaimer</h2>
-        <p>This website is provided "as is," with all faults, and BlogFusion expresses no representations or warranties, of any kind related to this website or the materials contained on this website.</p>
+        <p>This website is provided &quot;as is,&quot; with all faults, and BlogFusion expresses no representations or warranties, of any kind related to this website or the materials contained on this website.</p>
 
         <h2 className="mt-4">6. Changes to Terms</h2>
         <p>BlogFusion is permitted to revise these terms at any time as it sees fit, and by using this website you are expected to review these terms on a regular basis.</p>

@@ -18,19 +18,18 @@ const Footer = () => {
           <Link href="/category">Topics</Link>
           <Link href="/privacy-policy">Privacy Policy</Link>
           <Link href="/terms-and-conditions">Terms & Conditions</Link>
-          <Link href="/sitemap">Sitemap</Link>
         </nav>
 
         {/* Social Media Icons */}
         <div className="footer-social">
-          <a href="#" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/huzaifa-2006-mh" target="_blank" rel="noopener noreferrer">
             <i className="fab fa-github"></i>
           </a>
-          <a href="#" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.facebook.com/profile.php?id=61590547042139" target="_blank" rel="noopener noreferrer">
             <i className="fab fa-facebook"></i>
           </a>
-          <a href="#" target="_blank" rel="noopener noreferrer">
-            <i className="fab fa-instagram"></i>
+          <a href="https://www.linkedin.com/in/mhssoftwarehouse/" target="_blank" rel="noopener noreferrer">
+            <i className="fab fa-linkedin"></i>
           </a>
         </div>
 
