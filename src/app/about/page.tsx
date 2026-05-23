@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 'use client';
 
 export default function About() {
@@ -119,38 +118,10 @@ export default function About() {
               </p>
             </div>
           </div>
-=======
-import Link from 'next/link';
-
-// Rebuild trigger
-  return (
-    <div className="about-page" style={{ padding: '2rem 0' }}>
-      {/* Hero Section */}
-      <section className="about-hero" style={{ background: '#0f172a', color: 'white', padding: '4rem 0', textAlign: 'center' }}>
-        <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: 'clamp(2rem,4vw,3rem)', marginBottom: '1rem' }}>About Blog Fusion</h1>
-          <p style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>
-            Welcome to Blog Fusion – a modern platform built to share knowledge, creativity, technology, and innovation with readers worldwide.
-          </p>
-        </div>
-      </section>
-
-      {/* Mission & Vision */}
-      <section className="section" style={{ padding: '3rem 0' }}>
-        <div className="container" style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '2rem', marginBottom: '1rem', textAlign: 'center' }}>Our Goal</h2>
-          <p style={{ fontSize: '1rem', lineHeight: '1.7', marginBottom: '1rem' }}>
-            Our goal is to provide valuable, easy‑to‑understand, and engaging content that helps people learn, grow, and stay updated with the digital world.
-          </p>
-          <p style={{ fontSize: '1rem', lineHeight: '1.7' }}>
-            At Blog Fusion we believe technology and creativity together can build powerful ideas. Behind this platform is a dedicated team passionate about web development, data analytics, and modern digital solutions.
-          </p>
->>>>>>> Stashed changes
         </div>
       </section>
 
       {/* Team Section */}
-<<<<<<< Updated upstream
       <section className="section team-section">
         <div className="container">
           <div className="section-title">
@@ -232,73 +203,10 @@ import Link from 'next/link';
                 ))}
               </div>
             </div>
-=======
-      <section className="team-section" style={{ background: '#f8fafc', padding: '3rem 0' }}>
-        <div className="container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: '2rem', marginBottom: '2rem', textAlign: 'center' }}>Meet Our Team</h2>
-          {/* Marium */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginBottom: '3rem' }}>
-            <h3 style={{ fontSize: '1.8rem', color: '#0f172a' }}>Marium Waseem – CEO of Blog Fusion</h3>
-            <p style={{ fontSize: '1rem', lineHeight: '1.6' }}>
-              Marium Waseem is the CEO of Blog Fusion and plays a leading role in managing and growing the platform. She is a skilled Data Analyst and Web Developer with a strong passion for technology, analytics, and creative digital experiences.
-            </p>
-            <p style={{ fontSize: '1rem', lineHeight: '1.6' }}>
-              She specializes in transforming data into meaningful insights and building modern, responsive, and user‑friendly websites.
-            </p>
-            <h4 style={{ fontSize: '1.4rem', marginTop: '1rem' }}>Skills & Expertise</h4>
-            <ul style={{ columnCount: 2, columnGap: '2rem', fontSize: '1rem', lineHeight: '1.6' }}>
-              <li>Data Analytics</li>
-              <li>HTML5 & CSS3</li>
-              <li>JavaScript</li>
-              <li>PHP</li>
-              <li>WordPress</li>
-              <li>React.js</li>
-              <li>SQL</li>
-              <li>Data Visualization</li>
-              <li>Dashboard Reporting</li>
-              <li>Microsoft Excel</li>
-              <li>Responsive Web Design</li>
-              <li>UI/UX Understanding</li>
-              <li>Website Management</li>
-              <li>Research & Data Interpretation</li>
-              <li>Problem Solving & Team Management</li>
-            </ul>
-          </div>
-
-          {/* Muhammad Huzaifa */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.8rem', color: '#0f172a' }}>Muhammad Huzaifa – Boss & Lead Developer</h3>
-            <p style={{ fontSize: '1rem', lineHeight: '1.6' }}>
-              Muhammad Huzaifa is the Boss and Lead Developer at Blog Fusion. He is passionate about modern technologies, programming, and full‑stack web development. With over 1 year of experience, he has worked on a variety of projects involving front‑end interfaces, back‑end systems, databases, and scalable web applications.
-            </p>
-            <h4 style={{ fontSize: '1.4rem', marginTop: '1rem' }}>Skills & Expertise</h4>
-            <ul style={{ columnCount: 2, columnGap: '2rem', fontSize: '1rem', lineHeight: '1.6' }}>
-              <li>Oracle Database</li>
-              <li>WordPress Development</li>
-              <li>Java</li>
-              <li>DSA in Java</li>
-              <li>JavaScript</li>
-              <li>HTML5 & CSS3</li>
-              <li>Tailwind CSS</li>
-              <li>PHP</li>
-              <li>C#</li>
-              <li>Python</li>
-              <li>Node.js</li>
-              <li>Express.js</li>
-              <li>Next.js</li>
-              <li>MySQL</li>
-              <li>MongoDB</li>
-              <li>REST API Development</li>
-              <li>Full‑Stack Web Development</li>
-              <li>Responsive Web Design</li>
-              <li>Database Management</li>
-            </ul>
->>>>>>> Stashed changes
           </div>
         </div>
       </section>
 
-<<<<<<< Updated upstream
       {/* Values Section */}
       <section className="section values-section">
         <div className="container">
@@ -772,12 +680,6 @@ import Link from 'next/link';
           }
         }
       `}</style>
-=======
-      {/* Back to Home */}
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-        <Link href="/" style={{ color: '#2563eb', textDecoration: 'underline', fontSize: '1rem' }}>← Back to Home</Link>
-      </div>
->>>>>>> Stashed changes
     </div>
   );
 }
