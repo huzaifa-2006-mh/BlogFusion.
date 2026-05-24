@@ -40,10 +40,10 @@ export default async function Home() {
             {/* Left Column: Description */}
             <div style={{ fontSize: '1rem', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
                 <p style={{ marginBottom: '1.5rem' }}>
-                    Blog Fusion is your go-to resource for mastering Google apps and modern productivity tools. Created by Muhammad Huzaifa we've been helping millions of users since 2020 with clear, practical guides that turn complex technology into simple solutions.
+                    Blog Fusion is your go-to resource for mastering Google apps and modern productivity tools. Created by Muhammad Huzaifa we've been helping millions of users since 2020 with cle[...]
                 </p>
                 <p>
-                    Automate your workflow with Google Sheets, streamline your inbox with custom Gmail routines, build powerful no-code workflows, or master the latest tech trends. Our popular Google Apps Script solutions save you time and make you more productive.
+                    Automate your workflow with Google Sheets, streamline your inbox with custom Gmail routines, build powerful no-code workflows, or master the latest tech trends. Our popular Goo[...]
                 </p>
             </div>
 
@@ -53,7 +53,8 @@ export default async function Home() {
                     "Independent and unbiased. No sponsored content, no paid endorsements, no brand partnerships. Just honest tech guidance you can trust."
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '45px', height: '45px', backgroundColor: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>MH</div>
+                    <div style={{ width: '45px', height: '45px', backgroundColor: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', f[...] }}>
+                    </div>
                     <div>
                         <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--text-primary)' }}>Muhammad Huzaifa</h4>
                         <p style={{ margin: '0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Founder, Blog Fusion</p>
