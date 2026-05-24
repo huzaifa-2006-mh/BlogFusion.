@@ -1,0 +1,4 @@
+{
+  "generator": "npx prisma",
+  "prismaCliVersion": "6.0.0"
+}
