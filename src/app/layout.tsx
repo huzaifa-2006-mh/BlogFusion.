@@ -6,14 +6,14 @@ import AnalyticsTracker from "@/components/AnalyticsTracker";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "BlogFusion | Best Platform for Tech, Online Earning, Jobs & Entertainment Blogs",
-  description: "Welcome to BlogFusion, a complete multi-niche blog where you can explore the latest updates in technology, programming tutorials, online earning methods, job opportunities, anime reviews, and entertainment content.",
-  keywords: "fusion blog, blog fusion, blog, online earning in Pakistan, latest tech blogs, programming tutorials for beginners, online jobs 2026, how to earn money online, anime reviews, drama reviews, freelancing tips, blogging tips",
+  title: "Blog Fusion | Best Platform for Tech, Online Earning, Jobs & Entertainment Blogs",
+  description: "Welcome to Blog Fusion, a complete multi-niche blog where you can explore the latest updates in technology, programming tutorials, online earning methods, job opportunities, anime r[...]",
+  keywords: "fusion blog, blog fusion, blog, online earning in Pakistan, latest tech blogs, programming tutorials for beginners, online jobs 2026, how to earn money online, anime reviews, drama re[...]",
   openGraph: {
-    title: "BlogFusion - Multi-Niche Blog",
+    title: "Blog Fusion - Multi-Niche Blog",
     description: "Explore tech, earning, and entertainment.",
     url: "https://blog-fusion-beta.vercel.app",
-    siteName: "BlogFusion",
+    siteName: "Blog Fusion",
     locale: "en_US",
     type: "website",
   },
