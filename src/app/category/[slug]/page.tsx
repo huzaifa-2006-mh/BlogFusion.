@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const category = await prisma.category.findUnique({ where: { slug } });
   return {
-    title: category ? `${category.name} - Digital Inspiration` : 'Category Not Found',
+    title: category ? `${category.name} - Blog Fusion` : 'Category Not Found',
     description: category?.description || `Explore the latest tips, tutorials, and guides in ${category?.name || 'this category'}.`,
   };
 }

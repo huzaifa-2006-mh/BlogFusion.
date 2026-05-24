@@ -26,12 +26,12 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
   if (!post) {
     return {
-      title: 'Post Not Found - Digital Inspiration'
+      title: 'Post Not Found - Blog Fusion'
     };
   }
 
   return {
-    title: post.metaTitle || `${post.title} - Digital Inspiration`,
+    title: post.metaTitle || `${post.title} - Blog Fusion`,
     description: post.metaDescription || post.excerpt,
     keywords: post.focusKeywords || undefined,
     openGraph: {

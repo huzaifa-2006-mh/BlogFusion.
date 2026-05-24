@@ -58,7 +58,7 @@ export async function GET() {
 // @ts-ignore
     const uniqueVisitorsCount = await prisma.analytics.groupBy({
       by: ['visitorId'],
-    }).then(res => res.length);
+    }).then((res: unknown[]) => res.length);
 
     // 2. Total Blog Reads
     const posts = await prisma.post.findMany({
