@@ -1,6 +1,7 @@
 {
-  "name": "mhsblog",
-  "version": "0.1.0",
+  "name": "blog-fusion",
+  "version": "1.0.0",
+  "description": "Blog Fusion - A modern multi-niche blogging platform",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,6 +13,14 @@
   "prisma": {
     "seed": "node prisma/seed.js"
   },
+  "keywords": [
+    "blog",
+    "blogging",
+    "multi-niche",
+    "nextjs",
+    "typescript"
+  ],
+  "author": "Blog Fusion Team",
   "dependencies": {
     "next": "16.2.4",
     "react": "19.2.4",
