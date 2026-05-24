@@ -53,7 +53,7 @@ export default async function Home() {
                     "Independent and unbiased. No sponsored content, no paid endorsements, no brand partnerships. Just honest tech guidance you can trust."
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '45px', height: '45px', backgroundColor: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', f[...] }}>
+                    <div style={{ width: '45px', height: '45px', backgroundColor: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
                     </div>
                     <div>
                         <h4 style={{ margin: '0', fontSize: '1rem', color: 'var(--text-primary)' }}>Muhammad Huzaifa</h4>
