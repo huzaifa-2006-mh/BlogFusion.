@@ -10,9 +10,6 @@
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "keywords": [
     "blog",
     "blogging",
