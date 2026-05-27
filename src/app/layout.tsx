@@ -30,6 +30,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <Script 
+          strategy="beforeInteractive" 
+          src="https://cdn.consentmanager.net/delivery/autoblocking/28235e7bd2553.js" 
+          data-cmp-ab="1" 
+          data-cmp-host="d.delivery.consentmanager.net" 
+          data-cmp-cdn="cdn.consentmanager.net" 
+          data-cmp-codesrc="16" 
+        />
         <link rel="icon" href="/logo.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
