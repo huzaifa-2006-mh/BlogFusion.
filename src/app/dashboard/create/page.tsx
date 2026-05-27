@@ -362,7 +362,7 @@ export default function CreatePost() {
                   required
                 ></textarea>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.6rem' }}>
-                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>💡 Tip: Use `[IMAGE]` to embed uploaded images inline.</span>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>💡 Tip: Use `[IMAGE: Your Alt Text]` to embed uploaded images inline with alt text.</span>
                   <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Supports robust HTML formatting tags</span>
                 </div>
               </div>

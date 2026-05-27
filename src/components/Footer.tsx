@@ -18,6 +18,7 @@ const Footer = () => {
           <Link href="/category">Topics</Link>
           <Link href="/privacy-policy">Privacy Policy</Link>
           <Link href="/terms-and-conditions">Terms & Conditions</Link>
+          <Link href="/disclaimer">Disclaimer</Link>
         </nav>
 
         {/* Social Media Icons */}

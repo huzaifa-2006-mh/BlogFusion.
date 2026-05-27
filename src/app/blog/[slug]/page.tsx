@@ -122,13 +122,20 @@ export default async function BlogPostPage({ params }: any) {
   const inlineImages = [...gallery];
   
   let imageIndex = 0;
-  while (processedContent.includes('[IMAGE]') && imageIndex < inlineImages.length) {
+  const imageRegex = /(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/i;
+  
+  while (imageRegex.test(processedContent) && imageIndex < inlineImages.length) {
+    const match = imageRegex.exec(processedContent);
+    if (!match) break;
+    
+    const altText = match[1] ? match[1].trim() : `Blog image ${imageIndex + 1}`;
     const imgHtml = `
-      <div class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
-        <img src="${inlineImages[imageIndex]}" alt="Blog image ${imageIndex + 1}" style="width: 100%; height: auto; display: block;" />
-      </div>
+      <figure class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
+        <img src="${inlineImages[imageIndex]}" alt="${altText}" style="width: 100%; height: auto; display: block;" />
+        ${match[1] ? `<figcaption style="text-align: center; font-size: 0.85rem; color: #64748b; padding: 0.75rem; background: #f8fafc; border-top: 1px solid #e2e8f0; margin: 0;">${altText}</figcaption>` : ''}
+      </figure>
     `;
-    processedContent = processedContent.replace('[IMAGE]', imgHtml);
+    processedContent = processedContent.replace(match[0], imgHtml);
     imageIndex++;
   }
 
