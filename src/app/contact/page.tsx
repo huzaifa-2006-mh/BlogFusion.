@@ -1,5 +1,6 @@
 import { getPageSeo } from '@/lib/seo';
 import type { Metadata } from 'next';
+import ContactForm from '@/components/ContactForm';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/contact', {
@@ -43,26 +44,7 @@ export default function Contact() {
             </div>
 
             <div className="contact-form">
-              <h3>Send a Message</h3>
-              <form>
-                <div className="form-group">
-                  <label htmlFor="name">Name</label>
-                  <input type="text" id="name" placeholder="Your Name" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="email">Email</label>
-                  <input type="email" id="email" placeholder="Your Email" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="subject">Subject</label>
-                  <input type="text" id="subject" placeholder="Subject" />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="message">Message</label>
-                  <textarea id="message" placeholder="How can we help you?"></textarea>
-                </div>
-                <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Send Message</button>
-              </form>
+              <ContactForm />
             </div>
           </div>
         </div>
