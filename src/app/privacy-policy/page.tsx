@@ -1,7 +1,7 @@
 import { getPageSeo } from '@/lib/seo';
 import type { Metadata } from 'next';
 
-export { seoRevalidate as revalidate } from '@/lib/seo-config';
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/privacy-policy', {

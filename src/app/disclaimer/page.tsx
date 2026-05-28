@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 import { getPageSeo } from '@/lib/seo';
 
-export { seoRevalidate as revalidate } from '@/lib/seo-config';
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/disclaimer', {
