@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { checkAuth } from '@/lib/auth';
+import prisma from '@/lib/prisma';
+import { cookies } from 'next/headers';
 
 export async function GET(request: Request) {
   try {
@@ -24,7 +24,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const session = await checkAuth();
+    const cookieStore = await cookies();
+    const session = cookieStore.get('auth_session');
+
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

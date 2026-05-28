@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { prisma } from './prisma';
+import prisma from './prisma';
 
 export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): Promise<Metadata> {
   try {
@@ -13,7 +13,7 @@ export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): P
       ...defaultMetadata,
       title: seoData.metaTitle || defaultMetadata.title,
       description: seoData.metaDescription || defaultMetadata.description,
-      keywords: seoData.focusKeywords || defaultMetadata.keywords,
+      keywords: seoData.focusKeywords || (defaultMetadata.keywords as string | undefined),
       openGraph: {
         ...(defaultMetadata.openGraph || {}),
         title: seoData.metaTitle || (defaultMetadata.openGraph as any)?.title,
