@@ -66,6 +66,9 @@ export async function POST(request: Request) {
         metaTitle: (formData.get('metaTitle') as string) || null,
         metaDescription: (formData.get('metaDescription') as string) || null,
         focusKeywords: (formData.get('focusKeywords') as string) || null,
+        ogImage: (formData.get('ogImage') as string) || null,
+        canonicalUrl: (formData.get('canonicalUrl') as string) || null,
+        isIndexable: formData.get('isIndexable') !== 'false',
       },
     });
 

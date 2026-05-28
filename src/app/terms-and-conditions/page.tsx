@@ -1,3 +1,13 @@
+import { getPageSeo } from '@/lib/seo';
+import type { Metadata } from 'next';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageSeo('/terms-and-conditions', {
+    title: 'Terms & Conditions - Blog Fusion',
+    description: 'Terms and Conditions of using Blog Fusion.',
+  });
+}
+
 export default function TermsAndConditions() {
   return (
     <section className="section">

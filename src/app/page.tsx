@@ -2,7 +2,17 @@
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
 
+import { getPageSeo } from '@/lib/seo';
+import type { Metadata } from 'next';
+
 export const revalidate = 60;
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageSeo('/', {
+    title: 'Blog Fusion | Best Platform for Tech, Online Earning, Jobs & Entertainment Blogs',
+    description: 'Welcome to Blog Fusion, a complete multi-niche blog.',
+  });
+}
 
 export default async function Home() {
   let categoriesWithPosts: any[] = []; // eslint-disable-line @typescript-eslint/no-explicit-any

@@ -1,10 +1,14 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Disclaimer - Blog Fusion',
-  description: 'Disclaimer and limitation of liability for Blog Fusion.',
-};
+import { getPageSeo } from '@/lib/seo';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageSeo('/disclaimer', {
+    title: 'Disclaimer - Blog Fusion',
+    description: 'Disclaimer and limitation of liability for Blog Fusion.',
+  });
+}
 
 export default function Disclaimer() {
   return (

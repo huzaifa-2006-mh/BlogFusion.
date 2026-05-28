@@ -1,3 +1,13 @@
+import { getPageSeo } from '@/lib/seo';
+import type { Metadata } from 'next';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageSeo('/privacy-policy', {
+    title: 'Privacy Policy - Blog Fusion',
+    description: 'Privacy Policy for Blog Fusion. Learn how we handle and protect your data.',
+  });
+}
+
 export default function PrivacyPolicy() {
   return (
     <section className="section">

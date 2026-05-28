@@ -2,10 +2,14 @@ import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Explore Topics | BlogFusion',
-  description: 'View tips, tutorials and how-to guides by topic on BlogFusion.',
-};
+import { getPageSeo } from '@/lib/seo';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageSeo('/category', {
+    title: 'Explore Topics | BlogFusion',
+    description: 'View tips, tutorials and how-to guides by topic on BlogFusion.',
+  });
+}
 
 export default async function CategoryIndexPage() {
   let categories: any[] = [];

@@ -21,6 +21,9 @@ export default function CreatePost() {
   const [showOnHome, setShowOnHome] = useState(true);
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
+  const [ogImage, setOgImage] = useState('');
+  const [canonicalUrl, setCanonicalUrl] = useState('');
+  const [isIndexable, setIsIndexable] = useState(true);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   useEffect(() => {
@@ -135,6 +138,9 @@ export default function CreatePost() {
       formData.append('content', content);
       formData.append('metaTitle', metaTitle);
       formData.append('metaDescription', metaDescription);
+      formData.append('ogImage', ogImage);
+      formData.append('canonicalUrl', canonicalUrl);
+      formData.append('isIndexable', String(isIndexable));
       imageFiles.forEach(file => formData.append('images', file));
 
       const response = await fetch('/api/posts', { method: 'POST', body: formData });
@@ -423,6 +429,68 @@ export default function CreatePost() {
                   onFocus={(e) => e.target.style.borderColor = '#0f172a'}
                   onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                 ></textarea>
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>OG Image URL</label>
+                <input 
+                  type="text" 
+                  value={ogImage} 
+                  onChange={(e) => setOgImage(e.target.value)} 
+                  placeholder="https://example.com/og-image.jpg" 
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.85rem 1rem', 
+                    border: '1px solid #cbd5e1', 
+                    borderRadius: '8px',
+                    outline: 'none',
+                    fontSize: '0.95rem',
+                    transition: 'border-color 0.2s'
+                  }} 
+                  onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Canonical URL (Optional)</label>
+                <input 
+                  type="text" 
+                  value={canonicalUrl} 
+                  onChange={(e) => setCanonicalUrl(e.target.value)} 
+                  placeholder="Leave blank to use default URL" 
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.85rem 1rem', 
+                    border: '1px solid #cbd5e1', 
+                    borderRadius: '8px',
+                    outline: 'none',
+                    fontSize: '0.95rem',
+                    transition: 'border-color 0.2s'
+                  }} 
+                  onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                />
+              </div>
+
+              <div>
+                <label style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.6rem', 
+                  cursor: 'pointer', 
+                  fontWeight: '600',
+                  fontSize: '0.9rem',
+                  color: '#334155'
+                }}>
+                  <input 
+                    type="checkbox" 
+                    checked={isIndexable} 
+                    onChange={(e) => setIsIndexable(e.target.checked)} 
+                    style={{ width: '1.15rem', height: '1.15rem', cursor: 'pointer' }} 
+                  />
+                  Index this page (Allow Search Engines)
+                </label>
               </div>
             </div>
 

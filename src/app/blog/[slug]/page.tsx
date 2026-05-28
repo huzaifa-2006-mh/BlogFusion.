@@ -30,17 +30,36 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     };
   }
 
-  return {
+  const metadata: Metadata = {
     title: post.metaTitle || `${post.title} - Blog Fusion`,
     description: post.metaDescription || post.excerpt,
     keywords: post.focusKeywords || undefined,
     openGraph: {
       title: post.metaTitle || post.title,
       description: post.metaDescription || post.excerpt,
-      images: post.coverImage ? [post.coverImage] : [],
+      images: post.ogImage ? [{ url: post.ogImage }] : (post.coverImage ? [{ url: post.coverImage }] : []),
+      url: post.canonicalUrl || undefined,
       type: 'article',
+    },
+    alternates: {
+      canonical: post.canonicalUrl || undefined,
     }
   };
+
+  if (!post.isIndexable) {
+    metadata.robots = {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
+    };
+  }
+
+  return metadata;
 }
 
 export default async function BlogPostPage({ params }: any) {

@@ -1,3 +1,13 @@
+import { getPageSeo } from '@/lib/seo';
+import type { Metadata } from 'next';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getPageSeo('/contact', {
+    title: 'Contact Us - Blog Fusion',
+    description: 'Get in touch with Blog Fusion for business inquiries, feedback, or collaborations.',
+  });
+}
+
 export default function Contact() {
   return (
     <div>
