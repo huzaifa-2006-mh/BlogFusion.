@@ -15,12 +15,14 @@ export default function CreatePost() {
   const [categoryId, setCategoryId] = useState('');
   const [content, setContent] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageAlts, setImageAlts] = useState<string[]>([]);
   const [categories, setCategories] = useState<{ id: string, name: string }[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showOnHome, setShowOnHome] = useState(true);
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
+  const [focusKeywords, setFocusKeywords] = useState('');
   const [ogImage, setOgImage] = useState('');
   const [canonicalUrl, setCanonicalUrl] = useState('');
   const [isIndexable, setIsIndexable] = useState(true);
@@ -36,6 +38,7 @@ export default function CreatePost() {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setImageFiles(prev => [...prev, ...files]);
+      setImageAlts(prev => [...prev, ...files.map((file) => file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '))]);
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (event) => setPreviews(prev => [...prev, event.target?.result as string]);
@@ -46,7 +49,12 @@ export default function CreatePost() {
 
   const removeImage = (index: number) => {
     setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImageAlts(prev => prev.filter((_, i) => i !== index));
     setPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateImageAlt = (index: number, value: string) => {
+    setImageAlts((prev) => prev.map((alt, i) => (i === index ? value : alt)));
   };
 
   const addFAQ = () => setFaqs([...faqs, { question: '', answer: '' }]);
@@ -138,9 +146,11 @@ export default function CreatePost() {
       formData.append('content', content);
       formData.append('metaTitle', metaTitle);
       formData.append('metaDescription', metaDescription);
+      formData.append('focusKeywords', focusKeywords);
       formData.append('ogImage', ogImage);
       formData.append('canonicalUrl', canonicalUrl);
       formData.append('isIndexable', String(isIndexable));
+      formData.append('imageAlts', JSON.stringify(imageAlts));
       imageFiles.forEach(file => formData.append('images', file));
 
       const response = await fetch('/api/posts', { method: 'POST', body: formData });
@@ -431,6 +441,27 @@ export default function CreatePost() {
                 ></textarea>
               </div>
 
+              <div style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Focus Keywords</label>
+                <input
+                  type="text"
+                  value={focusKeywords}
+                  onChange={(e) => setFocusKeywords(e.target.value)}
+                  placeholder="e.g. next.js seo, blog optimization, image alt text"
+                  style={{
+                    width: '100%',
+                    padding: '0.85rem 1rem',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    fontSize: '0.95rem',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                />
+              </div>
+
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>OG Image URL</label>
                 <input 
@@ -698,8 +729,17 @@ export default function CreatePost() {
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
                 {previews.map((preview, i) => (
-                  <div key={i} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
-                    <img src={preview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <div key={i} style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1', background: 'white' }}>
+                    <div style={{ aspectRatio: '1/1' }}>
+                      <img src={preview} alt={imageAlts[i] || `preview ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <input
+                      type="text"
+                      value={imageAlts[i] || ''}
+                      onChange={(e) => updateImageAlt(i, e.target.value)}
+                      placeholder="Image alt text"
+                      style={{ width: '100%', border: 'none', borderTop: '1px solid #e2e8f0', padding: '0.55rem 0.6rem', fontSize: '0.8rem', outline: 'none' }}
+                    />
                     <button 
                       type="button" 
                       onClick={() => removeImage(i)} 

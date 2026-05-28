@@ -2,8 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { applyImageAltPlaceholders, optimizeAndStoreImage } from '@/lib/imageUpload';
 
 // GET a single post
 export async function GET(
@@ -41,12 +40,15 @@ export async function PATCH(
     const content = formData.get('content') as string;
     const categoryId = formData.get('categoryId') as string;
     const files = formData.getAll('images') as File[];
+    const imageAlts = JSON.parse((formData.get('imageAlts') as string) || '[]') as string[];
+
+    const contentWithImages = applyImageAltPlaceholders(content, imageAlts);
 
     const updateData: any = {
       title,
-      content,
+      content: contentWithImages,
       categoryId,
-      excerpt: content.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...',
+      excerpt: contentWithImages.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...',
       showOnHome: formData.get('showOnHome') === 'true',
       shortDescription: formData.get('shortDescription') as string || null,
       faqs: formData.get('faqs') ? JSON.parse(formData.get('faqs') as string) : null,
@@ -64,10 +66,8 @@ export async function PATCH(
 
       for (const file of files) {
         if (file.size > 0) {
-          const bytes = await file.arrayBuffer();
-          const buffer = Buffer.from(bytes);
-          const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
-          uploadedImagePaths.push(base64Image);
+          const optimizedPath = await optimizeAndStoreImage(file);
+          uploadedImagePaths.push(optimizedPath);
         }
       }
       updateData.images = uploadedImagePaths;

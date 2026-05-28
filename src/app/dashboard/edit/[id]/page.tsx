@@ -24,6 +24,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [showOnHome, setShowOnHome] = useState(true);
   const [metaTitle, setMetaTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
+  const [focusKeywords, setFocusKeywords] = useState('');
   const [ogImage, setOgImage] = useState('');
   const [canonicalUrl, setCanonicalUrl] = useState('');
   const [isIndexable, setIsIndexable] = useState(true);
@@ -49,6 +50,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           setFaqs(postData.faqs || []);
           setMetaTitle(postData.metaTitle || '');
           setMetaDescription(postData.metaDescription || '');
+          setFocusKeywords(postData.focusKeywords || '');
           setOgImage(postData.ogImage || '');
           setCanonicalUrl(postData.canonicalUrl || '');
           setIsIndexable(postData.isIndexable ?? true);
@@ -56,7 +58,9 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           let rawContent = postData.content || '';
           setContent(rawContent);
           
-          if (postData.images) setPreviews(postData.images);
+          if (postData.images) {
+            setPreviews(postData.images);
+          }
         }
       } catch (error) {
         console.error('Error loading data:', error);
@@ -174,9 +178,11 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       formData.append('content', content);
       formData.append('metaTitle', metaTitle);
       formData.append('metaDescription', metaDescription);
+      formData.append('focusKeywords', focusKeywords);
       formData.append('ogImage', ogImage);
       formData.append('canonicalUrl', canonicalUrl);
       formData.append('isIndexable', String(isIndexable));
+      formData.append('imageAlts', JSON.stringify([]));
       imageFiles.forEach(file => formData.append('images', file));
 
       const response = await fetch(`/api/posts/${id}`, { method: 'PATCH', body: formData });
@@ -469,6 +475,27 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                 ></textarea>
               </div>
 
+              <div style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+                <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>Focus Keywords</label>
+                <input
+                  type="text"
+                  value={focusKeywords}
+                  onChange={(e) => setFocusKeywords(e.target.value)}
+                  placeholder="e.g. next.js seo, blog optimization, image alt text"
+                  style={{
+                    width: '100%',
+                    padding: '0.85rem 1rem',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    fontSize: '0.95rem',
+                    transition: 'border-color 0.2s'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#0f172a'}
+                  onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
+                />
+              </div>
+
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ fontWeight: '800', fontSize: '0.8rem', color: '#475569', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'block', letterSpacing: '0.05em' }}>OG Image URL</label>
                 <input 
@@ -737,7 +764,9 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
                 {previews.map((preview, i) => (
                   <div key={i} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
-                    <img src={preview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <div style={{ aspectRatio: '1/1' }}>
+                      <img src={preview} alt={`preview ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
                     <button 
                       type="button" 
                       onClick={() => removeImage(i)} 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import { applyImageAltPlaceholders, optimizeAndStoreImage } from '@/lib/imageUpload';
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -17,17 +18,18 @@ export async function POST(request: Request) {
     const content = formData.get('content') as string;
     const categoryId = formData.get('categoryId') as string;
     const files = formData.getAll('images') as File[];
+    const imageAlts = JSON.parse((formData.get('imageAlts') as string) || '[]') as string[];
 
     const uploadedImagePaths: string[] = [];
 
     for (const file of files) {
       if (file.size > 0) {
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-        const base64Image = `data:${file.type};base64,${buffer.toString('base64')}`;
-        uploadedImagePaths.push(base64Image);
+        const optimizedPath = await optimizeAndStoreImage(file);
+        uploadedImagePaths.push(optimizedPath);
       }
     }
+
+    const contentWithImages = applyImageAltPlaceholders(content, imageAlts);
 
     // Find the user (author)
     const username = session.value;
@@ -53,8 +55,8 @@ export async function POST(request: Request) {
       data: {
         title,
         slug: baseSlug,
-        content,
-        excerpt: content.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...',
+        content: contentWithImages,
+        excerpt: contentWithImages.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...',
         categoryId,
         authorId: user.id,
         published: true,
