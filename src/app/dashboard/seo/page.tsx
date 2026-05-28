@@ -11,6 +11,7 @@ const PAGES = [
   { label: 'Privacy Policy', path: '/privacy-policy' },
   { label: 'Terms & Conditions', path: '/terms-and-conditions' },
   { label: 'Disclaimer', path: '/disclaimer' },
+  { label: 'FAQs Page', path: '/faqs' },
 ];
 
 export default function SeoDashboard() {

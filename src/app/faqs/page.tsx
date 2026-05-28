@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { getPageSeo } from '@/lib/seo';
 
+export { seoRevalidate as revalidate } from '@/lib/seo-config';
+
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/faqs', {
     title: 'Frequently Asked Questions (FAQs) - Blog Fusion',

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
+import { normalizePagePath } from '@/lib/seo';
 
 export async function GET(request: Request) {
   try {
@@ -11,8 +13,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Page path is required' }, { status: 400 });
     }
 
+    const normalizedPath = normalizePagePath(pagePath);
+
     const seoData = await prisma.pageSeo.findUnique({
-      where: { pagePath },
+      where: { pagePath: normalizedPath },
     });
 
     return NextResponse.json({ seo: seoData || null });
@@ -38,8 +42,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Page path is required' }, { status: 400 });
     }
 
+    const normalizedPath = normalizePagePath(pagePath);
+
     const seoData = await prisma.pageSeo.upsert({
-      where: { pagePath },
+      where: { pagePath: normalizedPath },
       update: {
         metaTitle,
         metaDescription,
@@ -49,7 +55,7 @@ export async function POST(request: Request) {
         isIndexable: isIndexable ?? true,
       },
       create: {
-        pagePath,
+        pagePath: normalizedPath,
         metaTitle,
         metaDescription,
         focusKeywords,
@@ -58,6 +64,9 @@ export async function POST(request: Request) {
         isIndexable: isIndexable ?? true,
       },
     });
+
+    revalidatePath(normalizedPath, 'layout');
+    revalidatePath(normalizedPath, 'page');
 
     return NextResponse.json({ success: true, seo: seoData });
   } catch (error) {

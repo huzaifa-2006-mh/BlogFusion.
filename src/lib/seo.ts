@@ -1,10 +1,18 @@
 import { Metadata } from 'next';
 import prisma from './prisma';
 
+export function normalizePagePath(pagePath: string): string {
+  const trimmed = pagePath.trim();
+  if (!trimmed || trimmed === '/') return '/';
+  return trimmed.replace(/\/+$/, '') || '/';
+}
+
 export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): Promise<Metadata> {
+  const normalizedPath = normalizePagePath(pagePath);
+
   try {
     const seoData = await prisma.pageSeo.findUnique({
-      where: { pagePath },
+      where: { pagePath: normalizedPath },
     });
 
     if (!seoData) return defaultMetadata;
@@ -41,7 +49,7 @@ export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): P
 
     return metadata;
   } catch (error) {
-    console.error(`Error fetching SEO for ${pagePath}:`, error);
+    console.error(`Error fetching SEO for ${normalizedPath}:`, error);
     return defaultMetadata;
   }
 }

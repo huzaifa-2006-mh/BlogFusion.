@@ -4,6 +4,8 @@ import { Metadata } from 'next';
 
 import { getPageSeo } from '@/lib/seo';
 
+export { seoRevalidate as revalidate } from '@/lib/seo-config';
+
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/category', {
     title: 'Explore Topics | BlogFusion',

@@ -3,6 +3,8 @@ import Link from 'next/link';
 
 import { getPageSeo } from '@/lib/seo';
 
+export { seoRevalidate as revalidate } from '@/lib/seo-config';
+
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/disclaimer', {
     title: 'Disclaimer - Blog Fusion',

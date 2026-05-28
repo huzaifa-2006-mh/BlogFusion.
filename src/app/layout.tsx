@@ -21,24 +21,19 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Blog Fusion | Best Platform for Tech, Online Earning, Jobs & Entertainment Blogs",
-  description: "Welcome to Blog Fusion, a complete multi-niche blog where you can explore the latest updates in technology, programming tutorials, online earning methods, job opportunities, anime r[...]",
-  keywords: "fusion blog, blog fusion, blog, online earning in Pakistan, latest tech blogs, programming tutorials for beginners, online jobs 2026, how to earn money online, anime reviews, drama re[...]",
-  openGraph: {
-    title: "Blog Fusion - Multi-Niche Blog",
-    description: "Explore tech, earning, and entertainment.",
-    url: "https://blog-fusion-beta.vercel.app",
-    siteName: "Blog Fusion",
-    locale: "en_US",
-    type: "website",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app'),
+  title: {
+    default: 'Blog Fusion',
+    template: '%s',
   },
+  description: 'Welcome to Blog Fusion — technology, programming, online earning, jobs, and entertainment blogs.',
   verification: {
-    google: "googled854f7a7aedcc96b",
+    google: 'googled854f7a7aedcc96b',
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
   },
 };
 
