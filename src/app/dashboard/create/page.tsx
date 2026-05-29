@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import BlogImageUploader from '@/components/BlogImageUploader';
 
 interface FAQ {
   question: string;
@@ -724,79 +725,13 @@ export default function CreatePost() {
 
             {/* Media Upload Card */}
             <div className="dashboard-card" style={{ padding: '2rem' }}>
-              <h4 style={{ margin: '0 0 0.3rem 0', fontWeight: '900', fontSize: '1.1rem', color: '#0f172a' }}>Blog Visuals</h4>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 1.2rem 0' }}>Upload image graphics for your guide's cover and bodies.</p>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-                {previews.map((preview, i) => (
-                  <div key={i} style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1', background: 'white' }}>
-                    <div style={{ aspectRatio: '1/1' }}>
-                      <img src={preview} alt={imageAlts[i] || `preview ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <input
-                      type="text"
-                      value={imageAlts[i] || ''}
-                      onChange={(e) => updateImageAlt(i, e.target.value)}
-                      placeholder="Image alt text"
-                      style={{ width: '100%', border: 'none', borderTop: '1px solid #e2e8f0', padding: '0.55rem 0.6rem', fontSize: '0.8rem', outline: 'none' }}
-                    />
-                    <button 
-                      type="button" 
-                      onClick={() => removeImage(i)} 
-                      title="Remove Image"
-                      style={{ 
-                        position: 'absolute', 
-                        top: '0.3rem', 
-                        right: '0.3rem', 
-                        background: 'rgba(255,255,255,0.92)', 
-                        border: 'none', 
-                        borderRadius: '50%', 
-                        width: '20px', 
-                        height: '20px', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        cursor: 'pointer',
-                        fontSize: '0.7rem',
-                        fontWeight: 'bold',
-                        color: '#64748b',
-                        transition: 'color 0.2s'
-                      }}
-                      onMouseOver={(e) => e.currentTarget.style.color = '#ef4444'}
-                      onMouseOut={(e) => e.currentTarget.style.color = '#64748b'}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-                
-                <label style={{ 
-                  aspectRatio: '1/1', 
-                  border: '2px dashed #cbd5e1', 
-                  borderRadius: '8px', 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  cursor: 'pointer', 
-                  color: '#64748b',
-                  backgroundColor: '#f8fafc',
-                  transition: 'all 0.2s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.borderColor = '#0f172a';
-                  e.currentTarget.style.backgroundColor = '#f1f5f9';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.borderColor = '#cbd5e1';
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                }}
-                >
-                  <span style={{ fontSize: '1.6rem', fontWeight: 'bold' }}>+</span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: '600' }}>Add Photo</span>
-                  <input type="file" hidden multiple onChange={handleImageChange} accept="image/*" />
-                </label>
-              </div>
+              <BlogImageUploader
+                previews={previews}
+                imageAlts={imageAlts}
+                onImagesChange={handleImageChange}
+                onAltChange={updateImageAlt}
+                onRemove={removeImage}
+              />
             </div>
           </div>
         </div>

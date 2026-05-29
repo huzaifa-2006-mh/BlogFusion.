@@ -12,7 +12,14 @@ const Navbar = () => {
     <header className="header">
       <div className="container nav">
         <Link href="/" className="logo-link">
-          <div className="logo-container">
+          <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <img
+              src="/logo.png"
+              alt="Blog Fusion logo"
+              width={40}
+              height={40}
+              style={{ borderRadius: '8px', objectFit: 'contain' }}
+            />
             <span className="logo-text">
               Blog<span className="logo-accent">Fusion</span>
             </span>

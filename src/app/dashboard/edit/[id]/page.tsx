@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
+import BlogImageUploader from '@/components/BlogImageUploader';
 
 interface FAQ {
   question: string;
@@ -17,6 +18,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [categoryId, setCategoryId] = useState('');
   const [content, setContent] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imageAlts, setImageAlts] = useState<string[]>([]);
   const [categories, setCategories] = useState<{ id: string, name: string }[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -60,6 +62,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           
           if (postData.images) {
             setPreviews(postData.images);
+            setImageAlts(postData.images.map(() => ''));
           }
         }
       } catch (error) {
@@ -143,6 +146,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setImageFiles(prev => [...prev, ...files]);
+      setImageAlts(prev => [...prev, ...files.map((file) => file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '))]);
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (event) => setPreviews(prev => [...prev, event.target?.result as string]);
@@ -153,7 +157,12 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
 
   const removeImage = (index: number) => {
     setPreviews(prev => prev.filter((_, i) => i !== index));
-    setImageFiles([]); 
+    setImageAlts(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateImageAlt = (index: number, value: string) => {
+    setImageAlts((prev) => prev.map((alt, i) => (i === index ? value : alt)));
   };
 
   const addFAQ = () => setFaqs([...faqs, { question: '', answer: '' }]);
@@ -182,7 +191,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       formData.append('ogImage', ogImage);
       formData.append('canonicalUrl', canonicalUrl);
       formData.append('isIndexable', String(isIndexable));
-      formData.append('imageAlts', JSON.stringify([]));
+      formData.append('imageAlts', JSON.stringify(imageAlts));
       imageFiles.forEach(file => formData.append('images', file));
 
       const response = await fetch(`/api/posts/${id}`, { method: 'PATCH', body: formData });
@@ -758,72 +767,13 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
 
             {/* Media Upload Card */}
             <div className="dashboard-card" style={{ padding: '2rem' }}>
-              <h4 style={{ margin: '0 0 0.3rem 0', fontWeight: '900', fontSize: '1.1rem', color: '#0f172a' }}>Blog Visuals</h4>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 1.2rem 0' }}>Upload image graphics for your guide's cover and bodies.</p>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-                {previews.map((preview, i) => (
-                  <div key={i} style={{ position: 'relative', aspectRatio: '1/1', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
-                    <div style={{ aspectRatio: '1/1' }}>
-                      <img src={preview} alt={`preview ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <button 
-                      type="button" 
-                      onClick={() => removeImage(i)} 
-                      title="Remove Image"
-                      style={{ 
-                        position: 'absolute', 
-                        top: '0.3rem', 
-                        right: '0.3rem', 
-                        background: 'rgba(255,255,255,0.92)', 
-                        border: 'none', 
-                        borderRadius: '50%', 
-                        width: '20px', 
-                        height: '20px', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        cursor: 'pointer',
-                        fontSize: '0.7rem',
-                        fontWeight: 'bold',
-                        color: '#64748b',
-                        transition: 'color 0.2s'
-                      }}
-                      onMouseOver={(e) => e.currentTarget.style.color = '#ef4444'}
-                      onMouseOut={(e) => e.currentTarget.style.color = '#64748b'}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-                
-                <label style={{ 
-                  aspectRatio: '1/1', 
-                  border: '2px dashed #cbd5e1', 
-                  borderRadius: '8px', 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  cursor: 'pointer', 
-                  color: '#64748b',
-                  backgroundColor: '#f8fafc',
-                  transition: 'all 0.2s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.borderColor = '#0f172a';
-                  e.currentTarget.style.backgroundColor = '#f1f5f9';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.borderColor = '#cbd5e1';
-                  e.currentTarget.style.backgroundColor = '#f8fafc';
-                }}
-                >
-                  <span style={{ fontSize: '1.6rem', fontWeight: 'bold' }}>+</span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: '600' }}>Add Photo</span>
-                  <input type="file" hidden multiple onChange={handleImageChange} accept="image/*" />
-                </label>
-              </div>
+              <BlogImageUploader
+                previews={previews}
+                imageAlts={imageAlts}
+                onImagesChange={handleImageChange}
+                onAltChange={updateImageAlt}
+                onRemove={removeImage}
+              />
             </div>
           </div>
         </div>

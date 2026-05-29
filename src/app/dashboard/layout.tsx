@@ -43,7 +43,8 @@ export default function DashboardLayout({
     <div className="dashboard-container">
       {/* Mobile Top Header Bar */}
       <header className="dashboard-mobile-header">
-        <Link href="/" className="logo-link">
+        <Link href="/" className="logo-link" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <img src="/logo.png" alt="Blog Fusion" width={32} height={32} style={{ borderRadius: '6px' }} />
           <span className="logo-text" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'white' }}>
             Blog<span style={{ color: '#e11d48' }}>Fusion</span>
           </span>
@@ -55,7 +56,8 @@ export default function DashboardLayout({
 
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <Link href="/" className="logo-link" onClick={() => setIsSidebarOpen(false)}>
+          <Link href="/" className="logo-link" onClick={() => setIsSidebarOpen(false)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <img src="/logo.png" alt="Blog Fusion" width={36} height={36} style={{ borderRadius: '6px' }} />
             <div className="logo-container">
               <span className="logo-text" style={{ fontSize: '1.5rem', background: 'linear-gradient(135deg, #ffffff 30%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                 Blog<span style={{ color: '#e11d48' }}>Fusion</span>
