@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     google: 'googled854f7a7aedcc96b',
   },
   icons: {
-    icon: '/logo.png',
+    icon: [{ url: '/logo.png', type: 'image/png' }],
     shortcut: '/logo.png',
     apple: '/logo.png',
   },
@@ -45,7 +45,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Analytics (Handled via Script tags in body) */}
+        <link rel="icon" href="/logo.png" type="image/png" sizes="32x32" />
+        <link rel="shortcut icon" href="/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
       </head>
       <body className={`${inter.variable} ${outfit.variable}`}>
         <Script strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-8612225GGD" />
