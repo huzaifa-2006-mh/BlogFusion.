@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import { existsSync } from 'fs';
+import { existsSync, writeFileSync, copyFileSync } from 'fs';
 import { join } from 'path';
 
 const root = process.cwd();
@@ -27,7 +27,37 @@ for (const { file, size } of outputs) {
   console.log(`Created ${file} (${size}x${size})`);
 }
 
-// favicon.ico = 32px PNG renamed works in many browsers; also write true ico via multi-size buffer
-const icon32 = await sharp(source).resize(32, 32, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 0 } }).png().toBuffer();
-await sharp(icon32).toFile(join(root, 'public', 'favicon.ico'));
-console.log('Created public/favicon.ico');
+// Real .ico file (multi-size) for browsers and Google
+let icoBuffer;
+try {
+  const toIco = (await import('to-ico')).default;
+  const sizes = [16, 32, 48];
+  const pngBuffers = await Promise.all(
+    sizes.map((size) =>
+      sharp(source)
+        .resize(size, size, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 0 } })
+        .png()
+        .toBuffer()
+    )
+  );
+  icoBuffer = await toIco(pngBuffers);
+} catch (error) {
+  console.warn('to-ico unavailable, using 32px PNG as favicon.ico fallback');
+  icoBuffer = await sharp(source)
+    .resize(32, 32, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 0 } })
+    .png()
+    .toBuffer();
+}
+
+const icoPaths = [
+  join(root, 'public', 'favicon.ico'),
+  join(root, 'src', 'app', 'favicon.ico'),
+];
+
+for (const icoPath of icoPaths) {
+  writeFileSync(icoPath, icoBuffer);
+  console.log(`Created ${icoPath}`);
+}
+
+// Next.js also reads app/icon.png — keep in sync with 32px asset
+copyFileSync(join(root, 'public', 'favicon-32x32.png'), join(root, 'src', 'app', 'icon.png'));

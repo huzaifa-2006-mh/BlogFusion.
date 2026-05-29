@@ -45,26 +45,26 @@ export const metadata: Metadata = {
     siteName: 'Blog Fusion',
     title: 'Blog Fusion',
     description: 'Tech guides, programming tutorials, online earning, jobs and entertainment blogs.',
-    images: [{ url: '/logo.png', width: 512, height: 512, alt: 'Blog Fusion logo' }],
+    images: [{ url: '/favicon-48x48.png', width: 48, height: 48, alt: 'Blog Fusion logo' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Blog Fusion',
     description: 'Tech guides, programming tutorials, online earning, jobs and entertainment blogs.',
-    images: ['/logo.png'],
+    images: ['/favicon-48x48.png'],
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '48x48' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
       { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   other: {
     'apple-mobile-web-app-title': 'Blog Fusion',
+    'msapplication-TileImage': '/favicon-48x48.png',
+    'msapplication-TileColor': '#0a192f',
   },
 };
 
@@ -78,10 +78,6 @@ export default function RootLayout({
       <head>
         <meta name="application-name" content="Blog Fusion" />
         <meta name="apple-mobile-web-app-title" content="Blog Fusion" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
-        <link rel="icon" href="/favicon-48x48.png" type="image/png" sizes="48x48" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
       </head>
       <body className={`${inter.variable} ${outfit.variable}`}>
         <SiteJsonLd />
