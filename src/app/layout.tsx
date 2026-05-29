@@ -54,9 +54,14 @@ export const metadata: Metadata = {
     images: ['/logo.png'],
   },
   icons: {
-    icon: [{ url: '/logo.png', type: 'image/png', sizes: '48x48' }],
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   other: {
     'apple-mobile-web-app-title': 'Blog Fusion',
@@ -72,9 +77,11 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="application-name" content="Blog Fusion" />
-        <link rel="icon" href="/logo.png" type="image/png" sizes="48x48" />
-        <link rel="shortcut icon" href="/logo.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <meta name="apple-mobile-web-app-title" content="Blog Fusion" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+        <link rel="icon" href="/favicon-48x48.png" type="image/png" sizes="48x48" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
       </head>
       <body className={`${inter.variable} ${outfit.variable}`}>
         <SiteJsonLd />

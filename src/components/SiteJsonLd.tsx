@@ -7,7 +7,7 @@ export default function SiteJsonLd() {
     name: 'Blog Fusion',
     alternateName: 'BlogFusion',
     url: siteUrl,
-    logo: `${siteUrl}/logo.png`,
+    logo: `${siteUrl}/favicon-48x48.png`,
     sameAs: [
       'https://github.com/huzaifa-2006-mh',
       'https://www.facebook.com/profile.php?id=61590547042139',
@@ -26,7 +26,7 @@ export default function SiteJsonLd() {
       name: 'Blog Fusion',
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/logo.png`,
+        url: `${siteUrl}/favicon-48x48.png`,
       },
     },
   };
