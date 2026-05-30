@@ -14,7 +14,7 @@ export default function TermsAndConditions() {
   return (
     <section className="section">
       <div className="container" style={{ maxWidth: '800px' }}>
-        <h1 className="mb-4">📜 Terms and Conditions</h1>
+        <h1 className="mb-4"> Terms and Conditions</h1>
         <p>Welcome to <strong>BlogFusion</strong>. These terms and conditions outline the rules and regulations for the use of our website.</p>
         
         <h2 className="mt-4">1. Acceptance of Terms</h2>
