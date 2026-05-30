@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
   return (
     <section className="section">
       <div className="container" style={{ maxWidth: '800px' }}>
-        <h1 className="mb-4">🔒 Privacy Policy</h1>
+        <h1 className="mb-4">Privacy Policy</h1>
         <p>At <strong>BlogFusion</strong>, we value the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by BlogFusion and how we use it.</p>
         
         <h2 className="mt-4">Information We Collect</h2>
