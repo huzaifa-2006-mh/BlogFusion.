@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
+import { unstable_noStore as noStore, revalidateTag } from 'next/cache';
 import prisma from './prisma';
+
+export const PAGE_SEO_TAG = 'page-seo';
 
 export function normalizePagePath(pagePath: string): string {
   const trimmed = pagePath.trim();
@@ -7,7 +10,30 @@ export function normalizePagePath(pagePath: string): string {
   return trimmed.replace(/\/+$/, '') || '/';
 }
 
+export function revalidatePageSeo(pagePath: string) {
+  const normalizedPath = normalizePagePath(pagePath);
+  revalidateTag(PAGE_SEO_TAG);
+  revalidateTag(`${PAGE_SEO_TAG}:${normalizedPath}`);
+}
+
+function resolveDefaultTitle(title: Metadata['title']): string | undefined {
+  if (!title) return undefined;
+  if (typeof title === 'string') return title;
+  if (typeof title === 'object' && 'default' in title && title.default) {
+    return String(title.default);
+  }
+  return undefined;
+}
+
+function resolveDefaultDescription(description: Metadata['description']): string | undefined {
+  if (!description) return undefined;
+  if (typeof description === 'string') return description;
+  return undefined;
+}
+
 export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): Promise<Metadata> {
+  noStore();
+
   const normalizedPath = normalizePagePath(pagePath);
 
   try {
@@ -17,20 +43,31 @@ export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): P
 
     if (!seoData) return defaultMetadata;
 
+    const defaultTitle = resolveDefaultTitle(defaultMetadata.title);
+    const defaultDescription = resolveDefaultDescription(defaultMetadata.description);
+    const title = seoData.metaTitle?.trim() || defaultTitle;
+    const description = seoData.metaDescription?.trim() || defaultDescription;
+
     const metadata: Metadata = {
-      ...defaultMetadata,
-      title: seoData.metaTitle || defaultMetadata.title,
-      description: seoData.metaDescription || defaultMetadata.description,
-      keywords: seoData.focusKeywords || (defaultMetadata.keywords as string | undefined),
+      title,
+      description,
+      keywords: seoData.focusKeywords?.trim() || undefined,
       openGraph: {
-        ...(defaultMetadata.openGraph || {}),
-        title: seoData.metaTitle || (defaultMetadata.openGraph as any)?.title,
-        description: seoData.metaDescription || (defaultMetadata.openGraph as any)?.description,
-        images: seoData.ogImage ? [{ url: seoData.ogImage }] : (defaultMetadata.openGraph as any)?.images,
-        url: seoData.canonicalUrl || (defaultMetadata.openGraph as any)?.url,
+        title,
+        description,
+        images: seoData.ogImage?.trim() ? [{ url: seoData.ogImage.trim() }] : undefined,
+        url: seoData.canonicalUrl?.trim() || undefined,
+        siteName: 'Blog Fusion',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: seoData.ogImage?.trim() ? [seoData.ogImage.trim()] : undefined,
       },
       alternates: {
-        canonical: seoData.canonicalUrl || undefined,
+        canonical: seoData.canonicalUrl?.trim() || undefined,
       },
     };
 
@@ -44,6 +81,11 @@ export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): P
           follow: false,
           noimageindex: true,
         },
+      };
+    } else {
+      metadata.robots = {
+        index: true,
+        follow: true,
       };
     }
 

@@ -2,7 +2,7 @@ import { getPageSeo } from '@/lib/seo';
 import type { Metadata } from 'next';
 import ContactForm from '@/components/ContactForm';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/contact', {

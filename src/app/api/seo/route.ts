@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { normalizePagePath } from '@/lib/seo';
+import { normalizePagePath, revalidatePageSeo } from '@/lib/seo';
 
 export async function GET(request: Request) {
   try {
@@ -65,8 +65,9 @@ export async function POST(request: Request) {
       },
     });
 
-    revalidatePath(normalizedPath, 'layout');
+    revalidatePageSeo(normalizedPath);
     revalidatePath(normalizedPath, 'page');
+    revalidatePath(normalizedPath, 'layout');
 
     return NextResponse.json({ success: true, seo: seoData });
   } catch (error) {

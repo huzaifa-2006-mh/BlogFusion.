@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getPageSeo } from '@/lib/seo';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/faqs', {

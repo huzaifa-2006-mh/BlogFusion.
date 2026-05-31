@@ -94,6 +94,7 @@ export default function SeoDashboard() {
       const data = await res.json();
       if (data.success) {
         setMessage({ text: 'SEO settings saved successfully!', type: 'success' });
+        router.refresh();
       } else {
         setMessage({ text: data.error || 'Failed to save SEO settings', type: 'error' });
       }
