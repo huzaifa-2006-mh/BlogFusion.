@@ -1,11 +1,11 @@
 import { randomUUID } from 'crypto';
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
+import sharp from 'sharp';
 
 const UPLOADS_DIR = join(process.cwd(), 'public', 'uploads');
 
 export async function optimizeAndStoreImage(file: File): Promise<string> {
-  const sharp = (await import('sharp')).default;
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
