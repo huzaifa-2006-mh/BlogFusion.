@@ -1,9 +1,4 @@
-import { randomUUID } from 'crypto';
-import { mkdir, writeFile } from 'fs/promises';
-import { join } from 'path';
 import sharp from 'sharp';
-
-const UPLOADS_DIR = join(process.cwd(), 'public', 'uploads');
 
 export async function optimizeAndStoreImage(file: File): Promise<string> {
   const bytes = await file.arrayBuffer();
@@ -15,11 +10,8 @@ export async function optimizeAndStoreImage(file: File): Promise<string> {
     .webp({ quality: 76, effort: 4 })
     .toBuffer();
 
-  await mkdir(UPLOADS_DIR, { recursive: true });
-  const fileName = `${Date.now()}-${randomUUID()}.webp`;
-  await writeFile(join(UPLOADS_DIR, fileName), optimizedBuffer);
-
-  return `/uploads/${fileName}`;
+  const base64Data = optimizedBuffer.toString('base64');
+  return `data:image/webp;base64,${base64Data}`;
 }
 
 export function applyImageAltPlaceholders(content: string, imageAlts: string[]): string {
