@@ -90,6 +90,9 @@ export default function RootLayout({
             gtag('config', 'G-8612225GGD');
           `}
         </Script>
+      /* 👇 ADD THIS HERE moneteg*/
+        <script src="https://quge5.com/88/tag.min.js" data-zone="246867" async data-cfasync="false"></script>
+        
         <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>
