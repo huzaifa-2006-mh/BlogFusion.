@@ -14,10 +14,10 @@ export default function AboutUsPage() {
         </h1>
         {/* The same detailed content as in the previous About page */}
         <p style={{ fontSize: "1.05rem", lineHeight: "1.8", color: "#475569", marginBottom: "2rem" }}>
-          Welcome to Blog Fusion, a modern platform created to share knowledge, creativity, technology, and innovation with readers worldwide. Our goal is to provide valuable, easy‑to‑understand, and engaging content that helps people learn, grow, and stay updated with the digital world.
+          Welcome to Blog Fusion, a modern platform created to share knowledge, creativity, technology, and innovation with readers worldwide. Our goal is to provide valuable, easy‑to‑understand, [...]
         </p>
         <p style={{ fontSize: "1.05rem", lineHeight: "1.8", color: "#475569", marginBottom: "2rem" }}>
-          At Blog Fusion, we believe that technology and creativity together can build powerful ideas. Behind this platform is a dedicated team passionate about web development, data analytics, and modern digital solutions.
+          At Blog Fusion, we believe that technology and creativity together can build powerful ideas. Behind this platform is a dedicated team passionate about web development, data analytics, and mo[...]
         </p>
         <h2 style={{ fontSize: "1.8rem", fontWeight: "800", color: "#0f172a", marginTop: "2rem", marginBottom: "1rem" }}>
           Meet Our Team
@@ -25,7 +25,7 @@ export default function AboutUsPage() {
         {/* Team member sections (same as previous) */}
         <h3 style={{ fontSize: "1.4rem", fontWeight: "700", color: "#0f172a", marginBottom: "0.5rem" }}>Marium Waseem – CEO of Blog Fusion</h3>
         <p style={{ fontSize: "1rem", lineHeight: "1.7", color: "#475569", marginBottom: "1rem" }}>
-          Marium Waseem is the CEO of Blog Fusion and plays a leading role in managing and growing the platform. She is a skilled Data Analyst and Web Developer with a strong passion for technology, analytics, and creative digital experiences.
+          Marium Waseem is the CEO of Blog Fusion and plays a leading role in managing and growing the platform. She is a skilled Data Analyst and Web Developer with a strong passion for technology, a[...]
         </p>
         <p style={{ fontSize: "1rem", lineHeight: "1.7", color: "#475569", marginBottom: "1rem" }}>
           She specializes in transforming data into meaningful insights and building modern, responsive, and user‑friendly websites.
@@ -50,35 +50,6 @@ export default function AboutUsPage() {
         </ul>
         <p style={{ fontSize: "1rem", lineHeight: "1.7", color: "#475569", marginTop: "1rem" }}>
           Marium Waseem is dedicated to innovation, continuous learning, and delivering impactful digital solutions through creativity and analytical thinking.
-        </p>
-        <h3 style={{ fontSize: "1.4rem", fontWeight: "700", color: "#0f172a", marginTop: "2rem", marginBottom: "0.5rem" }}>Muhammad Huzaifa – Boss &amp; Lead Developer</h3>
-        <p style={{ fontSize: "1rem", lineHeight: "1.7", color: "#475569", marginBottom: "1rem" }}>
-          Muhammad Huzaifa is the Boss and Lead Developer at Blog Fusion. He is passionate about modern technologies, programming, and full‑stack web development. With over 1 year of experience in web development, he has worked on various projects involving front‑end interfaces, back‑end systems, databases, and scalable web applications.
-        </p>
-        <h4 style={{ fontSize: "1.2rem", fontWeight: "600", color: "#0f172a", marginTop: "1rem", marginBottom: "0.5rem" }}>Skills &amp; Expertise</h4>
-        <ul style={{ columns: "2", columnGap: "2rem", listStyle: "disc", paddingLeft: "1.2rem", color: "#475569" }}>
-          <li>Oracle Database</li>
-          <li>WordPress Development</li>
-          <li>Java</li>
-          <li>DSA in Java</li>
-          <li>JavaScript</li>
-          <li>HTML5 &amp; CSS3</li>
-          <li>Tailwind CSS</li>
-          <li>PHP</li>
-          <li>C#</li>
-          <li>Python</li>
-          <li>Node.js</li>
-          <li>Express.js</li>
-          <li>Next.js</li>
-          <li>MySQL</li>
-          <li>MongoDB</li>
-          <li>REST API Development</li>
-          <li>Full Stack Web Development</li>
-          <li>Responsive Web Design</li>
-          <li>Database Management</li>
-        </ul>
-        <p style={{ fontSize: "1rem", lineHeight: "1.7", color: "#475569", marginTop: "1rem" }}>
-          Muhammad Huzaifa focuses on building efficient, scalable, and modern web solutions while continuously exploring new technologies and development trends.
         </p>
         <div style={{ textAlign: "center", marginTop: "3rem" }}>
           <Link href="/" style={{ textDecoration: "none", color: "#0f172a", fontWeight: "600", fontSize: "1.1rem" }}>← Back to Home</Link>
