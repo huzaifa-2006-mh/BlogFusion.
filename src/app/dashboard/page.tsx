@@ -37,13 +37,9 @@ export default async function DashboardHome() {
       ? Math.round(visitorDurations.reduce((sum, v) => sum + (v._sum.duration || 0), 0) / visitorDurations.length)
       : 0;
 
-    // Unique Emails Collected
+    // Newsletter Subscribers (from dedicated Subscriber model)
 // @ts-ignore
-    const uniqueEmails = await prisma.analytics.groupBy({
-      by: ['email'],
-      where: { email: { not: null } }
-    });
-    stats.uniqueEmails = uniqueEmails.length;
+    stats.uniqueEmails = await prisma.subscriber.count();
 
     // Recent Activity (last 10 sessions)
 // @ts-ignore
@@ -82,8 +78,9 @@ export default async function DashboardHome() {
           <h3 style={{ color: '#0f172a' }}>{formatTime(stats.avgTimeSpent)}</h3>
         </div>
         <div className="stats-card" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', border: '1px solid #e2e8f0' }}>
-          <p style={{ color: '#64748b', fontSize: '0.95rem', fontWeight: 600 }}>Emails Collected</p>
+          <p style={{ color: '#64748b', fontSize: '0.95rem', fontWeight: 600 }}>Newsletter Subscribers</p>
           <h3 style={{ color: '#0f172a' }}>{stats.uniqueEmails}</h3>
+          <a href="/dashboard/subscribers" style={{ fontSize: '0.8rem', color: '#e11d48', textDecoration: 'none', fontWeight: 600 }}>View all →</a>
         </div>
       </div>
 

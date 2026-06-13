@@ -107,6 +107,9 @@ export default function DashboardLayout({
           <Link href="/dashboard/categories" className={pathname === '/dashboard/categories' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
              Categories
           </Link>
+          <Link href="/dashboard/subscribers" className={pathname === '/dashboard/subscribers' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
+             📬 Subscribers
+          </Link>
           <Link href="/dashboard/seo" className={pathname === '/dashboard/seo' ? 'active' : ''} onClick={() => setIsSidebarOpen(false)}>
              SEO Settings
           </Link>

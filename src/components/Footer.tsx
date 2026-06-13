@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import EmailSubscription from '@/components/EmailSubscription';
 
 const Footer = () => {
   const pathname = usePathname();
@@ -11,6 +12,11 @@ const Footer = () => {
   return (
     <footer className="footer-minimal">
       <div className="container">
+        {/* Newsletter Subscription */}
+        <div style={{ borderBottom: '1px solid rgba(100,255,218,0.1)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+          <EmailSubscription />
+        </div>
+
         {/* Navigation Links */}
         <nav className="footer-nav">
           <Link href="/about">About</Link>

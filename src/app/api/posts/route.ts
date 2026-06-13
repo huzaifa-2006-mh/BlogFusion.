@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { applyImageAltPlaceholders, optimizeAndStoreImage } from '@/lib/imageUpload';
+import { generateNewsletterEmail } from '@/lib/newsletter';
+import { Resend } from 'resend';
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -75,9 +77,43 @@ export async function POST(request: Request) {
     });
 
     revalidatePath('/');
+
+    // === NEWSLETTER: Send to all subscribers in background ===
+    (async () => {
+      try {
+        const subscribers = await prisma.subscriber.findMany({ select: { email: true } });
+        if (subscribers.length === 0) return;
+
+        const plainContent = contentWithImages.replace(/<[^>]*>?/gm, '').substring(0, 1000);
+        const { subject, html } = await generateNewsletterEmail(title, plainContent);
+
+        const resendKey = process.env.RESEND_API_KEY;
+        if (!resendKey) return;
+
+        const resend = new Resend(resendKey);
+        const emails = subscribers.map((s) => s.email);
+
+        // Send in batches of 50
+        for (let i = 0; i < emails.length; i += 50) {
+          const batch = emails.slice(i, i + 50);
+          await resend.emails.send({
+            from: 'Blog Fusion <onboarding@resend.dev>',
+            to: batch,
+            subject,
+            html,
+          });
+        }
+        console.log(`✅ Newsletter sent to ${emails.length} subscribers for post: "${title}"`);
+      } catch (newsletterErr) {
+        console.error('Newsletter send error (non-blocking):', newsletterErr);
+      }
+    })();
+    // =========================================================
+
     return NextResponse.json(post);
   } catch (error) {
     console.error('Post creation error:', error);
     return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
   }
 }
+

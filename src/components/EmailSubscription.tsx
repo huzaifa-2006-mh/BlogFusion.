@@ -4,88 +4,110 @@ import { useState, useEffect } from 'react';
 
 export default function EmailSubscription() {
   const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const savedEmail = localStorage.getItem('user_email');
+    const savedEmail = localStorage.getItem('bf_subscribed_email');
     if (savedEmail) {
-      setSubmitted(true);
-      setEmail(savedEmail);
+      setStatus('success');
+      setMessage('You are already subscribed! ✓');
     }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || status === 'loading') return;
 
-    localStorage.setItem('user_email', email);
-    setSubmitted(true);
+    setStatus('loading');
+    setMessage('');
 
-    // Ping analytics to link email to current session
-    const vid = localStorage.getItem('blog_visitor_id');
-    if (vid) {
-      try {
-        await fetch('/api/analytics', {
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Failed to subscribe.');
+
+      localStorage.setItem('bf_subscribed_email', email);
+      setStatus('success');
+      setMessage(data.message || 'Successfully subscribed! 🎉');
+      setEmail('');
+
+      // Also ping analytics to link email
+      const vid = localStorage.getItem('blog_visitor_id');
+      if (vid) {
+        fetch('/api/analytics', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            visitorId: vid,
-            path: window.location.pathname,
-            email: email
-          })
-        });
-      } catch (err) {
-        // Silent fail
+          body: JSON.stringify({ visitorId: vid, path: window.location.pathname, email }),
+        }).catch(() => {});
       }
+    } catch (err: unknown) {
+      setStatus('error');
+      setMessage(err instanceof Error ? err.message : 'Something went wrong.');
     }
   };
 
-  if (submitted) {
+  if (status === 'success') {
     return (
-      <div style={{ color: 'var(--secondary-color)', fontSize: '0.9rem', marginTop: '1rem' }}>
-        ✓ Thanks for subscribing!
+      <div style={{ marginTop: '1rem' }}>
+        <p style={{ color: '#64ffda', fontSize: '0.9rem', fontWeight: 600 }}>✓ {message}</p>
       </div>
     );
   }
 
   return (
     <div style={{ marginTop: '1.5rem' }}>
-      <p style={{ color: '#a8b2d1', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Get latest updates:</p>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
+      <p style={{ color: '#a8b2d1', fontSize: '0.9rem', marginBottom: '0.6rem', fontWeight: 500 }}>
+        📬 Get latest articles in your inbox:
+      </p>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
         <input
           type="email"
-          placeholder="Your Email"
+          placeholder="your@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={status === 'loading'}
           style={{
-            padding: '0.5rem',
-            borderRadius: '4px',
-            border: 'none',
+            padding: '0.55rem 0.75rem',
+            borderRadius: '6px',
+            border: '1px solid rgba(100,255,218,0.2)',
             fontSize: '0.9rem',
-            width: '100%',
-            background: 'rgba(255,255,255,0.1)',
-            color: 'white'
+            flex: 1,
+            minWidth: '180px',
+            background: 'rgba(255,255,255,0.05)',
+            color: '#ccd6f6',
+            outline: 'none',
           }}
         />
         <button
           type="submit"
-          className="btn-primary"
+          disabled={status === 'loading' || !email}
           style={{
-            padding: '0.5rem 1rem',
-            borderRadius: '4px',
-            fontSize: '0.8rem',
+            padding: '0.55rem 1.2rem',
+            borderRadius: '6px',
+            fontSize: '0.85rem',
             whiteSpace: 'nowrap',
-            background: 'var(--secondary-color)',
-            color: 'var(--primary-color)',
-            fontWeight: 'bold',
+            background: status === 'loading' ? 'rgba(100,255,218,0.4)' : '#64ffda',
+            color: '#0a192f',
+            fontWeight: 700,
             border: 'none',
-            cursor: 'pointer'
+            cursor: status === 'loading' ? 'not-allowed' : 'pointer',
+            transition: 'opacity 0.2s',
           }}
         >
-          Join
+          {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
         </button>
       </form>
+      {status === 'error' && message && (
+        <p style={{ color: '#ff6b6b', fontSize: '0.8rem', marginTop: '0.4rem' }}>{message}</p>
+      )}
     </div>
   );
 }
