@@ -1,62 +1,53 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { Resend } from 'resend';
-import { generateNewsletterEmail } from '@/lib/newsletter';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { title, content } = await req.json();
-
-    if (!title || !content) {
-      return NextResponse.json({ error: 'Title and content are required.' }, { status: 400 });
+    const body = await request.json().catch(() => null);
+    
+    if (!body || !body.email) {
+      return NextResponse.json(
+        { error: 'Email field is required.' },
+        { status: 400 }
+      );
     }
 
-    // Get all subscribers
-    const subscribers = await prisma.subscriber.findMany({ select: { email: true } });
+    const email = body.email.trim().toLowerCase();
 
-    if (subscribers.length === 0) {
-      return NextResponse.json({ message: 'No subscribers to email.', sent: 0 });
+    if (!email.includes('@')) {
+      return NextResponse.json(
+        { error: 'Please enter a valid email address.' },
+        { status: 400 }
+      );
     }
 
-    // Generate newsletter via Gemini AI
-    const { subject, html } = await generateNewsletterEmail(title, content);
-
-    // Send emails via Resend
-    const resendKey = process.env.RESEND_API_KEY;
-    if (!resendKey) {
-      return NextResponse.json({ error: 'RESEND_API_KEY not configured.' }, { status: 500 });
-    }
-
-    const resend = new Resend(resendKey);
-    const emails = subscribers.map((s) => s.email);
-
-    // Send in batches of 50 (Resend limit)
-    let successCount = 0;
-    const batchSize = 50;
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
-      try {
-        await resend.emails.send({
-          from: 'Blog Fusion <onboarding@resend.dev>',
-          to: batch,
-          subject,
-          html,
-        });
-        successCount += batch.length;
-      } catch (batchErr) {
-        console.error('Batch send error:', batchErr);
-      }
-    }
-
-    return NextResponse.json({
-      message: `Newsletter sent to ${successCount} subscribers.`,
-      subject,
-      sent: successCount,
-      total: emails.length,
+    // چیک کریں کہ ای میل پہلے سے موجود تو نہیں
+    const existingSubscriber = await prisma.subscriber.findUnique({
+      where: { email },
     });
 
-  } catch (err) {
-    console.error('Send newsletter error:', err);
-    return NextResponse.json({ error: 'Failed to send newsletter.' }, { status: 500 });
+    if (existingSubscriber) {
+      return NextResponse.json(
+        { error: 'This email is already subscribed!' },
+        { status: 400 }
+      );
+    }
+
+    // ڈیٹا بیس میں ای میل سیو کرنا
+    await prisma.subscriber.create({
+      data: { email },
+    });
+
+    return NextResponse.json(
+      { message: 'Awesome! You have successfully subscribed.' },
+      { status: 200 }
+    );
+
+  } catch (error: any) {
+    console.error('Database/Server Error:', error);
+    return NextResponse.json(
+      { error: 'Server error. Please try again later.' },
+      { status: 500 }
+    );
   }
 }
