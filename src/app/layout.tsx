@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import SiteJsonLd from "@/components/SiteJsonLd";
-import Script from "next/script";
+
 import { Inter, Outfit } from "next/font/google";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
