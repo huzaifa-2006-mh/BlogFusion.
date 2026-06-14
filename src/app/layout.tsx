@@ -90,6 +90,7 @@ export default function RootLayout({
             gtag('config', 'G-8612225GGD');
           `}
         </Script>
+        <script>(function(s){s.dataset.zone='11145909',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
         <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>
