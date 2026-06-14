@@ -93,7 +93,7 @@ export default function RootLayout({
         </Script>
         <script src="https://5gvci.com/act/files/tag.min.js?z=11145911" data-cfasync="false" async></script>
         
-// اپنے RootLayout کے اندر، body ٹیگ کے اندر اس طرح لکھیں:
+
 <Script id="monetag-smart-tag" strategy="afterInteractive">
   {`
     (function(s){
