@@ -91,7 +91,7 @@ export default function RootLayout({
           `}
         </Script>
         <script src="https://5gvci.com/act/files/tag.min.js?z=11145911" data-cfasync="false" async></script>
-        <script>(function(s){s.dataset.zone='11145909',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+        
         <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>
