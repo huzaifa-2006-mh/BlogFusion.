@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma'; // Curly braces hata diye hain
 
 export async function POST(request: Request) {
   try {
+  
     const body = await request.json().catch(() => null);
     
     if (!body || !body.email) {
