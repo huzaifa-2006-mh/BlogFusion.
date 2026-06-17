@@ -106,7 +106,19 @@ export default function RootLayout({
     })(document.createElement('script'));
   `}
 </Script>
-        <script>(function(s){s.dataset.zone='11156399',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+       <Script id="monetag-vignette" strategy="afterInteractive">
+  {`
+    (function(){
+      var s = document.createElement('script');
+      s.dataset.zone = '11156399';
+      s.src = 'https://n6wxm.com/vignette.min.js';
+      var target = [document.documentElement, document.body].filter(Boolean).pop();
+      if (target) {
+        target.appendChild(s);
+      }
+    })();
+  `}
+</Script>
         <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>
