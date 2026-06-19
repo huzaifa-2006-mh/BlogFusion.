@@ -14,7 +14,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <article className="py-8 bg-white min-h-screen font-sans">
-      {/* ─── MAIN GRID LAYOUT: Web content left par, ads right sidebar me ─── */}
+      {/* ─── MAIN GRID LAYOUT: Content left par, ads right sidebar me ─── */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 md:px-6">
         
         {/* ================= LEFT COLUMN: AAPKA ASAL PREMIUM DESIGN CONTENT ================= */}
