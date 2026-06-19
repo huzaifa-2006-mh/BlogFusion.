@@ -140,6 +140,16 @@ export default async function BlogPostPage({ params }: any) {
 
   return (
     <article className="section" style={{ padding: '4rem 0 6rem 0' }}>
+      
+      {/* ─── NAYI AUTOMATIC ADS: SOCIAL BAR & FLOATING SCRIPT NO. 1 ─── */}
+      <div dangerouslySetInnerHTML={{
+        __html: `
+          <script async="async" data-cfasync="false" src="https://pl29699171.effectivecpmnetwork.com/646dfe8819eb11a7954692a21b4c9ada/invoke.js"></script>
+          <div id="container-646dfe8819eb11a7954692a21b4c9ada"></div>
+          <script type="text/javascript" src="https://pl29699172.effectivecpmnetwork.com/10/f4/fb/10f4fb60e1a7547158745009f4cbeb84.js"></script>
+        `
+      }} />
+
       <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1.5rem' }}>
         <Link href="/" className="back-link">
           &larr; Back to Home
@@ -167,7 +177,7 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         </header>
 
-        {/* ─── CENTERED TOP BANNER AD (468x60) ─── */}
+        {/* ─── CENTERED TOP BANNER AD (468x60 NAYA CODE) ─── */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto 3rem auto', maxWidth: '468px', padding: '6px', background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
           <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '3px', fontWeight: '700' }}>ADVERTISEMENT</span>
           <div 
@@ -176,14 +186,14 @@ export default async function BlogPostPage({ params }: any) {
               __html: `
                 <script type="text/javascript">
                   atOptions = {
-                    'key' : '29598671',
+                    'key' : '2a32449f0366cc57d7aa759f77df868f',
                     'format' : 'iframe',
                     'height' : 60,
                     'width' : 468,
                     'params' : {}
                   };
                 </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/29598671/invoke.js"></script>
+                <script type="text/javascript" src="https://www.highperformanceformat.com/2a32449f0366cc57d7aa759f77df868f/invoke.js"></script>
               `
             }} 
           />
@@ -193,7 +203,7 @@ export default async function BlogPostPage({ params }: any) {
           <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
 
-        {/* ─── MIDDLE SQUARE BOX AD (300x250) ─── */}
+        {/* ─── MIDDLE SQUARE BOX AD (300x250 NAYA CODE) ─── */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '4rem auto', width: '320px', padding: '10px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
           <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '6px', fontWeight: '700' }}>SPONSORED ADS</span>
           <div 
@@ -202,14 +212,36 @@ export default async function BlogPostPage({ params }: any) {
               __html: `
                 <script type="text/javascript">
                   atOptions = {
-                    'key' : '29598678',
+                    'key' : '8319ba78a1a7f355cf49e22e003c7d9b',
                     'format' : 'iframe',
                     'height' : 250,
                     'width' : 300,
                     'params' : {}
                   };
                 </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/29598678/invoke.js"></script>
+                <script type="text/javascript" src="https://www.highperformanceformat.com/8319ba78a1a7f355cf49e22e003c7d9b/invoke.js"></script>
+              `
+            }} 
+          />
+        </div>
+
+        {/* ─── BOTTOM MOBILE RESPONSIVE BANNER AD (320x50 NAYA CODE) ─── */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '3rem auto', maxWidth: '320px', padding: '6px', background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
+          <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '3px', fontWeight: '700' }}>MOBILE AD</span>
+          <div 
+            style={{ width: '320px', height: '50px', overflow: 'hidden' }} 
+            dangerouslySetInnerHTML={{
+              __html: `
+                <script type="text/javascript">
+                  atOptions = {
+                    'key' : 'b4c654470b9ee32fd3bae63c8c04897d',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                  };
+                </script>
+                <script type="text/javascript" src="https://www.highperformanceformat.com/b4c654470b9ee32fd3bae63c8c04897d/invoke.js"></script>
               `
             }} 
           />
@@ -270,23 +302,23 @@ export default async function BlogPostPage({ params }: any) {
         </div>
       </div>
 
-      {/* ─── DESKTOP RIGHT FLOATING SKYSCRAPER AD (160x600) ─── */}
-      <div className="hidden xl:block" style={{ position: 'fixed', right: '20px', top: '150px', zIndex: 50, width: '160px', height: '600px', background: '#f8fafc', borderRadius: '8px', padding: '4px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-        <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>SPONSORED</span>
+      {/* ─── DESKTOP RIGHT FLOATING LARGE LEADERBOARD AD (728x90 NAYA CODE) ─── */}
+      <div className="hidden xl:block" style={{ position: 'fixed', right: '20px', bottom: '20px', zIndex: 50, width: '728px', height: '90px', background: '#f8fafc', borderRadius: '8px', padding: '4px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
+        <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>RECOMMENDED FOR YOU</span>
         <div 
           style={{ width: '100%', height: '100%' }} 
           dangerouslySetInnerHTML={{
             __html: `
               <script type="text/javascript">
                 atOptions = {
-                  'key' : '29598677',
+                  'key' : 'f39f63f3c9406103dbb6c88ba9ac0717',
                   'format' : 'iframe',
-                  'height' : 600,
-                  'width' : 160,
+                  'height' : 90,
+                  'width' : 728,
                   'params' : {}
                 };
               </script>
-              <script type="text/javascript" src="//www.highperformanceformat.com/29598677/invoke.js"></script>
+              <script type="text/javascript" src="https://www.highperformanceformat.com/f39f63f3c9406103dbb6c88ba9ac0717/invoke.js"></script>
             `
           }} 
         />
