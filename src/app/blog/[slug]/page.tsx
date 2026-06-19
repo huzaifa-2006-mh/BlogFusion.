@@ -207,21 +207,7 @@ export default async function BlogPostPage({ params }: any) {
           />
         </div>
 
-        {/* ─── BOTTOM MOBILE RESPONSIVE BANNER AD (320x50 NAYA CODE) ─── */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '3rem auto', maxWidth: '320px', padding: '6px', background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
-          <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '3px', fontWeight: '700' }}>MOBILE AD</span>
-          <div 
-            style={{ width: '320px', height: '50px', overflow: 'hidden' }} 
-            dangerouslySetInnerHTML={{
-              __html: `
-                <script type="text/javascript">
-                  atOptions = {
-                    'key' : 'b4c654470b9ee32fd3bae63c8c04897d',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                  };
+        
                 </script>
                 <script type="text/javascript" src="https://www.highperformanceformat.com/b4c654470b9ee32fd3bae63c8c04897d/invoke.js"></script>
               `
