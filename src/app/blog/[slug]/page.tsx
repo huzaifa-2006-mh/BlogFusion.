@@ -198,29 +198,29 @@ export default async function BlogPostPage({ params }: any) {
             }} 
           />
         </div>
-        <div dangerouslySetInnerHTML={{ __html: processedContent }} />
+      <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
-      </div>
 
-      {imageIndex < inlineImages.length && (
-        <div style={{ marginTop: '4rem' }}>
-          <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
-            More Images from this Blog
-          </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
-            {inlineImages.slice(imageIndex).map((img, idx) => (
-              <div key={idx} style={{ position: 'relative', height: '200px', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-                <Image
-                  src={img.src}
-                  alt={img.alt || `Blog image ${idx + 1}`}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
-            ))}
+        {imageIndex < inlineImages.length && (
+          <div style={{ marginTop: '4rem' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
+              More Images from this Blog
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+              {inlineImages.slice(imageIndex).map((img, idx) => (
+                <div key={idx} style={{ position: 'relative', height: '200px', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                  <Image
+                    src={img.src}
+                    alt={img.alt || `Blog image ${idx + 1}`}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </article>
     </div>
   );
 }
