@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { checkAuth } from '../../../lib/auth';
-import { PrismaClient } from '@/lib/prisma';
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Default import jo bina brackets ke lowercase prisma fetch karega
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
 
@@ -21,7 +20,6 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
-  
   const post = await prisma.post.findUnique({
     where: { slug }
   });
@@ -67,13 +65,9 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 export default async function BlogPostPage({ params }: any) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
-
   const post = await prisma.post.findUnique({
     where: { slug },
-    include: {
-      category: true,
-      author: true
-    }
+    include: { category: true, author: true }
   });
 
   if (!post || !post.published) {
@@ -88,9 +82,8 @@ export default async function BlogPostPage({ params }: any) {
 
   const authorName = post.author?.username || "Admin";
   const authorInitial = authorName[0]?.toUpperCase() || "D";
-
   let content = post.content;
-  
+
   // Extract font settings if present: <post-settings size="20px" family="Arial" />
   const fontSettingsMatch = content.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
   let customStyles: React.CSSProperties = {};
@@ -104,7 +97,7 @@ export default async function BlogPostPage({ params }: any) {
 
   // Replace <back href="..."> with <a>
   let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
-  
+
   // Handle <color val="..."> tag
   processedContent = processedContent.replace(/<color val="(.*?)">(.*?)<\/color>/g, '<span style="color: $1">$2</span>');
 
@@ -138,17 +131,15 @@ export default async function BlogPostPage({ params }: any) {
   codeBlocks.forEach((block, index) => {
     processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
   });
-  
+
   const gallery = [...(post.images || [])];
   const inlineImages = [...gallery];
-  
   let imageIndex = 0;
   const imageRegex = /(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/i;
-  
+
   while (imageRegex.test(processedContent) && imageIndex < inlineImages.length) {
     const match = imageRegex.exec(processedContent);
     if (!match) break;
-    
     const altText = match[1] ? match[1].trim() : `Blog image ${imageIndex + 1}`;
     const imgHtml = `
       <figure class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
@@ -163,49 +154,25 @@ export default async function BlogPostPage({ params }: any) {
   return (
     <article className="section" style={{ padding: '4rem 0 6rem 0' }}>
       <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1.5rem' }}>
-        
         {/* Compact Back Button */}
         <Link href="/" className="back-link">
           &larr; Back to Home
         </Link>
-        
+
         {/* Dynamic Detail Header (Beautifully Centered) */}
         <header style={{ marginBottom: '3.5rem', textAlign: 'center' }}>
           {/* Centered Date */}
-          <span style={{ 
-            fontSize: '0.875rem', 
-            color: '#64748b', 
-            fontWeight: '600', 
-            textTransform: 'uppercase', 
-            letterSpacing: '0.05em', 
-            marginBottom: '0.8rem', 
-            display: 'block' 
-          }}>
+          <span style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.8rem', display: 'block' }}>
             {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </span>
-          
+
           {/* Centered Title */}
-          <h1 style={{ 
-            fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)', 
-            fontWeight: '800', 
-            color: '#0f172a',
-            lineHeight: '1.25',
-            letterSpacing: '-0.02em',
-            margin: '0 auto 1.2rem auto',
-            maxWidth: '750px'
-          }}>
+          <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)', fontWeight: '800', color: '#0f172a', lineHeight: '1.25', letterSpacing: '-0.02em', margin: '0 auto 1.2rem auto', maxWidth: '750px' }}>
             {post.title}
           </h1>
-          
+
           {post.shortDescription && (
-            <p style={{ 
-              fontSize: '1.05rem', 
-              color: '#475569', 
-              lineHeight: '1.5', 
-              fontWeight: '500',
-              margin: '0 auto 1.5rem auto',
-              maxWidth: '620px'
-            }}>
+            <p style={{ fontSize: '1.05rem', color: '#475569', lineHeight: '1.5', fontWeight: '500', margin: '0 auto 1.5rem auto', maxWidth: '620px' }}>
               {post.shortDescription}
             </p>
           )}
@@ -257,32 +224,8 @@ export default async function BlogPostPage({ params }: any) {
         )}
 
         {/* Premium Author Bio Box */}
-        <div style={{ 
-          marginTop: '5rem', 
-          padding: '2rem', 
-          background: '#f8fafc', 
-          borderRadius: '16px', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
-        }}>
-          <div style={{ 
-            width: '75px', 
-            height: '75px', 
-            borderRadius: '50%', 
-            background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', 
-            overflow: 'hidden', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            color: 'white', 
-            fontWeight: '800',
-            fontSize: '1.8rem',
-            boxShadow: '0 8px 20px rgba(236,72,153,0.2)',
-            flexShrink: 0
-          }}>
+        <div style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+          <div style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(236,72,153,0.2)', flexShrink: 0 }}>
             {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
               <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
@@ -294,10 +237,7 @@ export default async function BlogPostPage({ params }: any) {
               Written by <span style={{ color: '#ec4899' }}>{authorName}</span>
             </h3>
             <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
-              {authorName.toLowerCase().includes('marium') ? 
-                "Marium Waseem is a passionate developer and the lead voice behind Blog Fusion. She loves exploring new technologies and sharing her knowledge." :
-                "Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge."
-              }
+              {authorName.toLowerCase().includes('marium') ? "Marium Waseem is a passionate developer and the lead voice behind Blog Fusion. She loves exploring new technologies and sharing her knowledge." : "Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge."}
             </p>
           </div>
         </div>
