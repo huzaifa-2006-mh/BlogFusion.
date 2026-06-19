@@ -179,7 +179,7 @@ export default async function BlogPostPage({ params }: any) {
         </div>
 
         <div 
-          className="markdown-content text-gray-800 dark:text-gray-200 leading-relaxed max-w-none"
+          className="markdown-content text-gray-800 dark:text-gray-200 leading-relaxed"
           style={customStyles}
           dangerouslySetInnerHTML={{ __html: processedContent }} 
         />
