@@ -119,6 +119,17 @@ export default function RootLayout({
     })();
   `}
 </Script>
+        <script>
+  atOptions = {
+    'key' : '2a32449f0366cc57d7aa759f77df868f',
+    'format' : 'iframe',
+    'height' : 60,
+    'width' : 468,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highperformanceformat.com/2a32449f0366cc57d7aa759f77df868f/invoke.js"></script>
+
         <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>
