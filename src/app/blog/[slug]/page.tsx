@@ -198,96 +198,29 @@ export default async function BlogPostPage({ params }: any) {
             }} 
           />
         </div>
-
-        <div className="blog-content" style={{ ...customStyles }}>
-       <div dangerouslySetInnerHTML={{ __html: processedContent }} />
-        </div>
-
-        {/* ─── BOTTOM MOBILE RESPONSIVE BANNER AD ─── */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '3rem auto', maxWidth: '320px', padding: '6px', background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
-          <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '3px', fontWeight: '700' }}>MOBILE AD</span>
-          <div style={{ width: '320px', height: '50px', overflow: 'hidden' }} dangerouslySetInnerHTML={{
-            __html: `
-              <script type="text/javascript">
-                atOptions = { 'key' : 'b4c654470b9ee32fd3bae63c8c04897d', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
-              </script>
-              <script type="text/javascript" src="https://www.highperformanceformat.com/b4c654470b9ee32fd3bae63c8c04897d/invoke.js"></script>
-            `
-          }} />
-        </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {(post.faqs as any[]).map((faq, index) => (
-                <div key={index} style={{ background: 'white', padding: '1.25rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
-                  <h4 style={{ color: '#0f172a', fontWeight: '700', fontSize: '1.02rem', marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}>
-                    <span style={{ color: '#ec4899', fontWeight: '800' }}>Q:</span> {faq.question}
-                  </h4>
-                  <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.5', margin: 0, fontWeight: '500' }}>
-                    {faq.answer}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {imageIndex < inlineImages.length && (
-          <div style={{ marginTop: '4rem' }}>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.5rem' }}>Post Gallery</h3>
-            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-              {inlineImages.slice(imageIndex).map((img, index) => (
-                <div key={index} style={{ height: '220px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-                  <img src={img} alt={`Gallery ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-          <div style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(236,72,153,0.2)', flexShrink: 0 }}>
-            {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
-              <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              authorInitial
-            )}
-          </div>
-          <div>
-            <h3 style={{ margin: '0 0 0.4rem 0', fontWeight: '800', color: '#0f172a', fontSize: '1.3rem' }}>
-              Written by <span style={{ color: '#ec4899' }}>{authorName}</span>
-            </h3>
-            <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
-              {authorName.toLowerCase().includes('marium') ? "Marium Waseem is a passionate developer and the lead voice behind Blog Fusion. She loves exploring new technologies and sharing her knowledge." : "Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge."}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f1f5f9', marginTop: '4rem' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginBottom: '1rem' }}>Share this post:</h3>
-          <ShareButtons title={post.title} />
+        <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
       </div>
 
-      {/* ─── DESKTOP RIGHT FLOATING LARGE LEADERBOARD AD (728x90 NAYA CODE) ─── */}
-      <div className="hidden xl:block" style={{ position: 'fixed', right: '20px', bottom: '20px', zIndex: 50, width: '728px', height: '90px', background: '#f8fafc', borderRadius: '8px', padding: '4px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
-        <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>RECOMMENDED FOR YOU</span>
-        <div 
-          style={{ width: '100%', height: '100%' }} 
-          dangerouslySetInnerHTML={{
-            __html: `
-              <script type="text/javascript">
-                atOptions = {
-                  'key' : 'f39f63f3c9406103dbb6c88ba9ac0717',
-                  'format' : 'iframe',
-                  'height' : 90,
-                  'width' : 728,
-                  'params' : {}
-                };
-              </script>
-              <script type="text/javascript" src="https://www.highperformanceformat.com/f39f63f3c9406103dbb6c88ba9ac0717/invoke.js"></script>
-            `
-          }} 
-        />
-      </div>
-    </article>
+      {imageIndex < inlineImages.length && (
+        <div style={{ marginTop: '4rem' }}>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
+            More Images from this Blog
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+            {inlineImages.slice(imageIndex).map((img, idx) => (
+              <div key={idx} style={{ position: 'relative', height: '200px', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                <Image
+                  src={img.src}
+                  alt={img.alt || `Blog image ${idx + 1}`}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
