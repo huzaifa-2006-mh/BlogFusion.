@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { checkAuth } from '../../../lib/auth';
-import prisma from '@/lib/prisma'; // Default import jo bina brackets ke lowercase prisma fetch karega
+import prisma from '@/lib/prisma'; 
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
 import Script from 'next/script';
@@ -75,7 +75,6 @@ export default async function BlogPostPage({ params }: any) {
     notFound();
   }
 
-  // Increment view count in background
   prisma.post.update({
     where: { id: post.id },
     data: { views: { increment: 1 } }
@@ -86,7 +85,6 @@ export default async function BlogPostPage({ params }: any) {
 
   let content = post.content;
 
-  // Extract font settings if present: <post-settings size="20px" family="Arial" />
   const fontSettingsMatch = content.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
   let customStyles: React.CSSProperties = {};
   if (fontSettingsMatch) {
@@ -97,25 +95,16 @@ export default async function BlogPostPage({ params }: any) {
     content = content.replace(/<post-settings .*? \/>/, '');
   }
 
-  // Replace <back href="..."> with <a>
   let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
-
-  // Handle <color val="..."> tag
   processedContent = processedContent.replace(/<color val="(.*?)">(.*?)<\/color>/g, '<span style="color: $1">$2</span>');
-
-  // Handle <u> and <no-u>
   processedContent = processedContent.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline">$1</span>');
   processedContent = processedContent.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none">$1</span>');
-
-  // Handle <spacer /> tag
   processedContent = processedContent.replace(/<spacer \/>/g, '<div style="height: 1.5rem;" class="blog-spacer"></div>');
 
-  // Replace Markdown-like headings
   processedContent = processedContent.replace(/^###\s+(.*)$/gm, '<h4>$1</h4>');
   processedContent = processedContent.replace(/^##\s+(.*)$/gm, '<h3>$1</h3>');
   processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
 
-  // Handle <code> tags with newline preservation
   const codeBlocks: string[] = [];
   processedContent = processedContent.replace(/<code>([\s\S]*?)<\/code>/g, (match, code) => {
     const placeholder = `[CODE_BLOCK_${codeBlocks.length}]`;
@@ -124,12 +113,9 @@ export default async function BlogPostPage({ params }: any) {
   });
 
   processedContent = processedContent.replace(/\n/g, '<br/>');
-
-  // Clean up <br/> around block elements to prevent excessive spacing
   processedContent = processedContent.replace(/(<\/h[1-6]>)(?:\s*<br\/>)+/g, '$1');
   processedContent = processedContent.replace(/(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
 
-  // Restore code blocks
   codeBlocks.forEach((block, index) => {
     processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
   });
@@ -156,19 +142,15 @@ export default async function BlogPostPage({ params }: any) {
   return (
     <article className="section" style={{ padding: '4rem 0 6rem 0' }}>
       <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1.5rem' }}>
-        {/* Compact Back Button */}
         <Link href="/" className="back-link">
           &larr; Back to Home
         </Link>
 
-        {/* Dynamic Detail Header */}
         <header style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
-          {/* Centered Date */}
           <span style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.8rem', display: 'block' }}>
             {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </span>
 
-          {/* Centered Title */}
           <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)', fontWeight: '800', color: '#0f172a', lineHeight: '1.25', letterSpacing: '-0.02em', margin: '0 auto 1.2rem auto', maxWidth: '750px' }}>
             {post.title}
           </h1>
@@ -179,7 +161,6 @@ export default async function BlogPostPage({ params }: any) {
             </p>
           )}
 
-          {/* Centered Category Tag Row */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
             <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
               <span className="blog-detail-category-tag" style={{ marginBottom: 0 }}>#{post.category.slug}</span>
@@ -190,9 +171,9 @@ export default async function BlogPostPage({ params }: any) {
         {/* ─── CENTERED TOP BANNER AD (468x60) ─── */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto 3rem auto', maxWidth: '468px', padding: '6px', background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
           <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '3px', fontWeight: '700' }}>ADVERTISEMENT</span>
-          <div style={{ width: '468px', height: '60px', overflow: 'hidden' }}>
-            <Script id="adsterra-468-60" strategy="afterInteractive">
-              {`
+          <div style={{ width: '468px', height: '60px', overflow: 'hidden', position: 'relative' }}>
+            <Script id="adsterra-468-60" strategy="afterInteractive" dangerouslySetInnerHTML={{
+              __html: `
                 window.atOptions = {
                   'key' : '29598671',
                   'format' : 'iframe',
@@ -200,13 +181,12 @@ export default async function BlogPostPage({ params }: any) {
                   'width' : 468,
                   'params' : {}
                 };
-              `}
-            </Script>
+              `
+            }} />
             <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598671/invoke.js" />
           </div>
         </div>
 
-        {/* Clean Reading Box */}
         <div className="blog-content" style={{ ...customStyles }}>
           <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
@@ -214,9 +194,9 @@ export default async function BlogPostPage({ params }: any) {
         {/* ─── MIDDLE SQUARE BOX AD (300x250) ─── */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '4rem auto', width: '320px', padding: '10px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
           <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '6px', fontWeight: '700' }}>SPONSORED ADS</span>
-          <div style={{ width: '300px', height: '250px', overflow: 'hidden', borderRadius: '8px', background: '#fff' }}>
-            <Script id="adsterra-300-250" strategy="afterInteractive">
-              {`
+          <div style={{ width: '300px', height: '250px', overflow: 'hidden', borderRadius: '8px', background: '#fff', position: 'relative' }}>
+            <Script id="adsterra-300-250" strategy="afterInteractive" dangerouslySetInnerHTML={{
+              __html: `
                 window.atOptions = {
                   'key' : '29598678',
                   'format' : 'iframe',
@@ -224,13 +204,12 @@ export default async function BlogPostPage({ params }: any) {
                   'width' : 300,
                   'params' : {}
                 };
-              `}
-            </Script>
+              `
+            }} />
             <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598678/invoke.js" />
           </div>
         </div>
 
-        {/* Premium FAQ Card Accordions */}
         {post.faqs && (post.faqs as any[]).length > 0 && (
           <div style={{ marginTop: '2rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
             <h2 style={{ marginBottom: '1.8rem', fontSize: '1.6rem', color: '#0f172a', textAlign: 'center', fontWeight: '800', letterSpacing: '-0.02em' }}>Frequently Asked Questions</h2>
@@ -249,7 +228,6 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         )}
 
-        {/* Remaining Gallery Display */}
         {imageIndex < inlineImages.length && (
           <div style={{ marginTop: '4rem' }}>
             <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.5rem' }}>Post Gallery</h3>
@@ -263,7 +241,6 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         )}
 
-        {/* Premium Author Bio Box */}
         <div style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
           <div style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(236,72,153,0.2)', flexShrink: 0 }}>
             {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
@@ -282,7 +259,6 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         </div>
 
-        {/* Sharing Ribbon */}
         <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f1f5f9', marginTop: '4rem' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginBottom: '1rem' }}>Share this post:</h3>
           <ShareButtons title={post.title} />
@@ -292,8 +268,8 @@ export default async function BlogPostPage({ params }: any) {
       {/* ─── DESKTOP RIGHT FLOATING SKYSCRAPER AD (160x600) ─── */}
       <div className="hidden xl:block" style={{ position: 'fixed', right: '20px', top: '150px', zIndex: 50, width: '160px', height: '600px', background: '#f8fafc', borderRadius: '8px', padding: '4px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
         <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>SPONSORED</span>
-        <Script id="adsterra-160-600" strategy="afterInteractive">
-          {`
+        <Script id="adsterra-160-600" strategy="afterInteractive" dangerouslySetInnerHTML={{
+          __html: `
             window.atOptions = {
               'key' : '29598677',
               'format' : 'iframe',
@@ -301,8 +277,8 @@ export default async function BlogPostPage({ params }: any) {
               'width' : 160,
               'params' : {}
             };
-          `}
-        </Script>
+          `
+        }} />
         <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598677/invoke.js" />
       </div>
     </article>
