@@ -376,7 +376,21 @@ export default async function BlogPostPage({ params }: any) {
 
         {/* Premium Author Bio Box */}
         <div style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-          <div style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justify-center: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(236,72,153,0.2)', flexShrink: 0 }}>
+         <div style={{ 
+  width: '75px', 
+  height: '75px', 
+  borderRadius: '50%', 
+  background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', 
+  overflow: 'hidden', 
+  display: 'flex', 
+  alignItems: 'center', 
+  justifyContent: 'center', // <-- Isko sahi kiya
+  color: 'white', 
+  fontWeight: '800', 
+  fontSize: '1.8rem', 
+  boxShadow: '0 8px 20px rgba(236,72,153,0.2)', 
+  flexShrink: 0 
+}}>
             {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
               <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
