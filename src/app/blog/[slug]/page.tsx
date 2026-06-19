@@ -1,103 +1,208 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { checkAuth } from '../../../lib/auth';
 import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
+import { Metadata } from 'next';
 import Image from 'next/image';
+
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const posts = await prisma.post.findMany({
+    where: { published: true },
+    select: { slug: true }
+  });
+  return posts.map((post) => ({
+    slug: post.slug
+  }));
+}
+
+export async function generateMetadata({ params }: any): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  const post = await prisma.post.findUnique({
+    where: { slug }
+  });
+
+  if (!post) {
+    return { title: 'Post Not Found - Blog Fusion' };
+  }
+
+  const metadata: Metadata = {
+    title: post.metaTitle || `${post.title} - Blog Fusion`,
+    description: post.metaDescription || post.excerpt,
+    keywords: post.focusKeywords || undefined,
+    openGraph: {
+      title: post.metaTitle || post.title,
+      description: post.metaDescription || post.excerpt,
+      images: post.ogImage ? [{ url: post.ogImage }] : (post.coverImage ? [{ url: post.coverImage }] : []),
+      url: post.canonicalUrl || undefined,
+      type: 'article',
+    },
+    alternates: {
+      canonical: post.canonicalUrl || undefined,
+    }
+  };
+
+  if (!post.isIndexable) {
+    metadata.robots = {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
+    };
+  }
+
+  return metadata;
+}
 
 export default async function BlogPostPage({ params }: any) {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
-
   const post = await prisma.post.findUnique({
     where: { slug },
-    include: { author: true }
+    include: { category: true, author: true }
   });
 
-  if (!post) {
+  if (!post || !post.published) {
     notFound();
   }
 
+  prisma.post.update({
+    where: { id: post.id },
+    data: { views: { increment: 1 } }
+  }).catch(err => console.error("Error updating views:", err));
+
+  const authorName = post.author?.username || "Admin";
+  const authorInitial = authorName[0]?.toUpperCase() || "D";
+
+  let content = post.content;
+  const fontSettingsMatch = content.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
+  let customStyles: React.CSSProperties = {};
+
+  if (fontSettingsMatch) {
+    customStyles = { fontSize: fontSettingsMatch[1], fontFamily: fontSettingsMatch[2] };
+    content = content.replace(/<post-settings .*? \/>/, '');
+  }
+
+  let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
+  processedContent = processedContent.replace(/<color val="(.*?)">(.*?)<\/color>/g, '<span style="color: $1">$2</span>');
+  processedContent = processedContent.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline">$1</span>');
+  processedContent = processedContent.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none">$1</span>');
+  processedContent = processedContent.replace(/<spacer \/>/g, '<div style="height: 1.5rem;" class="blog-spacer"></div>');
+  processedContent = processedContent.replace(/^###\s+(.*)$/gm, '<h4>$1</h4>');
+  processedContent = processedContent.replace(/^##\s+(.*)$/gm, '<h3>$1</h3>');
+  processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
+
+  const codeBlocks: string[] = [];
+  processedContent = processedContent.replace(/<code>([\s\S]*?)<\/code>/g, (match, code) => {
+    const placeholder = `[CODE_BLOCK_${codeBlocks.length}]`;
+    codeBlocks.push(`<pre class="code-block"><code>${code.trim()}</code></pre>`);
+    return placeholder;
+  });
+
+  processedContent = processedContent.replace(/\n/g, '<br/>');
+  processedContent = processedContent.replace(/(<\/h[1-6]>)(?:\s*<br\/>)+/g, '$1');
+  processedContent = processedContent.replace(/(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
+
+  codeBlocks.forEach((block, index) => {
+    processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
+  });
+
+  const gallery = [...(post.images || [])];
+  const inlineImages = [...gallery];
+  let imageIndex = 0;
+
+  const imageRegex = /(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/i;
+  while (imageRegex.test(processedContent) && imageIndex < inlineImages.length) {
+    const match = imageRegex.exec(processedContent);
+    if (!match) break;
+    const altText = match[1] ? match[1].trim() : `Blog image ${imageIndex + 1}`;
+    const imgHtml = `
+      <figure class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
+        <img src="${inlineImages[imageIndex]}" alt="${altText}" style="width: 100%; height: auto; display: block;" />
+        ${match[1] ? `<figcaption style="text-align: center; font-size: 0.85rem; color: #64748b; padding: 0.75rem; background: #f8fafc; border-top: 1px solid #e2e8f0; margin: 0;">${altText}</figcaption>` : ''}
+      </figure>
+    `;
+    processedContent = processedContent.replace(match[0], imgHtml);
+    imageIndex++;
+  }
+
   return (
-    <div className="bg-white min-h-screen text-gray-900 selection:bg-indigo-100">
-      <article className="max-w-3xl mx-auto px-4 py-12 sm:px-6 lg:px-8 font-sans antialiased">
-        
-        {/* 1. Pill-Style Tags (Top Centered) */}
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
-          {post.focusKeywords?.split(',').map((tag: string) => (
-            <span 
-              key={tag} 
-              className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-50 rounded-full border border-indigo-100"
-            >
-              {tag.trim()}
-            </span>
-          ))}
-        </div>
-
-        {/* 2. Premium Serif Title */}
-        <h1 className="text-4xl sm:text-5xl font-serif font-bold text-center text-gray-900 leading-tight mb-6">
-          {post.title}
-        </h1>
-
-        {/* 3. Clean Meta Info (Centered Author & Date) */}
-        <div className="flex items-center justify-center space-x-3 text-sm text-gray-500 mb-10 border-b border-gray-100 pb-8">
-          {post.author?.image ? (
-            <Image 
-              src={post.author.image} 
-              alt={post.author.name || 'Author'} 
-              width={32} 
-              height={32} 
-              className="rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-semibold text-xs">
-              {post.author?.name?.charAt(0) || 'A'}
-            </div>
-          )}
-          <span className="font-medium text-gray-800">{post.author?.name || 'Admin'}</span>
-          <span>•</span>
-          <span>
-            {new Date(post.createdAt).toLocaleDateString('en-US', { 
-              month: 'short', 
-              day: 'numeric', 
-              year: 'numeric' 
-            })}
-          </span>
-        </div>
-
-        {/* 4. Beautiful Rounded Featured Image */}
-        {post.featuredImage && (
-          <div className="relative w-full h-64 sm:h-[400px] mb-12 overflow-hidden rounded-2xl shadow-sm border border-gray-100">
-            <Image 
-              src={post.featuredImage} 
-              alt={post.title} 
-              fill 
-              className="object-cover"
-              priority 
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <article className="prose lg:prose-xl mx-auto">
+        {post.coverImage && (
+          <div className="relative h-96 w-full mb-8 rounded-xl overflow-hidden shadow-lg">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              style={{ objectFit: 'cover' }}
+              priority
             />
           </div>
         )}
 
-        {/* 5. Article Content (Serif for Readability - Labnol Style) */}
-        <div className="font-serif text-lg sm:text-xl text-gray-800 leading-relaxed space-y-6 max-w-none">
-          {/* Injecting content safely */}
-          <div 
-            className="prose prose-lg prose-indigo max-w-none 
-              prose-headings:font-serif prose-headings:font-bold prose-headings:text-gray-900
-              prose-p:text-gray-800 prose-p:leading-relaxed
-              prose-pre:bg-gray-50 prose-pre:text-gray-900 prose-pre:border prose-pre:border-gray-200 prose-pre:rounded-xl prose-pre:p-4
-              prose-code:text-indigo-600 prose-code:bg-gray-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm"
-            dangerouslySetInnerHTML={{ __html: post.content }} 
-          />
-        </div>
-
-        {/* 6. Share Section */}
-        <div className="mt-16 pt-8 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center space-x-2 text-sm text-gray-500 font-medium">
-            <span>Share</span>
-            <ShareButtons url={`/blog/${post.slug}`} title={post.title} />
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="h-12 w-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+            {authorInitial}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">By {authorName}</p>
+            <p className="text-xs text-gray-500">
+              {new Date(post.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
           </div>
         </div>
 
+        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 mb-4">
+          {post.title}
+        </h1>
+
+        {post.category && (
+          <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-8">
+            {post.category.name}
+          </span>
+        )}
+
+        <div className="mb-8">
+          <ShareButtons url={`${process.env.NEXT_PUBLIC_SITE_URL || ''}/blog/${post.slug}`} title={post.title} />
+        </div>
+
+        <div 
+          className="markdown-content text-gray-800 dark:text-gray-200 leading-relaxed"
+          style={customStyles}
+          dangerouslySetInnerHTML={{ __html: processedContent }} 
+        />
+
+        {imageIndex < inlineImages.length && (
+          <div style={{ marginTop: '4rem' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
+              More Images from this Blog
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+              {inlineImages.slice(imageIndex).map((img, idx) => (
+                <div key={idx} style={{ position: 'relative', height: '200px', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                  <Image
+                    src={img}
+                    alt={`Blog image ${idx + 1}`}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </article>
     </div>
   );
