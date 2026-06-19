@@ -135,7 +135,7 @@ export default async function BlogPostPage({ params }: any) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <article className="prose lg:prose-xl mx-auto">
+      <article className="prose lg:prose-xl mx-auto dark:prose-invert">
         {post.coverImage && (
           <div className="relative h-96 w-full mb-8 rounded-xl overflow-hidden shadow-lg">
             <Image
@@ -179,7 +179,7 @@ export default async function BlogPostPage({ params }: any) {
         </div>
 
         <div 
-          className="markdown-content text-gray-800 dark:text-gray-200 leading-relaxed"
+          className="markdown-content text-gray-800 dark:text-gray-200 leading-relaxed prose max-w-none"
           style={customStyles}
           dangerouslySetInnerHTML={{ __html: processedContent }} 
         />
