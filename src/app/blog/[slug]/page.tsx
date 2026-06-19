@@ -200,20 +200,21 @@ export default async function BlogPostPage({ params }: any) {
         </div>
 
         <div className="blog-content" style={{ ...customStyles }}>
-        <div dangerouslySetInnerHTML={{ __html: processedContent }} />
+       <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
-        />
-      </div>
-    </script>
-    <script type="text/javascript" src="https://www.highperformanceformat.com/b4c654470b9ee32fd3bae63c8c04897d/invoke.js"></script>
-    `
-  }}
-/>
-</div>
 
-        {post.faqs && (post.faqs as any[]).length > 0 && (
-          <div style={{ marginTop: '2rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-            <h2 style={{ marginBottom: '1.8rem', fontSize: '1.6rem', color: '#0f172a', textAlign: 'center', fontWeight: '800', letterSpacing: '-0.02em' }}>Frequently Asked Questions</h2>
+        {/* ─── BOTTOM MOBILE RESPONSIVE BANNER AD ─── */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '3rem auto', maxWidth: '320px', padding: '6px', background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
+          <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '3px', fontWeight: '700' }}>MOBILE AD</span>
+          <div style={{ width: '320px', height: '50px', overflow: 'hidden' }} dangerouslySetInnerHTML={{
+            __html: `
+              <script type="text/javascript">
+                atOptions = { 'key' : 'b4c654470b9ee32fd3bae63c8c04897d', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+              </script>
+              <script type="text/javascript" src="https://www.highperformanceformat.com/b4c654470b9ee32fd3bae63c8c04897d/invoke.js"></script>
+            `
+          }} />
+        </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {(post.faqs as any[]).map((faq, index) => (
                 <div key={index} style={{ background: 'white', padding: '1.25rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
