@@ -248,10 +248,7 @@ export default async function BlogPostPage({ params }: any) {
           <ShareButtons title={post.title} />
         </div>
       </div>
-    </article>
-    return (
-    <article className="section" style={{ padding: '4rem 0 6rem 0', position: 'relative' }}>
-      
+   
       {/* ─── DESKTOP RIGHT FLOATING SKYSCRAPER AD (160x600) ─── */}
       <div className="hidden xl:block" style={{ position: 'fixed', right: '20px', top: '150px', zIndex: 50, width: '160px', height: '600px', background: '#f8fafc', borderRadius: '8px', padding: '4px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
         <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>SPONSORED</span>
