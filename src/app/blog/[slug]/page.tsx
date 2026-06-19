@@ -143,12 +143,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               <img src={post.author?.image || '/huzaifa.png'} alt={authorName} className="w-full h-full object-cover" />
             </div>
             <div>
-              <h3 className="m-0 font-extrabold text-[#0f172a] text-[1.3rem]">
-                Written by <span className="text-[#ec4899]">{authorName}</span>
-              </h3>
-              <p className="m-0 text-[#475569] text-[0.95rem] mt-1 leading-relaxed">
-                Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge.
-              </p>
+              <h3 className="m-0 font-extrabold text-[#0f172a] text-[1.3rem]"> Written by <span className="text-[#ec4899]">{authorName}</span> </h3>
+              <p className="m-0 text-[#475569] text-[0.95rem] mt-1 leading-relaxed"> Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge. </p>
             </div>
           </div>
 
@@ -188,7 +184,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </div>
 
             {/* Sidebar Ad (160x600 Skyscraper) */}
-            <div className="hidden lg:flex w-full max-w-[300px] p-3 bg-slate-50 border border-slate-200 rounded-2xl flex-col items-center shadow-sm">
+            <div className="hidden lg:flex w-full max-w-[300px] p-3 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-center shadow-sm">
               <span className="text-[10px] text-slate-400 font-bold mb-2 uppercase tracking-widest block text-center">Sponsored</span>
               <div className="w-[160px] h-[600px] bg-white overflow-hidden flex justify-center items-center rounded-lg border border-slate-100">
                 <Script id="adsterra-sidebar-160" strategy="afterInteractive">
