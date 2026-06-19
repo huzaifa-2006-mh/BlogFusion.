@@ -203,25 +203,7 @@ export default async function BlogPostPage({ params }: any) {
           <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
 
-        {/* ─── MIDDLE SQUARE BOX AD (300x250 NAYA CODE) ─── */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '4rem auto', width: '320px', padding: '10px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
-          <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '6px', fontWeight: '700' }}>SPONSORED ADS</span>
-          <div 
-            style={{ width: '300px', height: '250px', overflow: 'hidden', borderRadius: '8px', background: '#fff' }} 
-            dangerouslySetInnerHTML={{
-              __html: `
-                <script type="text/javascript">
-                  atOptions = {
-                    'key' : '8319ba78a1a7f355cf49e22e003c7d9b',
-                    'format' : 'iframe',
-                    'height' : 250,
-                    'width' : 300,
-                    'params' : {}
-                  };
-                </script>
-                <script type="text/javascript" src="https://www.highperformanceformat.com/8319ba78a1a7f355cf49e22e003c7d9b/invoke.js"></script>
-              `
-            }} 
+
           />
         </div>
 
