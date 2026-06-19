@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { checkAuth } from '../../../lib/auth';
-import { prisma } from '@/lib/prisma';
+import { PrismaClient } from '@/lib/prisma';
+const prisma = new PrismaClient();
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
 
