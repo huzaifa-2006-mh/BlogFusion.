@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-// Naya Code:
+import { checkAuth } from '../../../lib/auth';
 import { prisma } from '../../lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
