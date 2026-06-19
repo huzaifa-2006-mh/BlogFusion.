@@ -200,20 +200,16 @@ export default async function BlogPostPage({ params }: any) {
         </div>
 
         <div className="blog-content" style={{ ...customStyles }}>
-          <div dangerouslySetInnerHTML={{ __html: processedContent }} />
+        <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
-
-
-          />
-        </div>
-
-        
-                </script>
-                <script type="text/javascript" src="https://www.highperformanceformat.com/b4c654470b9ee32fd3bae63c8c04897d/invoke.js"></script>
-              `
-            }} 
-          />
-        </div>
+        />
+      </div>
+    </script>
+    <script type="text/javascript" src="https://www.highperformanceformat.com/b4c654470b9ee32fd3bae63c8c04897d/invoke.js"></script>
+    `
+  }}
+/>
+</div>
 
         {post.faqs && (post.faqs as any[]).length > 0 && (
           <div style={{ marginTop: '2rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
