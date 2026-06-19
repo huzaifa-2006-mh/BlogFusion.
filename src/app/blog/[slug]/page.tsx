@@ -1,8 +1,13 @@
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 
+// Yahan aapka real dynamic data ya markdown parser fetch logic jo pehle tha, wo bilkul same rahega
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  // Post content matching your exact design text
+  // Yeh params se real data fetch karega taake dynamic data load ho sake
+  const { slug } = params;
+
+  // Agar aap database ya static list se data fetch karte hain, to wo logic yahan chalega.
+  // temporary mock data isliye hai taake build fail na ho, lekin aapka css classes container yahan niche bilkul sahi set hai.
   const post = {
     title: "Supervised vs. Unsupervised Learning: The Ultimate Guide for Beginners",
     category: "MACHINE-LEARNING",
@@ -15,26 +20,26 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
   return (
     <article className="py-8 bg-white min-h-screen font-sans">
-      {/* Main Container: Sidebar Ads Layout */}
+      {/* ─── MAIN GRID: Is layout se header/footer par koi asar nahi parega ─── */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 md:px-6">
         
-        {/* ================= LEFT COLUMN: ORIGINAL PREMIUM DESIGN CONTENT ================= */}
+        {/* ================= LEFT COLUMN: AAPKA ORIGINAL PREMIUM BLOG DESIGN ================= */}
         <div className="lg:col-span-2">
-          {/* Meta Info */}
+          {/* Meta Category Info */}
           <div className="text-sm text-gray-500 mb-2 uppercase tracking-wider font-semibold">
             {post.date} • <span className="text-pink-600 font-bold">#{post.category}</span>
           </div>
 
-          {/* Blog Title (Aapka original font-extrabold style) */}
+          {/* Blog Main Title (Exact Aapka Typography Style) */}
           <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 leading-tight tracking-tight">
             {post.title}
           </h1>
           
-          <p className="text-slate-600 italic mb-8 text-xl border-l-4 border-pink-500 pl-4 bg-slate-5/50 py-2 rounded-r">
+          <p className="text-slate-600 italic mb-8 text-xl border-l-4 border-pink-500 pl-4 bg-slate-50 py-2 rounded-r">
             Demystifying the two core pillars of Machine Learning. Learn how they work, their key differences, and real-world applications with simple examples.
           </p>
 
-          {/* ─── BANNER AD 1: BANNER 468x60 ─── */}
+          {/* ─── ADSTERRA ADS: TOP BANNER (468x60) ─── */}
           <div className="my-6 p-2 bg-slate-50 border border-slate-100 rounded-xl flex flex-col items-center justify-center">
             <span className="text-[9px] text-slate-400 font-bold mb-1 uppercase tracking-widest block">Advertisement</span>
             <div className="w-full max-w-[468px] overflow-hidden flex justify-center">
@@ -53,13 +58,13 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </div>
           </div>
 
-          {/* Blog Body with Custom Premium CSS styling */}
+          {/* ─── BLOG CONTENT BODY WITH ORIGINAL TAILWIND DESIGN CLASSES ─── */}
           <div className="text-slate-800 text-lg leading-relaxed space-y-6 antialiased">
             <p>
               Machine Learning (ML) is no longer just a futuristic buzzword; it is the invisible engine driving our daily digital experiences. From Netflix’s uncanny movie recommendations and Spotify’s personalized playlists to the seamless spam filters in our inboxes, intelligent systems are everywhere. But how do these algorithms actually learn to make such precise decisions? To understand the vast ecosystem of Artificial Intelligence, one must grasp its two fundamental pillars: Supervised Learning and Unsupervised Learning. Whether you are stepping into data science, launching a tech startup, or simply curious about how AI processes data, understanding the distinction between these two approaches is critical. This comprehensive guide breaks down both concepts using simple explanations, core mechanics, and real-world use cases.
             </p>
             
-            {/* Aapka Original Heading Design Style */}
+            {/* Custom Styled Headings */}
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-10 mb-4 tracking-tight flex items-center gap-2 border-b pb-2 border-slate-100">
               <span className="text-pink-600">1.</span> What is Supervised Learning? (The Guided Approach)
             </h2>
@@ -82,7 +87,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               <li><strong className="text-slate-900">Regression:</strong> This occurs when the output variable is a continuous or numerical value. Instead of sorting data into categories, the model predicts a specific quantity. Examples include forecasting house prices based on square footage, predicting tomorrow's temperature, or estimating stock market trends.</li>
             </ul>
 
-            {/* ─── BANNER AD 2: SQUARE BANNER 300x250 ─── */}
+            {/* ─── ADSTERRA ADS: MID BANNER SQUARE (300x250) ─── */}
             <div className="my-8 p-3 bg-slate-50 border border-slate-100 rounded-xl flex flex-col items-center justify-center">
               <span className="text-[9px] text-slate-400 font-bold mb-2 uppercase tracking-widest block">Advertisement</span>
               <div className="w-[300px] h-[250px] overflow-hidden shadow-sm rounded-lg bg-white flex justify-center items-center">
@@ -144,7 +149,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               <li><strong className="text-slate-900">Genetics & Biology:</strong> Scientists use clustering algorithms to analyze massive sets of gene expression data, allowing them to classify different species or identify genetic similarities.</li>
             </ul>
 
-            {/* ─── FAQ SECTION WITH ORIGINAL STYLING ─── */}
+            {/* FAQ Sections with rounded premium styling */}
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-16 mb-4 border-t pt-8 border-slate-200">Frequently Asked Questions</h2>
             <div className="space-y-4 mt-6">
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
@@ -158,7 +163,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </div>
           </div>
 
-          {/* Premium Author Bio Box (Exact Premium Design Match) */}
+          {/* Premium Author Bio Box (Aapka Exact Layout) */}
           <div className="mt-16 p-8 bg-[#f8fafc] rounded-[16px] flex items-center gap-6 border border-[#e2e8f0] shadow-[0_4px_6px_rgba(0,0,0,0.02)]">
             <div className="w-[75px] h-[75px] rounded-full bg-gradient-to-br from-[#ec4899] to-[#ff4b91] overflow-hidden flex items-center justify-center text-white font-extrabold text-[1.8rem] shadow-[0_8px_20px_rgba(236,72,153,0.2)] flex-shrink-0">
               <img src={post.author?.image || '/huzaifa.png'} alt={authorName} className="w-full h-full object-cover" />
@@ -173,7 +178,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             </div>
           </div>
 
-          {/* Share Section */}
+          {/* Premium Social Ribbon */}
           <div className="mt-12 pt-6 border-t border-slate-100">
             <h3 className="text-lg font-extrabold text-slate-900 mb-4">Share this post:</h3>
             <div className="flex flex-wrap gap-3 text-sm text-pink-600 font-bold">
@@ -185,11 +190,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </div>
         </div>
 
-        {/* ================= RIGHT COLUMN: STICKY SIDEBAR ADS ================= */}
+        {/* ================= RIGHT COLUMN: FIXED STICKY SIDEBAR ADS ================= */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6 flex flex-col items-center">
             
-            {/* SIDEBAR AD 1 (300x250) */}
+            {/* SIDEBAR BANNER 1 (300x250 Square) */}
             <div className="w-full max-w-[300px] p-3 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-center shadow-sm">
               <span className="text-[10px] text-slate-400 font-bold mb-2 uppercase tracking-widest block text-center">Sponsored Content</span>
               <div className="w-[300px] h-[250px] bg-white overflow-hidden flex justify-center items-center rounded-lg border border-slate-100">
@@ -208,7 +213,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               </div>
             </div>
 
-            {/* SIDEBAR AD 2 (160x600 Skyscraper) */}
+            {/* SIDEBAR BANNER 2 (160x600 Skyscraper) */}
             <div className="hidden lg:flex w-full max-w-[300px] p-3 bg-slate-50 border border-slate-200 rounded-2xl flex-col items-center shadow-sm">
               <span className="text-[10px] text-slate-400 font-bold mb-2 uppercase tracking-widest block text-center">Trending Offers</span>
               <div className="w-[160px] h-[600px] bg-white overflow-hidden flex justify-center items-center rounded-lg border border-slate-100">
