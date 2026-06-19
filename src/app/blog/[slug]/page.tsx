@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { checkAuth } from '../../../lib/auth';
-import prisma from '@/lib/prisma'; 
+import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
+import Image from 'next/image';
 
 export const revalidate = 60;
 
@@ -25,9 +26,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   });
 
   if (!post) {
-    return {
-      title: 'Post Not Found - Blog Fusion'
-    };
+    return { title: 'Post Not Found - Blog Fusion' };
   }
 
   const metadata: Metadata = {
@@ -83,14 +82,11 @@ export default async function BlogPostPage({ params }: any) {
   const authorInitial = authorName[0]?.toUpperCase() || "D";
 
   let content = post.content;
-
   const fontSettingsMatch = content.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
   let customStyles: React.CSSProperties = {};
+
   if (fontSettingsMatch) {
-    customStyles = {
-      fontSize: fontSettingsMatch[1],
-      fontFamily: fontSettingsMatch[2]
-    };
+    customStyles = { fontSize: fontSettingsMatch[1], fontFamily: fontSettingsMatch[2] };
     content = content.replace(/<post-settings .*? \/>/, '');
   }
 
@@ -99,7 +95,6 @@ export default async function BlogPostPage({ params }: any) {
   processedContent = processedContent.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline">$1</span>');
   processedContent = processedContent.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none">$1</span>');
   processedContent = processedContent.replace(/<spacer \/>/g, '<div style="height: 1.5rem;" class="blog-spacer"></div>');
-
   processedContent = processedContent.replace(/^###\s+(.*)$/gm, '<h4>$1</h4>');
   processedContent = processedContent.replace(/^##\s+(.*)$/gm, '<h3>$1</h3>');
   processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
@@ -113,7 +108,7 @@ export default async function BlogPostPage({ params }: any) {
 
   processedContent = processedContent.replace(/\n/g, '<br/>');
   processedContent = processedContent.replace(/(<\/h[1-6]>)(?:\s*<br\/>)+/g, '$1');
-  processedContent = processedContent.replace(/(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
+  processedContent = processedContent.replace(/^(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
 
   codeBlocks.forEach((block, index) => {
     processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
@@ -122,8 +117,8 @@ export default async function BlogPostPage({ params }: any) {
   const gallery = [...(post.images || [])];
   const inlineImages = [...gallery];
   let imageIndex = 0;
-  const imageRegex = /(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/i;
 
+  const imageRegex = /(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/i;
   while (imageRegex.test(processedContent) && imageIndex < inlineImages.length) {
     const match = imageRegex.exec(processedContent);
     if (!match) break;
@@ -138,7 +133,77 @@ export default async function BlogPostPage({ params }: any) {
     imageIndex++;
   }
 
- 
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <article className="prose lg:prose-xl mx-auto">
+        {post.coverImage && (
+          <div className="relative h-96 w-full mb-8 rounded-xl overflow-hidden shadow-lg">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              style={{ objectFit: 'cover' }}
+              priority
+            />
+          </div>
+        )}
+
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="h-12 w-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
+            {authorInitial}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">By {authorName}</p>
+            <p className="text-xs text-gray-500">
+              {new Date(post.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+          </div>
+        </div>
+
+        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-gray-50 mb-4">
+          {post.title}
+        </h1>
+
+        {post.category && (
+          <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 mb-8">
+            {post.category.name}
+          </span>
+        )}
+
+        <div className="mb-8">
+          <ShareButtons url={`${process.env.NEXT_PUBLIC_SITE_URL || ''}/blog/${post.slug}`} title={post.title} />
+        </div>
+
+        <div 
+          className="markdown-content text-gray-800 dark:text-gray-200 leading-relaxed"
+          style={customStyles}
+          dangerouslySetInnerHTML={{ __html: processedContent }} 
+        />
+
+        {imageIndex < inlineImages.length && (
+          <div style={{ marginTop: '4rem' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
+              More Images from this Blog
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+              {inlineImages.slice(imageIndex).map((img, idx) => (
+                <div key={idx} style={{ position: 'relative', height: '200px', borderRadius: '0.5rem', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
+                  <Image
+                    src={img}
+                    alt={`Blog image ${idx + 1}`}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </article>
     </div>
   );
 }
