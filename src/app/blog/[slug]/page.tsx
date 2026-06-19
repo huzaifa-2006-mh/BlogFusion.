@@ -4,7 +4,6 @@ import { checkAuth } from '../../../lib/auth';
 import prisma from '@/lib/prisma'; 
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
-import Script from 'next/script';
 
 export const revalidate = 60;
 
@@ -171,20 +170,23 @@ export default async function BlogPostPage({ params }: any) {
         {/* ─── CENTERED TOP BANNER AD (468x60) ─── */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 auto 3rem auto', maxWidth: '468px', padding: '6px', background: '#f8fafc', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
           <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '3px', fontWeight: '700' }}>ADVERTISEMENT</span>
-          <div style={{ width: '468px', height: '60px', overflow: 'hidden', position: 'relative' }}>
-            <Script id="adsterra-468-60" strategy="afterInteractive" dangerouslySetInnerHTML={{
+          <div 
+            style={{ width: '468px', height: '60px', overflow: 'hidden' }} 
+            dangerouslySetInnerHTML={{
               __html: `
-                window.atOptions = {
-                  'key' : '29598671',
-                  'format' : 'iframe',
-                  'height' : 60,
-                  'width' : 468,
-                  'params' : {}
-                };
+                <script type="text/javascript">
+                  atOptions = {
+                    'key' : '29598671',
+                    'format' : 'iframe',
+                    'height' : 60,
+                    'width' : 468,
+                    'params' : {}
+                  };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/29598671/invoke.js"></script>
               `
-            }} />
-            <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598671/invoke.js" />
-          </div>
+            }} 
+          />
         </div>
 
         <div className="blog-content" style={{ ...customStyles }}>
@@ -194,20 +196,23 @@ export default async function BlogPostPage({ params }: any) {
         {/* ─── MIDDLE SQUARE BOX AD (300x250) ─── */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '4rem auto', width: '320px', padding: '10px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
           <span style={{ fontSize: '9px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '6px', fontWeight: '700' }}>SPONSORED ADS</span>
-          <div style={{ width: '300px', height: '250px', overflow: 'hidden', borderRadius: '8px', background: '#fff', position: 'relative' }}>
-            <Script id="adsterra-300-250" strategy="afterInteractive" dangerouslySetInnerHTML={{
+          <div 
+            style={{ width: '300px', height: '250px', overflow: 'hidden', borderRadius: '8px', background: '#fff' }} 
+            dangerouslySetInnerHTML={{
               __html: `
-                window.atOptions = {
-                  'key' : '29598678',
-                  'format' : 'iframe',
-                  'height' : 250,
-                  'width' : 300,
-                  'params' : {}
-                };
+                <script type="text/javascript">
+                  atOptions = {
+                    'key' : '29598678',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                  };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/29598678/invoke.js"></script>
               `
-            }} />
-            <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598678/invoke.js" />
-          </div>
+            }} 
+          />
         </div>
 
         {post.faqs && (post.faqs as any[]).length > 0 && (
@@ -268,18 +273,23 @@ export default async function BlogPostPage({ params }: any) {
       {/* ─── DESKTOP RIGHT FLOATING SKYSCRAPER AD (160x600) ─── */}
       <div className="hidden xl:block" style={{ position: 'fixed', right: '20px', top: '150px', zIndex: 50, width: '160px', height: '600px', background: '#f8fafc', borderRadius: '8px', padding: '4px', border: '1px solid #e2e8f0', textAlign: 'center' }}>
         <span style={{ fontSize: '9px', color: '#94a3b8', display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>SPONSORED</span>
-        <Script id="adsterra-160-600" strategy="afterInteractive" dangerouslySetInnerHTML={{
-          __html: `
-            window.atOptions = {
-              'key' : '29598677',
-              'format' : 'iframe',
-              'height' : 600,
-              'width' : 160,
-              'params' : {}
-            };
-          `
-        }} />
-        <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598677/invoke.js" />
+        <div 
+          style={{ width: '100%', height: '100%' }} 
+          dangerouslySetInnerHTML={{
+            __html: `
+              <script type="text/javascript">
+                atOptions = {
+                  'key' : '29598677',
+                  'format' : 'iframe',
+                  'height' : 600,
+                  'width' : 160,
+                  'params' : {}
+                };
+              </script>
+              <script type="text/javascript" src="//www.highperformanceformat.com/29598677/invoke.js"></script>
+            `
+          }} 
+        />
       </div>
     </article>
   );
