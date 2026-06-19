@@ -108,7 +108,7 @@ export default async function BlogPostPage({ params }: any) {
 
   processedContent = processedContent.replace(/\n/g, '<br/>');
   processedContent = processedContent.replace(/(<\/h[1-6]>)(?:\s*<br\/>)+/g, '$1');
-  processedContent = processedContent.replace(/^(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
+  processedContent = processedContent.replace(/(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
 
   codeBlocks.forEach((block, index) => {
     processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
@@ -135,7 +135,7 @@ export default async function BlogPostPage({ params }: any) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <article className="prose lg:prose-xl mx-auto dark:prose-invert">
+      <article className="prose lg:prose-xl mx-auto">
         {post.coverImage && (
           <div className="relative h-96 w-full mb-8 rounded-xl overflow-hidden shadow-lg">
             <Image
