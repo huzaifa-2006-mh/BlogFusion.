@@ -129,6 +129,50 @@ export default function RootLayout({
   };
 </script>
 <script src="https://www.highperformanceformat.com/2a32449f0366cc57d7aa759f77df868f/invoke.js"></script>
+        <script async="async" data-cfasync="false" src="https://pl29699171.effectivecpmnetwork.com/646dfe8819eb11a7954692a21b4c9ada/invoke.js"></script>
+<div id="container-646dfe8819eb11a7954692a21b4c9ada"></div>
+<script src="https://pl29699172.effectivecpmnetwork.com/10/f4/fb/10f4fb60e1a7547158745009f4cbeb84.js"></script>
+<script>
+  atOptions = {
+    'key' : '545cdb473b7f2a05d8f1486337299168',
+    'format' : 'iframe',
+    'height' : 300,
+    'width' : 160,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highperformanceformat.com/545cdb473b7f2a05d8f1486337299168/invoke.js"></script>
+<script>
+  atOptions = {
+    'key' : 'f39f63f3c9406103dbb6c88ba9ac0717',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script><script>
+  atOptions = {
+    'key' : '8319ba78a1a7f355cf49e22e003c7d9b',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highperformanceformat.com/8319ba78a1a7f355cf49e22e003c7d9b/invoke.js"></script>
+
+<script src="https://www.highperformanceformat.com/f39f63f3c9406103dbb6c88ba9ac0717/invoke.js"></script>
+<script>
+  atOptions = {
+    'key' : '4beacb9d36597821c806aa046b9662fa',
+    'format' : 'iframe',
+    'height' : 600,
+    'width' : 160,
+    'params' : {}
+  };
+</script>
+<script src="https://www.highperformanceformat.com/4beacb9d36597821c806aa046b9662fa/invoke.js"></script>
+
 
         <AnalyticsTracker />
         <Navbar />
