@@ -1,210 +1,311 @@
 import { notFound } from 'next/navigation';
-import Script from 'next/script';
+import Link from 'next/link';
+// Naya Code:
+import { prisma } from '../../lib/prisma';
+import ShareButtons from '@/components/ShareButtons';
+import { Metadata } from 'next';
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = {
-    title: "Supervised vs. Unsupervised Learning: The Ultimate Guide for Beginners",
-    category: "MACHINE-LEARNING",
-    date: "JUN 14, 2026",
-    author: { name: "Muhammad Huzaifa", image: "/huzaifa.png" }
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const posts = await prisma.post.findMany({
+    where: { published: true },
+    select: { slug: true }
+  });
+  return posts.map((post) => ({
+    slug: post.slug
+  }));
+}
+
+export async function generateMetadata({ params }: any): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  
+  const post = await prisma.post.findUnique({
+    where: { slug }
+  });
+
+  if (!post) {
+    return {
+      title: 'Post Not Found - Blog Fusion'
+    };
+  }
+
+  const metadata: Metadata = {
+    title: post.metaTitle || `${post.title} - Blog Fusion`,
+    description: post.metaDescription || post.excerpt,
+    keywords: post.focusKeywords || undefined,
+    openGraph: {
+      title: post.metaTitle || post.title,
+      description: post.metaDescription || post.excerpt,
+      images: post.ogImage ? [{ url: post.ogImage }] : (post.coverImage ? [{ url: post.coverImage }] : []),
+      url: post.canonicalUrl || undefined,
+      type: 'article',
+    },
+    alternates: {
+      canonical: post.canonicalUrl || undefined,
+    }
   };
 
-  const authorName = post.author?.name || "Muhammad Huzaifa";
+  if (!post.isIndexable) {
+    metadata.robots = {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+      },
+    };
+  }
+
+  return metadata;
+}
+
+export default async function BlogPostPage({ params }: any) {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+
+  const post = await prisma.post.findUnique({
+    where: { slug },
+    include: {
+      category: true,
+      author: true
+    }
+  });
+
+  if (!post || !post.published) {
+    notFound();
+  }
+
+  // Increment view count in background
+  prisma.post.update({
+    where: { id: post.id },
+    data: { views: { increment: 1 } }
+  }).catch(err => console.error("Error updating views:", err));
+
+  const authorName = post.author?.username || "Admin";
+  const authorInitial = authorName[0]?.toUpperCase() || "D";
+
+  let content = post.content;
+  
+  // Extract font settings if present: <post-settings size="20px" family="Arial" />
+  const fontSettingsMatch = content.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
+  let customStyles: React.CSSProperties = {};
+  if (fontSettingsMatch) {
+    customStyles = {
+      fontSize: fontSettingsMatch[1],
+      fontFamily: fontSettingsMatch[2]
+    };
+    content = content.replace(/<post-settings .*? \/>/, '');
+  }
+
+  // Replace <back href="..."> with <a>
+  let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
+  
+  // Handle <color val="..."> tag
+  processedContent = processedContent.replace(/<color val="(.*?)">(.*?)<\/color>/g, '<span style="color: $1">$2</span>');
+
+  // Handle <u> and <no-u>
+  processedContent = processedContent.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline">$1</span>');
+  processedContent = processedContent.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none">$1</span>');
+
+  // Handle <spacer /> tag
+  processedContent = processedContent.replace(/<spacer \/>/g, '<div style="height: 1.5rem;" class="blog-spacer"></div>');
+
+  // Replace Markdown-like headings
+  processedContent = processedContent.replace(/^###\s+(.*)$/gm, '<h4>$1</h4>');
+  processedContent = processedContent.replace(/^##\s+(.*)$/gm, '<h3>$1</h3>');
+  processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
+
+  // Handle <code> tags with newline preservation
+  const codeBlocks: string[] = [];
+  processedContent = processedContent.replace(/<code>([\s\S]*?)<\/code>/g, (match, code) => {
+    const placeholder = `[CODE_BLOCK_${codeBlocks.length}]`;
+    codeBlocks.push(`<pre class="code-block"><code>${code.trim()}</code></pre>`);
+    return placeholder;
+  });
+
+  processedContent = processedContent.replace(/\n/g, '<br/>');
+
+  // Clean up <br/> around block elements to prevent excessive spacing
+  processedContent = processedContent.replace(/(<\/h[1-6]>)(?:\s*<br\/>)+/g, '$1');
+  processedContent = processedContent.replace(/(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
+
+  // Restore code blocks
+  codeBlocks.forEach((block, index) => {
+    processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
+  });
+  
+  const gallery = [...(post.images || [])];
+  const inlineImages = [...gallery];
+  
+  let imageIndex = 0;
+  const imageRegex = /(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/i;
+  
+  while (imageRegex.test(processedContent) && imageIndex < inlineImages.length) {
+    const match = imageRegex.exec(processedContent);
+    if (!match) break;
+    
+    const altText = match[1] ? match[1].trim() : `Blog image ${imageIndex + 1}`;
+    const imgHtml = `
+      <figure class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
+        <img src="${inlineImages[imageIndex]}" alt="${altText}" style="width: 100%; height: auto; display: block;" />
+        ${match[1] ? `<figcaption style="text-align: center; font-size: 0.85rem; color: #64748b; padding: 0.75rem; background: #f8fafc; border-top: 1px solid #e2e8f0; margin: 0;">${altText}</figcaption>` : ''}
+      </figure>
+    `;
+    processedContent = processedContent.replace(match[0], imgHtml);
+    imageIndex++;
+  }
 
   return (
-    <article className="py-8 bg-white min-h-screen font-sans">
-      {/* Main Grid structure for content and sidebar layout */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 md:px-6">
+    <article className="section" style={{ padding: '4rem 0 6rem 0' }}>
+      <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1.5rem' }}>
         
-        {/* ================= LEFT COLUMN: YOUR ORIGINAL PREMIUM DESIGN ================= */}
-        <div className="lg:col-span-2">
-          {/* Meta Information tags */}
-          <div className="text-sm text-gray-500 mb-2 uppercase tracking-wider font-semibold">
-            {post.date} • <span className="text-pink-600 font-bold">#{post.category}</span>
-          </div>
-
-          {/* Premium Blog Main Title */}
-          <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4 leading-tight tracking-tight">
+        {/* Compact Back Button */}
+        <Link href="/" className="back-link">
+          &larr; Back to Home
+        </Link>
+        
+        {/* Dynamic Detail Header (Beautifully Centered) */}
+        <header style={{ marginBottom: '3.5rem', textAlign: 'center' }}>
+          {/* Centered Date */}
+          <span style={{ 
+            fontSize: '0.875rem', 
+            color: '#64748b', 
+            fontWeight: '600', 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.05em', 
+            marginBottom: '0.8rem', 
+            display: 'block' 
+          }}>
+            {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </span>
+          
+          {/* Centered Title */}
+          <h1 style={{ 
+            fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)', 
+            fontWeight: '800', 
+            color: '#0f172a',
+            lineHeight: '1.25',
+            letterSpacing: '-0.02em',
+            margin: '0 auto 1.2rem auto',
+            maxWidth: '750px'
+          }}>
             {post.title}
           </h1>
           
-          <p className="text-slate-600 italic mb-8 text-xl border-l-4 border-pink-500 pl-4 bg-slate-50 py-2 rounded-r">
-            Demystifying the two core pillars of Machine Learning. Learn how they work, their key differences, and real-world applications with simple examples.
-          </p>
+          {post.shortDescription && (
+            <p style={{ 
+              fontSize: '1.05rem', 
+              color: '#475569', 
+              lineHeight: '1.5', 
+              fontWeight: '500',
+              margin: '0 auto 1.5rem auto',
+              maxWidth: '620px'
+            }}>
+              {post.shortDescription}
+            </p>
+          )}
 
-          {/* Centered Top Banner Advertisement (468x60) */}
-          <div className="my-6 p-2 bg-slate-50 border border-slate-100 rounded-xl flex flex-col items-center justify-center">
-            <span className="text-[9px] text-slate-400 font-bold mb-1 uppercase tracking-widest block">Advertisement</span>
-            <div className="w-full max-w-[468px] overflow-hidden flex justify-center">
-              <Script id="adsterra-468" strategy="afterInteractive">
-                {`
-                  window.atOptions = {
-                    'key' : '29598671',
-                    'format' : 'iframe',
-                    'height' : 60,
-                    'width' : 468,
-                    'params' : {}
-                  };
-                `}
-              </Script>
-              <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598671/invoke.js" />
+          {/* Centered Category Tag Row */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
+              <span className="blog-detail-category-tag" style={{ marginBottom: 0 }}>#{post.category.slug}</span>
+            </Link>
+          </div>
+        </header>
+
+        {/* Clean Reading Box */}
+        <div className="blog-content" style={{ ...customStyles }}>
+          <div dangerouslySetInnerHTML={{ __html: processedContent }} />
+        </div>
+
+        {/* Premium FAQ Card Accordions */}
+        {post.faqs && (post.faqs as any[]).length > 0 && (
+          <div style={{ marginTop: '4.5rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+            <h2 style={{ marginBottom: '1.8rem', fontSize: '1.6rem', color: '#0f172a', textAlign: 'center', fontWeight: '800', letterSpacing: '-0.02em' }}>Frequently Asked Questions</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {(post.faqs as any[]).map((faq, index) => (
+                <div key={index} style={{ background: 'white', padding: '1.25rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
+                  <h4 style={{ color: '#0f172a', fontWeight: '700', fontSize: '1.02rem', marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                    <span style={{ color: '#ec4899', fontWeight: '800' }}>Q:</span> {faq.question}
+                  </h4>
+                  <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.5', margin: 0, fontWeight: '500' }}>
+                    {faq.answer}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
+        )}
 
-          {/* Premium Core Typography Block */}
-          <div className="text-slate-800 text-lg leading-relaxed space-y-6 antialiased">
-            <p>
-              Machine Learning (ML) is no longer just a futuristic buzzword; it is the invisible engine driving our daily digital experiences. From Netflix’s uncanny movie recommendations and Spotify’s personalized playlists to the seamless spam filters in our inboxes, intelligent systems are everywhere. But how do these algorithms actually learn to make such precise decisions? To understand the vast ecosystem of Artificial Intelligence, one must grasp its two fundamental pillars: Supervised Learning and Unsupervised Learning. Whether you are stepping into data science, launching a tech startup, or simply curious about how AI processes data, understanding the distinction between these two approaches is critical. This comprehensive guide breaks down both concepts using simple explanations, core mechanics, and real-world use cases.
-            </p>
-            
-            {/* Custom Heading Style with Pink Accents */}
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-10 mb-4 tracking-tight flex items-center gap-2 border-b pb-2 border-slate-100">
-              <span className="text-pink-600">1.</span> What is Supervised Learning? (The Guided Approach)
-            </h2>
-            <p>
-              Think of Supervised Learning as a classroom scenario where a student learns under the direct supervision of a teacher. In technical terms, Supervised Learning is a machine learning approach where a model is trained using a Labeled Dataset. A labeled dataset means that for every piece of input data, the correct corresponding output (the answer key) is already provided. The algorithm's primary task is to map the relationship between the inputs and the outputs.
-            </p>
-            
-            <h3 className="text-xl font-bold text-slate-900 mt-6 mb-2">How it Works:</h3>
-            <ul className="list-disc pl-6 space-y-3 text-slate-700">
-              <li><strong className="text-slate-900">Data Collection:</strong> You provide the algorithm with a massive dataset, for example, thousands of images of cats and dogs.</li>
-              <li><strong className="text-slate-900">Labeling:</strong> Each image is explicitly tagged (labeled) as either <span className="bg-pink-50 text-pink-700 px-1.5 py-0.5 rounded font-mono text-sm">"Cat"</span> or <span className="bg-pink-50 text-pink-700 px-1.5 py-0.5 rounded font-mono text-sm">"Dog"</span>.</li>
-              <li><strong className="text-slate-900">Training:</strong> The algorithm analyzes the features of these images—such as ear shapes, whiskers, and sizes—and associates them with the correct label.</li>
-              <li><strong className="text-slate-900">Prediction:</strong> Once training is complete, you introduce a completely new, unseen image. Based on its past training, the model calculates the probability and accurately predicts whether the image is a cat or a dog.</li>
-            </ul>
-
-            <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">Types of Supervised Learning:</h3>
-            <p>Supervised learning tasks are broadly divided into two major categories depending on the nature of the target variable:</p>
-            <ul className="list-disc pl-6 space-y-3 text-slate-700">
-              <li><strong className="text-slate-900">Classification:</strong> This occurs when the output variable is a distinct category or label. The goal is to sort data into predefined classes. Examples include predicting whether an email is "Spam" or "Not Spam," or determining if a financial transaction is "Fraudulent" or "Legitimate."</li>
-              <li><strong className="text-slate-900">Regression:</strong> This occurs when the output variable is a continuous or numerical value. Instead of sorting data into categories, the model predicts a specific quantity. Examples include forecasting house prices based on square footage, predicting tomorrow's temperature, or estimating stock market trends.</li>
-            </ul>
-
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-12 mb-4 tracking-tight flex items-center gap-2 border-b pb-2 border-slate-100">
-              <span className="text-pink-600">2.</span> What is Unsupervised Learning? (The Self-Learning Approach)
-            </h2>
-            <p>
-              Now, imagine hand-delivering a massive box of assorted building blocks to a young child without giving them any manual, instructions, or rules. Over time, the child will naturally start sorting the blocks themselves—perhaps putting all the red blocks together, grouping the long blocks, or separating the circular ones. This self-guided sorting mechanism is the essence of Unsupervised Learning.
-            </p>
-            <p>
-              In Unsupervised Learning, the algorithm is fed an Unlabeled Dataset. This means the system receives input data but is given no explicit target outputs, no tags, and no human supervisor to correct its mistakes. The algorithm is left entirely to its own devices to discover hidden patterns, underlying structures, and anomalies within the data.
-            </p>
-
-            <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">How it Works:</h3>
-            <ul className="list-disc pl-6 space-y-3 text-slate-700">
-              <li><strong className="text-slate-900">Data Input:</strong> You feed the algorithm raw, unstructured data, such as the purchase histories of hundreds of thousands of e-commerce customers.</li>
-              <li><strong className="text-slate-900">Pattern Discovery:</strong> Without any predefined categories, the algorithm scans the data to identify similarities, frequencies, and behavioral correlations.</li>
-              <li><strong className="text-slate-900">Grouping:</strong> The system autonomously clusters the data. For instance, it might group customers into distinct segments: "High-budget tech enthusiasts," "Seasonal discount shoppers," or "Bulk buyers."</li>
-            </ul>
-
-            <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">Types of Unsupervised Learning:</h3>
-            <ul className="list-disc pl-6 space-y-3 text-slate-700">
-              <li><strong className="text-slate-900">Clustering:</strong> The process of automatically grouping similar data points together based on inherent characteristics. It is widely used for market segmentation, image compression, and document organization.</li>
-              <li><strong className="text-slate-900">Association:</strong> This technique uncovers fascinating relationships and dependencies between variables in a dataset. A classic example is Market Basket Analysis, where retailers discover that customers who buy diapers are also highly likely to purchase baby wipes or formula during the same trip.</li>
-              <li><strong className="text-slate-900">Dimensionality Reduction:</strong> When dealing with massive datasets containing hundreds of variables (dimensions), this process strips away redundant or irrelevant features. It simplifies the data, making it easier for systems to process without losing critical underlying information.</li>
-            </ul>
-
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-12 mb-4 tracking-tight flex items-center gap-2 border-b pb-2 border-slate-100">
-              <span className="text-pink-600">3.</span> Real-World Applications
-            </h2>
-            <p>Both technologies work tirelessly behind the scenes of our favorite modern platforms. Here is how they are applied across global industries today:</p>
-            
-            <h3 className="text-xl font-bold text-slate-900 mt-6 mb-2">Supervised Learning Applications:</h3>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700">
-              <li><strong className="text-slate-900">Healthcare & Medical Imaging:</strong> Training models on thousands of labeled historical scans allows AI to assist radiologists in identifying early-stage tumors or cardiovascular risks with high precision.</li>
-              <li><strong className="text-slate-900">Email & Security Systems:</strong> Advanced filters use classification models to analyze email subject lines and metadata, instantly redirecting malicious phishing attempts away from your inbox.</li>
-              <li><strong className="text-slate-900">Voice Assistants:</strong> Virtual assistants like Siri, Alexa, and Google Assistant rely on supervised models to map your specific voice inputs into textual commands.</li>
-            </ul>
-
-            <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">Unsupervised Learning Applications:</h3>
-            <ul className="list-disc pl-6 space-y-2 text-slate-700">
-              <li><strong className="text-slate-900">E-Commerce Personalization:</strong> Major streaming platforms and digital marketplaces use clustering to analyze your silent browsing habits, recommending media and products you didn’t even know you wanted.</li>
-              <li><strong className="text-slate-900">Cybersecurity & Anomaly Detection:</strong> Financial institutions deploy unsupervised algorithms to monitor global network traffic. Because the AI knows what "normal" behavior looks like, it instantly flags sudden, unusual patterns that could indicate a sophisticated cyberattack.</li>
-              <li><strong className="text-slate-900">Genetics & Biology:</strong> Scientists use clustering algorithms to analyze massive sets of gene expression data, allowing them to classify different species or identify genetic similarities.</li>
-            </ul>
-
-            {/* Premium Accordion Style FAQs */}
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-16 mb-4 border-t pt-8 border-slate-200">Frequently Asked Questions</h2>
-            <div className="space-y-4 mt-6">
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                <h4 className="font-extrabold text-slate-900 text-lg">Q: Is Regression a type of Unsupervised Learning?</h4>
-                <p className="text-slate-600 mt-2">No, Regression is firmly a part of Supervised Learning. This is because regression algorithms require historical labeled training data (inputs paired with actual numeric outputs) to accurately forecast continuous numerical values.</p>
-              </div>
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                <h4 className="font-extrabold text-slate-900 text-lg">Q: Why is Unsupervised Learning considered harder than Supervised Learning?</h4>
-                <p className="text-slate-600 mt-2">Unsupervised learning is more challenging because it operates without validation. There is no training "ground truth" or correct answer key to evaluate the model's performance against, making its outputs highly dependent on mathematical interpretation and algorithm tuning.</p>
-              </div>
+        {/* Remaining Gallery Display */}
+        {imageIndex < inlineImages.length && (
+          <div style={{ marginTop: '4rem' }}>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.5rem' }}>Post Gallery</h3>
+            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+              {inlineImages.slice(imageIndex).map((img, index) => (
+                <div key={index} style={{ height: '220px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
+                  <img src={img} alt={`Gallery ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ))}
             </div>
           </div>
+        )}
 
-          {/* Premium Match Profile Author Box */}
-          <div className="mt-16 p-8 bg-[#f8fafc] rounded-[16px] flex items-center gap-6 border border-[#e2e8f0] shadow-[0_4px_6px_rgba(0,0,0,0.02)]">
-            <div className="w-[75px] h-[75px] rounded-full bg-gradient-to-br from-[#ec4899] to-[#ff4b91] overflow-hidden flex items-center justify-center text-white font-extrabold text-[1.8rem] shadow-[0_8px_20px_rgba(236,72,153,0.2)] flex-shrink-0">
-              <img src={post.author?.image || '/huzaifa.png'} alt={authorName} className="w-full h-full object-cover" />
-            </div>
-            <div>
-              <h3 className="m-0 font-extrabold text-[#0f172a] text-[1.3rem]"> Written by <span className="text-[#ec4899]">{authorName}</span> </h3>
-              <p className="m-0 text-[#475569] text-[0.95rem] mt-1 leading-relaxed"> Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge. </p>
-            </div>
+        {/* Premium Author Bio Box */}
+        <div style={{ 
+          marginTop: '5rem', 
+          padding: '2rem', 
+          background: '#f8fafc', 
+          borderRadius: '16px', 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '1.5rem',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
+        }}>
+          <div style={{ 
+            width: '75px', 
+            height: '75px', 
+            borderRadius: '50%', 
+            background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', 
+            overflow: 'hidden', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: 'white', 
+            fontWeight: '800',
+            fontSize: '1.8rem',
+            boxShadow: '0 8px 20px rgba(236,72,153,0.2)',
+            flexShrink: 0
+          }}>
+            {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
+              <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              authorInitial
+            )}
           </div>
-
-          {/* Share Ribbons layout matching global layout */}
-          <div className="mt-12 pt-6 border-t border-slate-100">
-            <h3 className="text-lg font-extrabold text-slate-900 mb-4">Share this post:</h3>
-            <div className="flex flex-wrap gap-3 text-sm text-pink-600 font-bold">
-              <span className="cursor-pointer bg-pink-50 px-3 py-1.5 rounded-full">Twitter</span> 
-              <span className="cursor-pointer bg-pink-50 px-3 py-1.5 rounded-full">LinkedIn</span> 
-              <span className="cursor-pointer bg-pink-50 px-3 py-1.5 rounded-full">Facebook</span> 
-              <span className="cursor-pointer bg-pink-50 px-3 py-1.5 rounded-full">WhatsApp</span>
-            </div>
+          <div>
+            <h3 style={{ margin: '0 0 0.4rem 0', fontWeight: '800', color: '#0f172a', fontSize: '1.3rem' }}>
+              Written by <span style={{ color: '#ec4899' }}>{authorName}</span>
+            </h3>
+            <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
+              {authorName.toLowerCase().includes('marium') ? 
+                "Marium Waseem is a passionate developer and the lead voice behind Blog Fusion. She loves exploring new technologies and sharing her knowledge." :
+                "Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge."
+              }
+            </p>
           </div>
         </div>
 
-        {/* ================= RIGHT COLUMN: Sidebar Ads Area ================= */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-24 space-y-6 flex flex-col items-center">
-            
-            {/* Sidebar Ad (300x250 Square) */}
-            <div className="w-full max-w-[300px] p-3 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-center shadow-sm">
-              <span className="text-[10px] text-slate-400 font-bold mb-2 uppercase tracking-widest block text-center">Advertisement</span>
-              <div className="w-[300px] h-[250px] bg-white overflow-hidden flex justify-center items-center rounded-lg border border-slate-100">
-                <Script id="adsterra-sidebar-300" strategy="afterInteractive">
-                  {`
-                    window.atOptions = {
-                      'key' : '29598678',
-                      'format' : 'iframe',
-                      'height' : 250,
-                      'width' : 300,
-                      'params' : {}
-                    };
-                  `}
-                </Script>
-                <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598678/invoke.js" />
-              </div>
-            </div>
-
-            {/* Sidebar Ad (160x600 Skyscraper) */}
-            <div className="hidden lg:flex w-full max-w-[300px] p-3 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-center shadow-sm">
-              <span className="text-[10px] text-slate-400 font-bold mb-2 uppercase tracking-widest block text-center">Sponsored</span>
-              <div className="w-[160px] h-[600px] bg-white overflow-hidden flex justify-center items-center rounded-lg border border-slate-100">
-                <Script id="adsterra-sidebar-160" strategy="afterInteractive">
-                  {`
-                    window.atOptions = {
-                      'key' : '29598677',
-                      'format' : 'iframe',
-                      'height' : 600,
-                      'width' : 160,
-                      'params' : {}
-                    };
-                  `}
-                </Script>
-                <Script strategy="afterInteractive" src="https://www.highperformanceformat.com/29598677/invoke.js" />
-              </div>
-            </div>
-
-          </div>
+        {/* Sharing Ribbon */}
+        <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f1f5f9', marginTop: '4rem' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginBottom: '1rem' }}>Share this post:</h3>
+          <ShareButtons title={post.title} />
         </div>
-
       </div>
     </article>
   );
