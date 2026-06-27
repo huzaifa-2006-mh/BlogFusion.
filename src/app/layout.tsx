@@ -38,6 +38,9 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
   verification: {
     google: 'googled854f7a7aedcc96b',
+    other: {
+      'p:domain_verify': ['c47206c820961b368aed70ec645b27a6'],
+    },
   },
   openGraph: {
     type: 'website',
