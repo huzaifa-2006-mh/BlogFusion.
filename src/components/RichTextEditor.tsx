@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 type RichTextEditorProps = {
   value: string;
@@ -8,46 +8,48 @@ type RichTextEditorProps = {
   placeholder?: string;
 };
 
-// Helper: Convert legacy tags into standard clean HTML
+// Helper: Convert legacy tags into standard clean HTML for existing posts
 export function convertLegacyContentToHtml(raw: string): string {
   if (!raw) return '';
 
   let html = raw;
 
-  // If content already contains HTML tags like <p>, <h2>, <div>, return as is
-  if (/<(p|h[1-6]|div|span|strong|em|ul|ol|table|blockquote|figure|img)/i.test(html)) {
-    return html;
-  }
-
-  // Convert legacy tags
+  // Convert legacy custom tags if present
   html = html.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
   html = html.replace(/<color val="(.*?)">(.*?)<\/color>/g, '<span style="color: $1;">$2</span>');
   html = html.replace(/<u>(.*?)<\/u>/g, '<u>$1</u>');
   html = html.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none;">$1</span>');
   html = html.replace(/<spacer \/>/g, '<hr style="border: none; border-top: 1px dashed #cbd5e1; margin: 1.5rem 0;" />');
-  
-  // Headings
+
+  // If content already contains standard HTML block tags (<p>, <h2>, <div>), return
+  if (/<(p|h[1-6]|div|span|strong|em|ul|ol|table|blockquote|figure|img)/i.test(html)) {
+    return html;
+  }
+
+  // Legacy Markdown-like headings
   html = html.replace(/^###\s+(.*)$/gm, '<h4>$1</h4>');
   html = html.replace(/^##\s+(.*)$/gm, '<h3>$1</h3>');
   html = html.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
 
-  // Bold / Code
+  // Legacy bold & code
   html = html.replace(/<b>(.*?)<\/b>/g, '<strong>$1</strong>');
   html = html.replace(/<code>([\s\S]*?)<\/code>/g, '<pre style="background: #0f172a; color: #f8fafc; padding: 1rem; border-radius: 8px; font-family: monospace;"><code>$1</code></pre>');
 
   // Wrap plain lines into paragraphs if not already wrapped
   const lines = html.split(/\n\n+/);
-  html = lines.map(line => {
-    line = line.trim();
-    if (!line) return '';
-    if (/^<h[1-6]|<pre|<blockquote|<table|<hr/i.test(line)) return line;
-    return `<p>${line.replace(/\n/g, '<br/>')}</p>`;
-  }).join('');
+  html = lines
+    .map((line) => {
+      line = line.trim();
+      if (!line) return '';
+      if (/^<h[1-6]|<pre|<blockquote|<table|<hr/i.test(line)) return line;
+      return `<p>${line.replace(/\n/g, '<br/>')}</p>`;
+    })
+    .join('');
 
   return html;
 }
 
-// Clean HTML to optimize for Semrush SEO (reduce DOM bloat, remove empty elements)
+// Clean HTML to optimize for Semrush SEO
 export function cleanHtmlForSeo(html: string): string {
   if (!html) return '';
 
@@ -68,7 +70,11 @@ export function cleanHtmlForSeo(html: string): string {
   return clean.trim();
 }
 
-export default function RichTextEditor({ value, onChange, placeholder = 'Start writing your blog post...' }: RichTextEditorProps) {
+export default function RichTextEditor({
+  value,
+  onChange,
+  placeholder = 'Start writing your blog post...',
+}: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -88,11 +94,13 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
   const [textColor, setTextColor] = useState('#0f172a');
   const [bgColor, setBgColor] = useState('#ffffff');
 
-  // Initialize editor content once
+  // Sync editor content ONLY on initial mount or when editor is NOT actively focused
+  // This prevents cursor resetting / jumping when typing!
   useEffect(() => {
     if (editorRef.current) {
+      const isFocused = document.activeElement === editorRef.current;
       const parsedHtml = convertLegacyContentToHtml(value);
-      if (editorRef.current.innerHTML !== parsedHtml) {
+      if (!isFocused && editorRef.current.innerHTML !== parsedHtml) {
         editorRef.current.innerHTML = parsedHtml;
         updateStats(parsedHtml);
       }
@@ -113,8 +121,18 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
   const handleInput = () => {
     if (editorRef.current) {
       const currentHtml = editorRef.current.innerHTML;
+      updateStats(currentHtml);
+      onChange(currentHtml);
+    }
+  };
+
+  const handleBlur = () => {
+    if (editorRef.current) {
+      const currentHtml = editorRef.current.innerHTML;
       const cleaned = cleanHtmlForSeo(currentHtml);
-      updateStats(cleaned);
+      if (cleaned !== currentHtml) {
+        editorRef.current.innerHTML = cleaned;
+      }
       onChange(cleaned);
     }
   };
@@ -143,7 +161,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
     }
   };
 
-  // Format Block (Paragraph, Headings, Quote, Code)
+  // Format Block
   const handleBlockChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const tag = e.target.value;
     if (tag) {
@@ -196,7 +214,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
   const insertLink = () => {
     if (!linkUrl) return;
     restoreSelection();
-    
+
     let url = linkUrl.trim();
     if (!/^https?:\/\//i.test(url) && !url.startsWith('/') && !url.startsWith('#')) {
       url = 'https://' + url;
@@ -213,7 +231,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
     setShowLinkModal(false);
   };
 
-  // Handle Image Upload (Any format: PNG, JPG, WEBP, GIF, SVG, AVIF, BMP)
+  // Image Upload (Works on Vercel Serverless & Local)
   const handleImageFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -324,14 +342,20 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
       >
         {/* Undo / Redo */}
         <div style={groupStyle}>
-          <button type="button" onClick={() => execCmd('undo')} title="Undo (Ctrl+Z)" style={btnStyle}>↩</button>
-          <button type="button" onClick={() => execCmd('redo')} title="Redo (Ctrl+Y)" style={btnStyle}>↪</button>
+          <button type="button" onClick={() => execCmd('undo')} title="Undo (Ctrl+Z)" style={btnStyle}>
+            ↩
+          </button>
+          <button type="button" onClick={() => execCmd('redo')} title="Redo (Ctrl+Y)" style={btnStyle}>
+            ↪
+          </button>
         </div>
 
         {/* Headings / Format */}
         <div style={groupStyle}>
           <select onChange={handleBlockChange} style={selectStyle} defaultValue="">
-            <option value="" disabled>Paragraph Style</option>
+            <option value="" disabled>
+              Paragraph Style
+            </option>
             <option value="<p>">Normal Paragraph</option>
             <option value="<h2>">Heading 2 (H2)</option>
             <option value="<h3>">Heading 3 (H3)</option>
@@ -344,7 +368,9 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
         {/* Font Family */}
         <div style={groupStyle}>
           <select onChange={handleFontFamilyChange} style={selectStyle} defaultValue="">
-            <option value="" disabled>Font Family</option>
+            <option value="" disabled>
+              Font Family
+            </option>
             <option value="Inter, sans-serif">Inter</option>
             <option value="Arial, sans-serif">Arial</option>
             <option value="Georgia, serif">Georgia</option>
@@ -358,7 +384,9 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
         {/* Font Size */}
         <div style={groupStyle}>
           <select onChange={handleFontSizeChange} style={{ ...selectStyle, width: '80px' }} defaultValue="">
-            <option value="" disabled>Size</option>
+            <option value="" disabled>
+              Size
+            </option>
             <option value="1">10px</option>
             <option value="2">13px</option>
             <option value="3">16px (Normal)</option>
@@ -371,12 +399,24 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
 
         {/* Bold, Italic, Underline, Strike, Sub, Super */}
         <div style={groupStyle}>
-          <button type="button" onClick={() => execCmd('bold')} title="Bold (Ctrl+B)" style={{ ...btnStyle, fontWeight: 'bold' }}>B</button>
-          <button type="button" onClick={() => execCmd('italic')} title="Italic (Ctrl+I)" style={{ ...btnStyle, fontStyle: 'italic' }}>I</button>
-          <button type="button" onClick={() => execCmd('underline')} title="Underline (Ctrl+U)" style={{ ...btnStyle, textDecoration: 'underline' }}>U</button>
-          <button type="button" onClick={() => execCmd('strikeThrough')} title="Strikethrough" style={{ ...btnStyle, textDecoration: 'line-through' }}>S</button>
-          <button type="button" onClick={() => execCmd('subscript')} title="Subscript" style={btnStyle}>x₂</button>
-          <button type="button" onClick={() => execCmd('superscript')} title="Superscript" style={btnStyle}>x²</button>
+          <button type="button" onClick={() => execCmd('bold')} title="Bold (Ctrl+B)" style={{ ...btnStyle, fontWeight: 'bold' }}>
+            B
+          </button>
+          <button type="button" onClick={() => execCmd('italic')} title="Italic (Ctrl+I)" style={{ ...btnStyle, fontStyle: 'italic' }}>
+            I
+          </button>
+          <button type="button" onClick={() => execCmd('underline')} title="Underline (Ctrl+U)" style={{ ...btnStyle, textDecoration: 'underline' }}>
+            U
+          </button>
+          <button type="button" onClick={() => execCmd('strikeThrough')} title="Strikethrough" style={{ ...btnStyle, textDecoration: 'line-through' }}>
+            S
+          </button>
+          <button type="button" onClick={() => execCmd('subscript')} title="Subscript" style={btnStyle}>
+            x₂
+          </button>
+          <button type="button" onClick={() => execCmd('superscript')} title="Superscript" style={btnStyle}>
+            x²
+          </button>
         </div>
 
         {/* Text & Background Color */}
@@ -386,25 +426,41 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
             <input type="color" value={textColor} onChange={handleTextColorChange} style={{ width: '20px', height: '20px', border: 'none', background: 'none', cursor: 'pointer' }} />
           </label>
           <label title="Highlight Color" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', padding: '0 0.3rem', gap: '0.2rem' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', background: '#fef08a', padding: '0 2px', borderRadius: '3px' }}>🎨</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', background: '#fef08a', padding: '0 2px', borderRadius: '3px' }}>A</span>
             <input type="color" value={bgColor} onChange={handleBgColorChange} style={{ width: '20px', height: '20px', border: 'none', background: 'none', cursor: 'pointer' }} />
           </label>
         </div>
 
         {/* Alignment */}
         <div style={groupStyle}>
-          <button type="button" onClick={() => execCmd('justifyLeft')} title="Align Left" style={btnStyle}>≡</button>
-          <button type="button" onClick={() => execCmd('justifyCenter')} title="Align Center" style={btnStyle}>≂</button>
-          <button type="button" onClick={() => execCmd('justifyRight')} title="Align Right" style={btnStyle}>≡</button>
-          <button type="button" onClick={() => execCmd('justifyFull')} title="Justify" style={btnStyle}>≣</button>
+          <button type="button" onClick={() => execCmd('justifyLeft')} title="Align Left" style={btnStyle}>
+            ≡
+          </button>
+          <button type="button" onClick={() => execCmd('justifyCenter')} title="Align Center" style={btnStyle}>
+            ≂
+          </button>
+          <button type="button" onClick={() => execCmd('justifyRight')} title="Align Right" style={btnStyle}>
+            ≡
+          </button>
+          <button type="button" onClick={() => execCmd('justifyFull')} title="Justify" style={btnStyle}>
+            ≣
+          </button>
         </div>
 
         {/* Lists & Indent */}
         <div style={groupStyle}>
-          <button type="button" onClick={() => execCmd('insertUnorderedList')} title="Bullet List" style={btnStyle}>• List</button>
-          <button type="button" onClick={() => execCmd('insertOrderedList')} title="Numbered List" style={btnStyle}>1. List</button>
-          <button type="button" onClick={() => execCmd('outdent')} title="Decrease Indent" style={btnStyle}>⇤</button>
-          <button type="button" onClick={() => execCmd('indent')} title="Increase Indent" style={btnStyle}>⇥</button>
+          <button type="button" onClick={() => execCmd('insertUnorderedList')} title="Bullet List" style={btnStyle}>
+            • List
+          </button>
+          <button type="button" onClick={() => execCmd('insertOrderedList')} title="Numbered List" style={btnStyle}>
+            1. List
+          </button>
+          <button type="button" onClick={() => execCmd('outdent')} title="Decrease Indent" style={btnStyle}>
+            ⇤
+          </button>
+          <button type="button" onClick={() => execCmd('indent')} title="Increase Indent" style={btnStyle}>
+            ⇥
+          </button>
         </div>
 
         {/* Inserts */}
@@ -416,23 +472,31 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
             title="Upload & Insert Image (PNG, JPG, WEBP, GIF, SVG, AVIF)"
             style={{ ...btnStyle, background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}
           >
-            {isUploading ? '⏳ Uploading...' : '🖼️ Image'}
+            {isUploading ? 'Uploading...' : 'Image'}
           </button>
-          <button type="button" onClick={openLinkModal} title="Insert Link" style={btnStyle}>🔗 Link</button>
-          <button type="button" onClick={insertTable} title="Insert Table" style={btnStyle}>📊 Table</button>
-          <button type="button" onClick={() => execCmd('insertHorizontalRule')} title="Horizontal Line" style={btnStyle}>➖ Line</button>
+          <button type="button" onClick={openLinkModal} title="Insert Link" style={btnStyle}>
+            Link
+          </button>
+          <button type="button" onClick={insertTable} title="Insert Table" style={btnStyle}>
+            Table
+          </button>
+          <button type="button" onClick={() => execCmd('insertHorizontalRule')} title="Horizontal Line" style={btnStyle}>
+            Line
+          </button>
         </div>
 
         {/* Tools */}
         <div style={groupStyle}>
-          <button type="button" onClick={() => execCmd('removeFormat')} title="Clear Formatting" style={btnStyle}>🧹 Clear</button>
+          <button type="button" onClick={() => execCmd('removeFormat')} title="Clear Formatting" style={btnStyle}>
+            Clear
+          </button>
           <button
             type="button"
             onClick={() => setIsFullScreen(!isFullScreen)}
             title="Full Screen / Document Mode"
             style={{ ...btnStyle, background: isFullScreen ? '#0f172a' : '#f1f5f9', color: isFullScreen ? 'white' : '#334155' }}
           >
-            {isFullScreen ? '↙ Exit Fullscreen' : '⛶ Fullscreen'}
+            {isFullScreen ? 'Exit Fullscreen' : 'Fullscreen'}
           </button>
         </div>
       </div>
@@ -443,7 +507,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
           ref={editorRef}
           contentEditable
           onInput={handleInput}
-          onBlur={handleInput}
+          onBlur={handleBlur}
           data-placeholder={placeholder}
           className="ms-word-canvas"
           style={{
@@ -462,7 +526,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
         />
       </div>
 
-      {/* Status Bar */}
+      {/* Status Bar (No Icons) */}
       <div
         style={{
           display: 'flex',
@@ -477,12 +541,12 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
         }}
       >
         <div style={{ display: 'flex', gap: '1.2rem' }}>
-          <span>📝 Words: <strong>{wordCount}</strong></span>
-          <span>🔤 Characters: <strong>{charCount}</strong></span>
-          <span>⏱️ Est. Reading Time: <strong>~{readTime} min</strong></span>
+          <span>Words: <strong>{wordCount}</strong></span>
+          <span>Characters: <strong>{charCount}</strong></span>
+          <span>Est. Reading Time: <strong>~{readTime} min</strong></span>
         </div>
         <div>
-          <span style={{ color: '#16a34a', fontWeight: '700' }}>✓ Semrush SEO Clean HTML</span>
+          <span style={{ color: '#16a34a', fontWeight: '700' }}>Semrush SEO Clean HTML</span>
         </div>
       </div>
 
@@ -513,7 +577,7 @@ export default function RichTextEditor({ value, onChange, placeholder = 'Start w
             }}
           >
             <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.2rem', fontWeight: '800', color: '#0f172a' }}>Insert Hyperlink</h3>
-            
+
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>Link URL</label>
               <input

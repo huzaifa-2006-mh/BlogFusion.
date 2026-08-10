@@ -7,54 +7,67 @@ export async function optimizeAndStoreImage(file: File): Promise<string> {
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-  
-  // Ensure uploads directory exists
-  try {
-    await fs.mkdir(uploadsDir, { recursive: true });
-  } catch (err) {
-    console.error('Error creating uploads directory:', err);
-  }
-
-  const randomHash = crypto.randomBytes(6).toString('hex');
   const fileExt = path.extname(file.name).toLowerCase();
   const baseName = path.basename(file.name, fileExt).replace(/[^\w-]/g, '_');
+  const randomHash = crypto.randomBytes(6).toString('hex');
 
-  // Handle SVG and animated GIF natively to preserve animation / vector quality
+  // Handle SVG and animated GIF natively
   if (fileExt === '.svg' || file.type === 'image/svg+xml') {
-    const fileName = `${baseName}_${Date.now()}_${randomHash}.svg`;
-    const filePath = path.join(uploadsDir, fileName);
-    await fs.writeFile(filePath, buffer);
-    return `/uploads/${fileName}`;
+    try {
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      await fs.mkdir(uploadsDir, { recursive: true });
+      const fileName = `${baseName}_${Date.now()}_${randomHash}.svg`;
+      const filePath = path.join(uploadsDir, fileName);
+      await fs.writeFile(filePath, buffer);
+      return `/uploads/${fileName}`;
+    } catch (fsErr) {
+      // Fallback for Vercel Serverless (read-only filesystem)
+      const base64 = buffer.toString('base64');
+      return `data:image/svg+xml;base64,${base64}`;
+    }
   }
 
   if (fileExt === '.gif' || file.type === 'image/gif') {
-    const fileName = `${baseName}_${Date.now()}_${randomHash}.gif`;
-    const filePath = path.join(uploadsDir, fileName);
-    await fs.writeFile(filePath, buffer);
-    return `/uploads/${fileName}`;
+    try {
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      await fs.mkdir(uploadsDir, { recursive: true });
+      const fileName = `${baseName}_${Date.now()}_${randomHash}.gif`;
+      const filePath = path.join(uploadsDir, fileName);
+      await fs.writeFile(filePath, buffer);
+      return `/uploads/${fileName}`;
+    } catch (fsErr) {
+      // Fallback for Vercel Serverless (read-only filesystem)
+      const base64 = buffer.toString('base64');
+      return `data:image/gif;base64,${base64}`;
+    }
   }
 
-  // For all raster images (JPG, PNG, WEBP, AVIF, BMP, TIFF, etc.), convert to web-optimized WebP
+  // Compress raster image to web-optimized WebP (max 1600px width, 80% quality)
+  let optimizedBuffer: Buffer;
   try {
-    const fileName = `${baseName}_${Date.now()}_${randomHash}.webp`;
-    const filePath = path.join(uploadsDir, fileName);
-
-    const optimizedBuffer = await sharp(buffer)
+    optimizedBuffer = await sharp(buffer)
       .rotate() // auto-orient based on EXIF
       .resize({ width: 1600, withoutEnlargement: true })
       .webp({ quality: 80, effort: 4 })
       .toBuffer();
+  } catch (sharpErr) {
+    console.warn('Sharp optimization error, using original buffer:', sharpErr);
+    optimizedBuffer = buffer;
+  }
 
+  // Attempt saving to public/uploads directory (works locally)
+  try {
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    await fs.mkdir(uploadsDir, { recursive: true });
+    const fileName = `${baseName}_${Date.now()}_${randomHash}.webp`;
+    const filePath = path.join(uploadsDir, fileName);
     await fs.writeFile(filePath, optimizedBuffer);
     return `/uploads/${fileName}`;
-  } catch (error) {
-    console.warn('Sharp optimization fallback (saving raw file):', error);
-    const safeExt = fileExt || '.png';
-    const fileName = `${baseName}_${Date.now()}_${randomHash}${safeExt}`;
-    const filePath = path.join(uploadsDir, fileName);
-    await fs.writeFile(filePath, buffer);
-    return `/uploads/${fileName}`;
+  } catch (fsErr) {
+    // Failover for Vercel Serverless (read-only filesystem) -> Return compressed WebP Data URL
+    console.log('Serverless environment detected (read-only filesystem). Returning compressed WebP Data URL.');
+    const base64 = optimizedBuffer.toString('base64');
+    return `data:image/webp;base64,${base64}`;
   }
 }
 
