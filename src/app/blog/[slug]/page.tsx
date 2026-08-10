@@ -84,7 +84,7 @@ export default async function BlogPostPage({ params }: any) {
   const authorName = post.author?.username || "Admin";
   const authorInitial = authorName[0]?.toUpperCase() || "D";
 
-  let content = post.content;
+  let content = post.content || '';
 
   // Extract font settings if present: <post-settings size="20px" family="Arial" />
   const fontSettingsMatch = content.match(/<post-settings size="(.*?)" family="(.*?)" \/>/);
@@ -97,42 +97,37 @@ export default async function BlogPostPage({ params }: any) {
     content = content.replace(/<post-settings .*? \/>/, '');
   }
 
-  // Replace <back href="..."> with <a>
-  let processedContent = content.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
+  const isRichHtml = /<(p|h[1-6]|div|figure|blockquote|table|ul|ol)/i.test(content);
+  let processedContent = content;
 
-  // Handle <color val="..."> tag
+  // Process legacy tags
+  processedContent = processedContent.replace(/<back href="(.*?)">(.*?)<\/back>/g, '<a href="$1" target="_blank" rel="noopener noreferrer">$2</a>');
   processedContent = processedContent.replace(/<color val="(.*?)">(.*?)<\/color>/g, '<span style="color: $1">$2</span>');
-
-  // Handle <u> and <no-u>
   processedContent = processedContent.replace(/<u>(.*?)<\/u>/g, '<span style="text-decoration: underline">$1</span>');
   processedContent = processedContent.replace(/<no-u>(.*?)<\/no-u>/g, '<span style="text-decoration: none">$1</span>');
-
-  // Handle <spacer /> tag
   processedContent = processedContent.replace(/<spacer \/>/g, '<div style="height: 1.5rem;" class="blog-spacer"></div>');
 
-  // Replace Markdown-like headings
-  processedContent = processedContent.replace(/^###\s+(.*)$/gm, '<h4>$1</h4>');
-  processedContent = processedContent.replace(/^##\s+(.*)$/gm, '<h3>$1</h3>');
-  processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
+  if (!isRichHtml) {
+    processedContent = processedContent.replace(/^###\s+(.*)$/gm, '<h4>$1</h4>');
+    processedContent = processedContent.replace(/^##\s+(.*)$/gm, '<h3>$1</h3>');
+    processedContent = processedContent.replace(/^(?:\*\*|\#)\s+(.*)$/gm, '<h2>$1</h2>');
 
-  // Handle <code> tags with newline preservation
-  const codeBlocks: string[] = [];
-  processedContent = processedContent.replace(/<code>([\s\S]*?)<\/code>/g, (match, code) => {
-    const placeholder = `[CODE_BLOCK_${codeBlocks.length}]`;
-    codeBlocks.push(`<pre class="code-block"><code>${code.trim()}</code></pre>`);
-    return placeholder;
-  });
+    const codeBlocks: string[] = [];
+    processedContent = processedContent.replace(/<code>([\s\S]*?)<\/code>/g, (match, code) => {
+      const placeholder = `[CODE_BLOCK_${codeBlocks.length}]`;
+      codeBlocks.push(`<pre class="code-block"><code>${code.trim()}</code></pre>`);
+      return placeholder;
+    });
 
-  processedContent = processedContent.replace(/\n/g, '<br/>');
+    processedContent = processedContent.replace(/\n/g, '<br/>');
 
-  // Clean up <br/> around block elements to prevent excessive spacing
-  processedContent = processedContent.replace(/(<\/h[1-6]>)(?:\s*<br\/>)+/g, '$1');
-  processedContent = processedContent.replace(/(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
+    processedContent = processedContent.replace(/(<\/h[1-6]>)(?:\s*<br\/>)+/g, '$1');
+    processedContent = processedContent.replace(/(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
 
-  // Restore code blocks
-  codeBlocks.forEach((block, index) => {
-    processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
-  });
+    codeBlocks.forEach((block, index) => {
+      processedContent = processedContent.replace(`[CODE_BLOCK_${index}]`, block);
+    });
+  }
 
   const gallery = [...(post.images || [])];
   const inlineImages = [...gallery];
