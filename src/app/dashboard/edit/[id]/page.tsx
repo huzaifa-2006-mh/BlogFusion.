@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import BlogImageUploader from '@/components/BlogImageUploader';
+
 import RichTextEditor from '@/components/RichTextEditor';
 
 interface FAQ {
@@ -440,15 +440,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
               </button>
             </div>
 
-            <div className="dashboard-card" style={{ padding: '1.8rem' }}>
-              <BlogImageUploader
-                previews={previews}
-                imageAlts={imageAlts}
-                onImagesChange={handleImageChange}
-                onAltChange={updateImageAlt}
-                onRemove={removeImage}
-              />
-            </div>
+
           </div>
         </div>
       </form>

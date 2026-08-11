@@ -57,7 +57,7 @@ export function cleanHtmlForSeo(html: string): string {
 
   // Remove empty paragraphs or linebreaks
   clean = clean.replace(/<p>\s*(<br\s*\/?>)?\s*<\/p>/gi, '');
-  clean = clean.replace(/(<br\s*\/?>\s*){3,}/gi, '<br/><br/>');
+  clean = clean.replace(/(<br\s*\/?>\\s*){3,}/gi, '<br/><br/>');
 
   // Remove empty span tags with no attributes or empty text
   clean = clean.replace(/<span\s*>(.*?)<\/span>/gi, '$1');
@@ -84,6 +84,11 @@ export default function RichTextEditor({
   const [linkNewTab, setLinkNewTab] = useState(true);
   const [savedSelection, setSavedSelection] = useState<Range | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+
+  // Code block modal
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [codeLanguage, setCodeLanguage] = useState('javascript');
+  const [codeContent, setCodeContent] = useState('');
 
   // Statistics
   const [wordCount, setWordCount] = useState(0);
