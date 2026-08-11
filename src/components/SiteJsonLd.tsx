@@ -16,7 +16,7 @@ export default function SiteJsonLd() {
     },
     chiefExecutiveOfficer: {
       '@type': 'Person',
-      name: 'Maryam',
+      name: 'Marium',
       jobTitle: 'CEO',
       url: siteUrl,
     },
@@ -42,17 +42,17 @@ export default function SiteJsonLd() {
     image: `${siteUrl}/huzaifa.png`,
   };
 
-  const maryamPersonSchema = {
+  const mariumPersonSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: 'Maryam',
+    name: 'Marium',
     jobTitle: 'CEO',
     worksFor: {
       '@type': 'Organization',
       name: 'Blog Fusion',
       url: siteUrl,
     },
-    description: 'Maryam is the Chief Executive Officer (CEO) of Blog Fusion.',
+    description: 'Marium is the Chief Executive Officer (CEO) of Blog Fusion.',
     url: siteUrl,
   };
 
@@ -84,7 +84,7 @@ export default function SiteJsonLd() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(maryamPersonSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(mariumPersonSchema) }}
       />
       <script
         type="application/ld+json"

@@ -290,11 +290,11 @@ export default async function BlogPostPage({ params }: any) {
           </div>
           <div>
             <h3 style={{ margin: '0 0 0.4rem 0', fontWeight: '800', color: '#0f172a', fontSize: '1.3rem' }}>
-              Written by <span style={{ color: '#ec4899' }}>{authorName.toLowerCase().includes('mari') ? 'Maryam (CEO)' : authorName.toLowerCase().includes('huzaifa') ? 'Muhammad Huzaifa (Founder & Boss)' : authorName}</span>
+              Written by <span style={{ color: '#ec4899' }}>{authorName.toLowerCase().includes('mari') ? 'Marium (CEO)' : authorName.toLowerCase().includes('huzaifa') ? 'Muhammad Huzaifa (Founder & Boss)' : authorName}</span>
             </h3>
             <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
               {authorName.toLowerCase().includes('mari') 
-                ? "Maryam is the Chief Executive Officer (CEO) of Blog Fusion. She leads company strategy, technology insights, and editorial excellence." 
+                ? "Marium is the Chief Executive Officer (CEO) of Blog Fusion. She leads company strategy, technology insights, and editorial excellence." 
                 : "Muhammad Huzaifa is the Founder and Boss of Blog Fusion. He is a passionate software engineer and creator dedicated to sharing practical tech guides."}
             </p>
           </div>

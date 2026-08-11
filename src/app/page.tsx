@@ -53,7 +53,7 @@ export default async function Home() {
           <div className="hero-grid">
             <div style={{ fontSize: '1rem', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
               <p style={{ marginBottom: '1.5rem' }}>
-                Blog Fusion is your go-to resource for mastering Google apps, online earning methods, software programming, and modern productivity tools. Co-founded by Muhammad Huzaifa (Founder & Boss) and Maryam (CEO), we've been helping millions of readers with clear, step-by-step guides.
+                Blog Fusion is your go-to resource for mastering Google apps, online earning methods, software programming, and modern productivity tools. Co-founded by Muhammad Huzaifa (Founder & Boss) and Marium (CEO), we've been helping millions of readers with clear, step-by-step guides.
               </p>
               <p>
                 Automate your workflow, streamline your inbox, build powerful no-code routines, or master the latest tech trends with our curated blogs.
@@ -78,12 +78,12 @@ export default async function Home() {
                   </div>
                 </div>
 
-                {/* CEO Maryam */}
+                {/* CEO Marium */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   {mariumUser?.image ? (
                     <img
                       src={mariumUser.image}
-                      alt="Maryam"
+                      alt="Marium"
                       style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff4b91' }}
                     />
                   ) : (
@@ -92,7 +92,7 @@ export default async function Home() {
                     </div>
                   )}
                   <div>
-                    <h3 style={{ margin: '0', fontSize: '1rem', color: 'var(--text-primary)', fontWeight: '700' }}>Maryam</h3>
+                    <h3 style={{ margin: '0', fontSize: '1rem', color: 'var(--text-primary)', fontWeight: '700' }}>Marium</h3>
                     <p style={{ margin: '0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>CEO, Blog Fusion</p>
                   </div>
                 </div>
