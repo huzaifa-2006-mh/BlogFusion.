@@ -14,6 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   let categoriesWithPosts: any[] = [];
+  let huzaifaUser: any = null;
+  let mariumUser: any = null;
 
   try {
     categoriesWithPosts = await prisma.category.findMany({
@@ -29,8 +31,12 @@ export default async function Home() {
         },
       },
     });
+
+    huzaifaUser = await prisma.user.findUnique({ where: { username: 'huzaifa' } });
+    mariumUser = (await prisma.user.findUnique({ where: { username: 'marium' } })) || 
+                 (await prisma.user.findUnique({ where: { username: 'maryam' } }));
   } catch (error) {
-    console.error('Failed to fetch categories:', error);
+    console.error('Failed to fetch home page data:', error);
   }
 
   return (
@@ -47,7 +53,7 @@ export default async function Home() {
           <div className="hero-grid">
             <div style={{ fontSize: '1rem', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
               <p style={{ marginBottom: '1.5rem' }}>
-                Blog Fusion is your go-to resource for mastering Google apps, online earning methods, software programming, and modern productivity tools. Created by Muhammad Huzaifa, we've been helping millions of readers with clear, step-by-step guides.
+                Blog Fusion is your go-to resource for mastering Google apps, online earning methods, software programming, and modern productivity tools. Co-founded by Muhammad Huzaifa (Founder & Boss) and Maryam (CEO), we've been helping millions of readers with clear, step-by-step guides.
               </p>
               <p>
                 Automate your workflow, streamline your inbox, build powerful no-code routines, or master the latest tech trends with our curated blogs.
@@ -58,13 +64,37 @@ export default async function Home() {
               <blockquote style={{ fontSize: '1.25rem', fontWeight: '500', color: 'var(--text-primary)', marginBottom: '1.5rem', lineHeight: '1.4', margin: 0 }}>
                 "Independent and unbiased. No sponsored content, no paid endorsements, no brand partnerships. Just honest tech guidance you can trust."
               </blockquote>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
-                <div style={{ width: '45px', height: '45px', backgroundColor: '#0f172a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.1rem' }}>
-                  MH
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '1.5rem' }}>
+                {/* Founder & Boss Huzaifa */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <img
+                    src={huzaifaUser?.image || '/huzaifa.png'}
+                    alt="Muhammad Huzaifa"
+                    style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff4b91' }}
+                  />
+                  <div>
+                    <h3 style={{ margin: '0', fontSize: '1rem', color: 'var(--text-primary)', fontWeight: '700' }}>Muhammad Huzaifa</h3>
+                    <p style={{ margin: '0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Founder & Boss, Blog Fusion</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ margin: '0', fontSize: '1rem', color: 'var(--text-primary)', fontWeight: '700' }}>Muhammad Huzaifa</h3>
-                  <p style={{ margin: '0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Founder, Blog Fusion</p>
+
+                {/* CEO Maryam */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  {mariumUser?.image ? (
+                    <img
+                      src={mariumUser.image}
+                      alt="Maryam"
+                      style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #ff4b91' }}
+                    />
+                  ) : (
+                    <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.2rem', border: '2px solid #ff4b91' }}>
+                      M
+                    </div>
+                  )}
+                  <div>
+                    <h3 style={{ margin: '0', fontSize: '1rem', color: 'var(--text-primary)', fontWeight: '700' }}>Maryam</h3>
+                    <p style={{ margin: '0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>CEO, Blog Fusion</p>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -107,9 +137,6 @@ export default async function Home() {
                               </p>
                             )}
                           </Link>
-                          {block[0].coverImage && (
-                            <img src={block[0].coverImage} alt={block[0].title} style={{ width: '100%', borderRadius: '4px', marginTop: '2rem' }} />
-                          )}
                         </article>
                       )}
 

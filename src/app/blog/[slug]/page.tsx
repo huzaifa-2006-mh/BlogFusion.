@@ -280,18 +280,22 @@ export default async function BlogPostPage({ params }: any) {
         {/* Author Bio Box */}
         <aside style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
           <div style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(236,72,153,0.2)', flexShrink: 0 }}>
-            {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
-              <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            {post.author?.image ? (
+              <img src={post.author.image} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : authorName.toLowerCase().includes('huzaifa') ? (
+              <img src="/huzaifa.png" alt="Muhammad Huzaifa" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               authorInitial
             )}
           </div>
           <div>
             <h3 style={{ margin: '0 0 0.4rem 0', fontWeight: '800', color: '#0f172a', fontSize: '1.3rem' }}>
-              Written by <span style={{ color: '#ec4899' }}>{authorName}</span>
+              Written by <span style={{ color: '#ec4899' }}>{authorName.toLowerCase().includes('mari') ? 'Maryam (CEO)' : authorName.toLowerCase().includes('huzaifa') ? 'Muhammad Huzaifa (Founder & Boss)' : authorName}</span>
             </h3>
             <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
-              {authorName.toLowerCase().includes('marium') ? "Marium Waseem is a passionate developer and the lead voice behind Blog Fusion. She loves exploring new technologies and sharing her knowledge." : "Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge."}
+              {authorName.toLowerCase().includes('mari') 
+                ? "Maryam is the Chief Executive Officer (CEO) of Blog Fusion. She leads company strategy, technology insights, and editorial excellence." 
+                : "Muhammad Huzaifa is the Founder and Boss of Blog Fusion. He is a passionate software engineer and creator dedicated to sharing practical tech guides."}
             </p>
           </div>
         </aside>
