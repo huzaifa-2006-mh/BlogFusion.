@@ -94,15 +94,7 @@ export default function RootLayout({
             gtag('config', 'G-8612225GGD');
           `}
         </Script>
-        <script src="https://5gvci.com/act/files/tag.min.js?z=11145911" data-cfasync="false" async></script>
-        {/* Google AdSense Script */}
-<Script
-  async
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3138004383378619"
-  crossOrigin="anonymous"
-  strategy="afterInteractive"
-/>
-  <AnalyticsTracker />
+        <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>
         <Footer />

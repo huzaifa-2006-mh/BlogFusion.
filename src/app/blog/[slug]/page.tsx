@@ -1,20 +1,18 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { checkAuth } from '../../../lib/auth';
-import prisma from '@/lib/prisma'; // Default import jo bina brackets ke lowercase prisma fetch karega
+import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
-
 
 export const revalidate = 60;
 
 export async function generateStaticParams() {
   const posts = await prisma.post.findMany({
     where: { published: true },
-    select: { slug: true }
+    select: { slug: true },
   });
   return posts.map((post) => ({
-    slug: post.slug
+    slug: post.slug,
   }));
 }
 
@@ -22,12 +20,12 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = resolvedParams.slug;
   const post = await prisma.post.findUnique({
-    where: { slug }
+    where: { slug },
   });
 
   if (!post) {
     return {
-      title: 'Post Not Found - Blog Fusion'
+      title: 'Post Not Found - Blog Fusion',
     };
   }
 
@@ -38,13 +36,13 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     openGraph: {
       title: post.metaTitle || post.title,
       description: post.metaDescription || post.excerpt,
-      images: post.ogImage ? [{ url: post.ogImage }] : (post.coverImage ? [{ url: post.coverImage }] : []),
+      images: post.ogImage ? [{ url: post.ogImage }] : post.coverImage ? [{ url: post.coverImage }] : [],
       url: post.canonicalUrl || undefined,
       type: 'article',
     },
     alternates: {
       canonical: post.canonicalUrl || undefined,
-    }
+    },
   };
 
   if (!post.isIndexable) {
@@ -68,7 +66,7 @@ export default async function BlogPostPage({ params }: any) {
   const slug = resolvedParams.slug;
   const post = await prisma.post.findUnique({
     where: { slug },
-    include: { category: true, author: true }
+    include: { category: true, author: true },
   });
 
   if (!post || !post.published) {
@@ -78,11 +76,11 @@ export default async function BlogPostPage({ params }: any) {
   // Increment view count in background
   prisma.post.update({
     where: { id: post.id },
-    data: { views: { increment: 1 } }
-  }).catch(err => console.error("Error updating views:", err));
+    data: { views: { increment: 1 } },
+  }).catch((err) => console.error('Error updating views:', err));
 
-  const authorName = post.author?.username || "Admin";
-  const authorInitial = authorName[0]?.toUpperCase() || "D";
+  const authorName = post.author?.username || 'Admin';
+  const authorInitial = authorName[0]?.toUpperCase() || 'D';
 
   let content = post.content || '';
 
@@ -92,7 +90,7 @@ export default async function BlogPostPage({ params }: any) {
   if (fontSettingsMatch) {
     customStyles = {
       fontSize: fontSettingsMatch[1],
-      fontFamily: fontSettingsMatch[2]
+      fontFamily: fontSettingsMatch[2],
     };
     content = content.replace(/<post-settings .*? \/>/, '');
   }
@@ -120,7 +118,6 @@ export default async function BlogPostPage({ params }: any) {
     });
 
     processedContent = processedContent.replace(/\n/g, '<br/>');
-
     processedContent = processedContent.replace(/(<\/h[1-6]>)(?:\s*<br\/>)+/g, '$1');
     processedContent = processedContent.replace(/(?:<br\/>\s*)+(<h[1-6]>)/g, '$1');
 
@@ -148,22 +145,83 @@ export default async function BlogPostPage({ params }: any) {
     imageIndex++;
   }
 
+  // Schema.org JSON-LD definitions
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
+  const postUrl = `${siteUrl}/blog/${post.slug}`;
+  const coverImg = post.ogImage || post.coverImage || `${siteUrl}/favicon-48x48.png`;
+
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.metaDescription || post.excerpt,
+    image: [coverImg],
+    datePublished: post.createdAt.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    author: {
+      '@type': 'Person',
+      name: authorName,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Blog Fusion',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/favicon-48x48.png`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': postUrl,
+    },
+  };
+
+  const faqList = (post.faqs as any[]) || [];
+  const faqSchema =
+    faqList.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqList.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: faq.answer,
+            },
+          })),
+        }
+      : null;
+
   return (
     <article className="section" style={{ padding: '4rem 0 6rem 0' }}>
+      {/* Schema.org Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
+
       <div className="container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1.5rem' }}>
-        {/* Compact Back Button */}
+        {/* Back Link */}
         <Link href="/" className="back-link">
           &larr; Back to Home
         </Link>
 
         {/* Dynamic Detail Header */}
         <header style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
-          {/* Centered Date */}
-          <span style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.8rem', display: 'block' }}>
+          <time
+            dateTime={post.createdAt.toISOString()}
+            style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.8rem', display: 'block' }}
+          >
             {new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-          </span>
+          </time>
 
-          {/* Centered Title */}
           <h1 style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2.3rem)', fontWeight: '800', color: '#0f172a', lineHeight: '1.25', letterSpacing: '-0.02em', margin: '0 auto 1.2rem auto', maxWidth: '750px' }}>
             {post.title}
           </h1>
@@ -174,7 +232,6 @@ export default async function BlogPostPage({ params }: any) {
             </p>
           )}
 
-          {/* Centered Category Tag Row */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
             <Link href={`/category/${post.category.slug}`} style={{ textDecoration: 'none' }}>
               <span className="blog-detail-category-tag" style={{ marginBottom: 0 }}>#{post.category.slug}</span>
@@ -182,48 +239,46 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         </header>
 
-      
-        {/* Clean Reading Box */}
+        {/* Clean Article Content */}
         <div className="blog-content" style={{ ...customStyles }}>
           <div dangerouslySetInnerHTML={{ __html: processedContent }} />
         </div>
 
-       
-        {/* Premium FAQ Card Accordions */}
-        {post.faqs && (post.faqs as any[]).length > 0 && (
-          <div style={{ marginTop: '2rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+        {/* FAQ Accordions */}
+        {faqList.length > 0 && (
+          <section style={{ marginTop: '2rem', padding: '2.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
             <h2 style={{ marginBottom: '1.8rem', fontSize: '1.6rem', color: '#0f172a', textAlign: 'center', fontWeight: '800', letterSpacing: '-0.02em' }}>Frequently Asked Questions</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {(post.faqs as any[]).map((faq, index) => (
+              {faqList.map((faq, index) => (
                 <div key={index} style={{ background: 'white', padding: '1.25rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.01)' }}>
-                  <h4 style={{ color: '#0f172a', fontWeight: '700', fontSize: '1.02rem', marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                  <h3 style={{ color: '#0f172a', fontWeight: '700', fontSize: '1.02rem', marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}>
                     <span style={{ color: '#ec4899', fontWeight: '800' }}>Q:</span> {faq.question}
-                  </h4>
+                  </h3>
                   <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.5', margin: 0, fontWeight: '500' }}>
                     {faq.answer}
                   </p>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Remaining Gallery Display */}
+        {/* Gallery */}
         {imageIndex < inlineImages.length && (
-          <div style={{ marginTop: '4rem' }}>
+          <section style={{ marginTop: '4rem' }}>
             <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.5rem' }}>Post Gallery</h3>
             <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
               {inlineImages.slice(imageIndex).map((img, index) => (
                 <div key={index} style={{ height: '220px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-                  <img src={img} alt={`Gallery ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src={img} alt={`Gallery image ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Premium Author Bio Box */}
-        <div style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+        {/* Author Bio Box */}
+        <aside style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
           <div style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(236,72,153,0.2)', flexShrink: 0 }}>
             {(post.author?.image || authorName.toLowerCase().includes('huzaifa')) ? (
               <img src={post.author?.image || '/huzaifa.png'} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -239,7 +294,7 @@ export default async function BlogPostPage({ params }: any) {
               {authorName.toLowerCase().includes('marium') ? "Marium Waseem is a passionate developer and the lead voice behind Blog Fusion. She loves exploring new technologies and sharing her knowledge." : "Muhammad Huzaifa is a passionate developer and the lead voice behind Blog Fusion. He loves exploring new technologies and sharing his knowledge."}
             </p>
           </div>
-        </div>
+        </aside>
 
         {/* Sharing Ribbon */}
         <div className="mt-4 pt-4" style={{ borderTop: '1px solid #f1f5f9', marginTop: '4rem' }}>
@@ -247,8 +302,6 @@ export default async function BlogPostPage({ params }: any) {
           <ShareButtons title={post.title} />
         </div>
       </div>
-
-  
     </article>
   );
 }
