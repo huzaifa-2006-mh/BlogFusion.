@@ -36,45 +36,60 @@ export default function ContactForm() {
   };
 
   return (
-    <>
-      <h3>Send a Message</h3>
+    <div>
+      <h3
+        style={{
+          fontSize: '1.4rem',
+          fontWeight: '850',
+          color: '#3E2618',
+          marginBottom: '0.4rem',
+          fontFamily: 'var(--font-outfit, sans-serif)',
+        }}
+      >
+        Send a Message
+      </h3>
+      <p style={{ fontSize: '0.92rem', color: '#666666', marginBottom: '1.8rem' }}>
+        Fill in the details below and we will get back to your inquiry promptly.
+      </p>
 
       {status === 'success' && (
-        <p
+        <div
           role="status"
           style={{
-            padding: '0.85rem 1rem',
-            marginBottom: '1rem',
-            borderRadius: '8px',
-            background: '#ecfdf5',
-            border: '1px solid #86efac',
-            color: '#166534',
-            fontWeight: 600,
+            padding: '1rem 1.2rem',
+            marginBottom: '1.5rem',
+            borderRadius: '10px',
+            background: '#F5EDE4',
+            border: '1px solid #6B4226',
+            color: '#3E2618',
+            fontWeight: 700,
+            fontSize: '0.92rem',
           }}
         >
-          Thank you! Your message was sent successfully. We will get back to you soon.
-        </p>
+          ✓ Thank you! Your message was sent successfully. We will get back to you soon.
+        </div>
       )}
 
       {status === 'error' && (
-        <p
+        <div
           role="alert"
           style={{
-            padding: '0.85rem 1rem',
-            marginBottom: '1rem',
-            borderRadius: '8px',
-            background: '#fef2f2',
-            border: '1px solid #fca5a5',
-            color: '#991b1b',
-            fontWeight: 600,
+            padding: '1rem 1.2rem',
+            marginBottom: '1.5rem',
+            borderRadius: '10px',
+            background: '#FEF2F2',
+            border: '1px solid #FCA5A5',
+            color: '#991B1B',
+            fontWeight: 700,
+            fontSize: '0.92rem',
           }}
         >
-          {errorMessage}
-        </p>
+          ✕ {errorMessage}
+        </div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        {/* Honeypot — hidden from users, catches bots */}
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* Honeypot */}
         <input
           type="text"
           name="_honey"
@@ -84,58 +99,103 @@ export default function ContactForm() {
           style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
         />
 
-        <div className="form-group">
-          <label htmlFor="name">Name</label>
+        <div>
+          <label style={labelStyle} htmlFor="name">
+            Your Full Name *
+          </label>
           <input
             type="text"
             id="name"
             name="name"
-            placeholder="Your Name"
+            placeholder="Jane Doe"
             required
             disabled={status === 'loading'}
+            style={inputStyle}
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
+
+        <div>
+          <label style={labelStyle} htmlFor="email">
+            Email Address *
+          </label>
           <input
             type="email"
             id="email"
             name="email"
-            placeholder="Your Email"
+            placeholder="jane@example.com"
             required
             disabled={status === 'loading'}
+            style={inputStyle}
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="subject">Subject</label>
+
+        <div>
+          <label style={labelStyle} htmlFor="subject">
+            Inquiry Subject *
+          </label>
           <input
             type="text"
             id="subject"
             name="subject"
-            placeholder="Subject"
+            placeholder="Editorial Question / Partnership Inquiry"
             required
             disabled={status === 'loading'}
+            style={inputStyle}
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="message">Message</label>
+
+        <div>
+          <label style={labelStyle} htmlFor="message">
+            Message *
+          </label>
           <textarea
             id="message"
             name="message"
-            placeholder="How can we help you?"
+            placeholder="Share your thoughts, feedback, or proposal..."
+            rows={4}
             required
             disabled={status === 'loading'}
+            style={{ ...inputStyle, resize: 'vertical' }}
           />
         </div>
+
         <button
           type="submit"
-          className="btn btn-primary"
-          style={{ width: '100%' }}
           disabled={status === 'loading'}
+          className="vip-btn-primary"
+          style={{
+            width: '100%',
+            padding: '0.95rem',
+            fontSize: '1rem',
+            justifyContent: 'center',
+            cursor: status === 'loading' ? 'not-allowed' : 'pointer',
+          }}
         >
-          {status === 'loading' ? 'Sending...' : 'Send Message'}
+          {status === 'loading' ? 'Sending Message...' : 'Send Message ✉️'}
         </button>
       </form>
-    </>
+    </div>
   );
 }
+
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: '0.8rem',
+  fontWeight: '800',
+  textTransform: 'uppercase',
+  letterSpacing: '0.04em',
+  color: '#3E2618',
+  marginBottom: '0.4rem',
+};
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '0.85rem 1rem',
+  border: '1px solid #E8DFD8',
+  borderRadius: '10px',
+  fontSize: '0.95rem',
+  color: '#222222',
+  background: '#FAFAFA',
+  outline: 'none',
+  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+};

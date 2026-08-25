@@ -4,61 +4,72 @@ import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    select: { slug: true },
-  });
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+  try {
+    const posts = await prisma.post.findMany({
+      where: { published: true },
+      select: { slug: true },
+    });
+    return posts.map((post) => ({
+      slug: post.slug,
+    }));
+  } catch (error) {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const resolvedParams = await params;
-  const slug = resolvedParams.slug;
-  const post = await prisma.post.findUnique({
-    where: { slug },
-  });
+  try {
+    const resolvedParams = await params;
+    const slug = resolvedParams.slug;
+    const post = await prisma.post.findUnique({
+      where: { slug },
+    });
 
-  if (!post) {
-    return {
-      title: 'Post Not Found - Blog Fusion',
-    };
-  }
+    if (!post) {
+      return {
+        title: 'Post Not Found - Blog Fusion',
+      };
+    }
 
-  const metadata: Metadata = {
-    title: post.metaTitle || `${post.title} - Blog Fusion`,
-    description: post.metaDescription || post.excerpt,
-    keywords: post.focusKeywords || undefined,
-    openGraph: {
-      title: post.metaTitle || post.title,
+    const metadata: Metadata = {
+      title: post.metaTitle || `${post.title} - Blog Fusion`,
       description: post.metaDescription || post.excerpt,
-      images: post.ogImage ? [{ url: post.ogImage }] : post.coverImage ? [{ url: post.coverImage }] : [],
-      url: post.canonicalUrl || undefined,
-      type: 'article',
-    },
-    alternates: {
-      canonical: post.canonicalUrl || undefined,
-    },
-  };
-
-  if (!post.isIndexable) {
-    metadata.robots = {
-      index: false,
-      follow: false,
-      nocache: true,
-      googleBot: {
-        index: false,
-        follow: false,
-        noimageindex: true,
+      keywords: post.focusKeywords || undefined,
+      openGraph: {
+        title: post.metaTitle || post.title,
+        description: post.metaDescription || post.excerpt,
+        images: post.ogImage ? [{ url: post.ogImage }] : post.coverImage ? [{ url: post.coverImage }] : [],
+        url: post.canonicalUrl || undefined,
+        type: 'article',
+      },
+      alternates: {
+        canonical: post.canonicalUrl || undefined,
       },
     };
-  }
 
-  return metadata;
+    if (!post.isIndexable) {
+      metadata.robots = {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+        },
+      };
+    }
+
+    return metadata;
+  } catch (error) {
+    return {
+      title: 'Blog Fusion',
+      description: 'Explore blogs on Blog Fusion',
+    };
+  }
 }
 
 export default async function BlogPostPage({ params }: any) {

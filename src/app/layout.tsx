@@ -6,32 +6,16 @@ import Footer from "@/components/Footer";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import SiteJsonLd from "@/components/SiteJsonLd";
 
-import { Inter, Outfit } from "next/font/google";
-
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  variable: "--font-outfit",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: 'Blog Fusion',
   title: {
-    default: 'Blog Fusion',
-    template: '%s',
+    default: 'Blog Fusion | Ideas, Insights, and Knowledge for a Better Future',
+    template: '%s | Blog Fusion',
   },
-  description: 'Welcome to Blog Fusion — technology, programming, online earning, jobs, and entertainment blogs.',
+  description: 'Welcome to Blog Fusion — practical information, useful ideas, and insights across AI & Technology, Finance, Education, Careers, Health, and Fitness.',
   authors: [{ name: 'Blog Fusion' }],
   creator: 'Blog Fusion',
   publisher: 'Blog Fusion',
@@ -48,13 +32,13 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: 'Blog Fusion',
     title: 'Blog Fusion',
-    description: 'Tech guides, programming tutorials, online earning, jobs and entertainment blogs.',
+    description: 'Ideas, Insights, and Knowledge for a Better Future.',
     images: [{ url: '/favicon-48x48.png', width: 48, height: 48, alt: 'Blog Fusion logo' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Blog Fusion',
-    description: 'Tech guides, programming tutorials, online earning, jobs and entertainment blogs.',
+    description: 'Ideas, Insights, and Knowledge for a Better Future.',
     images: ['/favicon-48x48.png'],
   },
   icons: {
@@ -68,7 +52,7 @@ export const metadata: Metadata = {
   other: {
     'apple-mobile-web-app-title': 'Blog Fusion',
     'msapplication-TileImage': '/favicon-48x48.png',
-    'msapplication-TileColor': '#0a192f',
+    'msapplication-TileColor': '#3E2618',
   },
 };
 
@@ -82,8 +66,14 @@ export default function RootLayout({
       <head>
         <meta name="application-name" content="Blog Fusion" />
         <meta name="apple-mobile-web-app-title" content="Blog Fusion" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Poppins:wght@500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className={`${inter.variable} ${outfit.variable}`}>
+      <body>
         <SiteJsonLd />
         <Script strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-8612225GGD" />
         <Script id="google-analytics" strategy="afterInteractive">

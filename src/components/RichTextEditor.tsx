@@ -166,11 +166,27 @@ export default function RichTextEditor({
     }
   };
 
-  // Format Block
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+  const [imageAlt, setImageAlt] = useState('');
+  const [imageCaption, setImageCaption] = useState('');
+
+  // Format Block with cross-browser compatibility
   const handleBlockChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const tag = e.target.value;
     if (tag) {
-      execCmd('formatBlock', tag);
+      // Focus the editor first if not focused
+      if (editorRef.current && document.activeElement !== editorRef.current) {
+        editorRef.current.focus();
+      }
+      try {
+        document.execCommand('formatBlock', false, tag);
+      } catch (err) {
+        // Fallback for some browsers expecting plain tag name
+        const plainTag = tag.replace(/[<>]/g, '');
+        document.execCommand('formatBlock', false, plainTag);
+      }
+      handleInput();
       e.target.value = '';
     }
   };
@@ -236,15 +252,13 @@ export default function RichTextEditor({
     setShowLinkModal(false);
   };
 
-  // Image Upload (Works on Vercel Serverless & Local)
-  const handleImageFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  // Upload helper for files
+  const uploadFiles = async (files: File[]) => {
     if (!files || files.length === 0) return;
-
     setIsUploading(true);
     try {
       const formData = new FormData();
-      Array.from(files).forEach((file) => formData.append('images', file));
+      files.forEach((file) => formData.append('images', file));
 
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -258,11 +272,12 @@ export default function RichTextEditor({
       const data = await res.json();
       const urls: string[] = data.urls || (data.url ? [data.url] : []);
 
-      urls.forEach((imgUrl) => {
+      urls.forEach((imgUrl, i) => {
+        const alt = files[i]?.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Blog Image';
         const figureHtml = `
-          <figure style="margin: 1.8rem 0; text-align: center;">
-            <img src="${imgUrl}" alt="Blog Image" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: inline-block;" />
-            <figcaption style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem; font-style: italic;">Caption here...</figcaption>
+          <figure style="margin: 2rem 0; text-align: center;">
+            <img src="${imgUrl}" alt="${alt}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); display: inline-block;" />
+            <figcaption style="font-size: 0.85rem; color: #64748b; margin-top: 0.6rem; font-style: italic;">${alt}</figcaption>
           </figure><p></p>
         `;
         execCmd('insertHTML', figureHtml);
@@ -272,6 +287,64 @@ export default function RichTextEditor({
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Image File Select
+  const handleImageFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      await uploadFiles(Array.from(e.target.files));
+    }
+  };
+
+  // Insert Image from URL Modal
+  const insertImageFromUrl = () => {
+    if (!imageUrl) return;
+    restoreSelection();
+
+    const alt = imageAlt.trim() || 'Blog Image';
+    const caption = imageCaption.trim();
+
+    const figureHtml = `
+      <figure style="margin: 2rem 0; text-align: center;">
+        <img src="${imageUrl.trim()}" alt="${alt}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); display: inline-block;" />
+        ${caption ? `<figcaption style="font-size: 0.85rem; color: #64748b; margin-top: 0.6rem; font-style: italic;">${caption}</figcaption>` : ''}
+      </figure><p></p>
+    `;
+
+    execCmd('insertHTML', figureHtml);
+    setImageUrl('');
+    setImageAlt('');
+    setImageCaption('');
+    setShowImageModal(false);
+  };
+
+  // Drag & Drop Image Handler
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const imgFiles = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
+      if (imgFiles.length > 0) {
+        await uploadFiles(imgFiles);
+      }
+    }
+  };
+
+  // Paste Image Handler
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (items) {
+      const imgFiles: File[] = [];
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          const file = items[i].getAsFile();
+          if (file) imgFiles.push(file);
+        }
+      }
+      if (imgFiles.length > 0) {
+        e.preventDefault();
+        await uploadFiles(imgFiles);
+      }
     }
   };
 
@@ -357,16 +430,19 @@ export default function RichTextEditor({
 
         {/* Headings / Format */}
         <div style={groupStyle}>
-          <select onChange={handleBlockChange} style={selectStyle} defaultValue="">
+          <select onChange={handleBlockChange} style={{ ...selectStyle, fontWeight: '700', color: '#0f172a' }} defaultValue="">
             <option value="" disabled>
-              Paragraph Style
+              Heading / Style
             </option>
+            <option value="<h1>">👑 Heading 1 (H1 - Main)</option>
+            <option value="<h2>">📌 Heading 2 (H2 - Major)</option>
+            <option value="<h3>">🔹 Heading 3 (H3 - Sub)</option>
+            <option value="<h4>">▫️ Heading 4 (H4 - Topic)</option>
+            <option value="<h5>">Heading 5 (H5)</option>
+            <option value="<h6>">Heading 6 (H6)</option>
             <option value="<p>">Normal Paragraph</option>
-            <option value="<h2>">Heading 2 (H2)</option>
-            <option value="<h3>">Heading 3 (H3)</option>
-            <option value="<h4>">Heading 4 (H4)</option>
-            <option value="<blockquote>">Quote Block</option>
-            <option value="<pre>">Code Block</option>
+            <option value="<blockquote>">💬 Quote Block</option>
+            <option value="<pre>">💻 Code Block</option>
           </select>
         </div>
 
@@ -474,10 +550,21 @@ export default function RichTextEditor({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            title="Upload & Insert Image (PNG, JPG, WEBP, GIF, SVG, AVIF)"
-            style={{ ...btnStyle, background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}
+            title="Upload Local Image (PNG, JPG, WEBP, GIF, SVG, AVIF)"
+            style={{ ...btnStyle, background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe', fontWeight: '700' }}
           >
-            {isUploading ? 'Uploading...' : 'Image'}
+            {isUploading ? 'Uploading...' : '📁 Upload Image'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              saveCurrentSelection();
+              setShowImageModal(true);
+            }}
+            title="Insert Image by URL"
+            style={{ ...btnStyle, background: '#fdf2f8', color: '#db2777', borderColor: '#fbcfe8', fontWeight: '700' }}
+          >
+            🌐 Image URL
           </button>
           <button type="button" onClick={openLinkModal} title="Insert Link" style={btnStyle}>
             Link
@@ -513,6 +600,9 @@ export default function RichTextEditor({
           contentEditable
           onInput={handleInput}
           onBlur={handleBlur}
+          onDrop={handleDrop}
+          onDragOver={(e) => e.preventDefault()}
+          onPaste={handlePaste}
           data-placeholder={placeholder}
           className="ms-word-canvas"
           style={{
@@ -531,7 +621,7 @@ export default function RichTextEditor({
         />
       </div>
 
-      {/* Status Bar (No Icons) */}
+      {/* Status Bar */}
       <div
         style={{
           display: 'flex',
@@ -551,9 +641,125 @@ export default function RichTextEditor({
           <span>Est. Reading Time: <strong>~{readTime} min</strong></span>
         </div>
         <div>
-          <span style={{ color: '#16a34a', fontWeight: '700' }}>Semrush SEO Clean HTML</span>
+          <span style={{ color: '#16a34a', fontWeight: '700' }}>✓ Semrush SEO Clean HTML</span>
         </div>
       </div>
+
+      {/* Image by URL Modal */}
+      {showImageModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(15, 23, 42, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+          }}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '12px',
+              padding: '1.8rem',
+              width: '90%',
+              maxWidth: '480px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.25rem', fontWeight: '800', color: '#0f172a' }}>
+              Insert Image by URL
+            </h3>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
+                Image Web Link (URL) *
+              </label>
+              <input
+                type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                placeholder="https://images.unsplash.com/photo-..."
+                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}
+                autoFocus
+              />
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
+                Alt Text (Description for SEO)
+              </label>
+              <input
+                type="text"
+                value={imageAlt}
+                onChange={(e) => setImageAlt(e.target.value)}
+                placeholder="Brief description of the image"
+                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
+                Caption (Optional)
+              </label>
+              <input
+                type="text"
+                value={imageCaption}
+                onChange={(e) => setImageCaption(e.target.value)}
+                placeholder="Image caption shown below image"
+                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}
+              />
+            </div>
+
+            {imageUrl && (
+              <div style={{ marginBottom: '1.5rem', textAlign: 'center', background: '#f8fafc', padding: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <p style={{ margin: '0 0 0.4rem 0', fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>Live Preview:</p>
+                <img
+                  src={imageUrl}
+                  alt="Preview"
+                  style={{ maxHeight: '120px', maxWidth: '100%', borderRadius: '6px', objectFit: 'contain' }}
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowImageModal(false);
+                  setImageUrl('');
+                }}
+                style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #cbd5e1', background: 'white', fontWeight: '600', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={insertImageFromUrl}
+                disabled={!imageUrl.trim()}
+                style={{
+                  padding: '0.5rem 1.2rem',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: imageUrl.trim() ? '#0f172a' : '#94a3b8',
+                  color: 'white',
+                  fontWeight: '700',
+                  cursor: imageUrl.trim() ? 'pointer' : 'not-allowed',
+                }}
+              >
+                Insert Image
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Link Modal */}
       {showLinkModal && (

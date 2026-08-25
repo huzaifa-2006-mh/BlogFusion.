@@ -1,55 +1,41 @@
 import prisma from '@/lib/prisma';
-import Link from 'next/link';
 import { Metadata } from 'next';
-
 import { getPageSeo } from '@/lib/seo';
+import CategoryExplorer from '@/components/CategoryExplorer';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/category', {
-    title: 'Explore Topics | BlogFusion',
-    description: 'View tips, tutorials and how-to guides by topic on BlogFusion.',
+    title: 'Explore Categories & Articles | Blog Fusion',
+    description: 'Browse articles, guides, and insights by topic on Blog Fusion.',
   });
 }
 
 export default async function CategoryIndexPage() {
   let categories: any[] = [];
+  let posts: any[] = [];
+
   try {
     categories = await prisma.category.findMany({
-      orderBy: { name: 'asc' }
+      orderBy: { name: 'asc' },
+    });
+
+    posts = await prisma.post.findMany({
+      where: { published: true },
+      include: {
+        category: true,
+        author: true,
+      },
+      orderBy: { createdAt: 'desc' },
     });
   } catch (error) {
-    console.error('Failed to fetch categories:', error);
+    console.error('Failed to fetch categories or posts:', error);
   }
 
   return (
-    <div className="category-page">
-      <div className="container">
-        <header className="category-header fade-in">
-          <h1>Explore Topics</h1>
-          <p>View tips, tutorials and how-to guides by topic</p>
-        </header>
-
-        {categories.length > 0 ? (
-          <div className="topic-grid fade-in" style={{ animationDelay: '0.2s' }}>
-            {categories.map((category) => (
-              <Link 
-                key={category.id} 
-                href={`/category/${category.slug}`} 
-                className="topic-tag"
-                id={`category-${category.slug}`}
-              >
-                #{category.slug}
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center fade-in" style={{ padding: '4rem', background: 'white', borderRadius: '12px', border: '1px dashed #ddd' }}>
-            <p style={{ color: '#888' }}>No topics found yet. Check back soon!</p>
-          </div>
-        )}
-      </div>
+    <div style={{ background: '#FFFFFF', minHeight: '80vh' }}>
+      <CategoryExplorer categories={categories} posts={posts} initialCategorySlug="all" />
     </div>
   );
 }

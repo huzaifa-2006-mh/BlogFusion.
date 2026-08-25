@@ -60,6 +60,21 @@ export async function PATCH(
       isIndexable: formData.get('isIndexable') !== 'false',
     };
 
+    const coverImageFile = formData.get('coverImageFile') as File | null;
+    const coverImageUrl = formData.get('coverImageUrl') as string | null;
+
+    if (coverImageFile && coverImageFile.size > 0) {
+      const optimizedPath = await optimizeAndStoreImage(coverImageFile);
+      updateData.coverImage = optimizedPath;
+      if (updateData.images) {
+        updateData.images = [optimizedPath, ...updateData.images];
+      }
+    } else if (coverImageUrl !== null && coverImageUrl !== undefined) {
+      if (coverImageUrl.trim()) {
+        updateData.coverImage = coverImageUrl.trim();
+      }
+    }
+
     // Handle new images if uploaded
     if (files.length > 0 && files[0].size > 0) {
       const uploadedImagePaths: string[] = [];
@@ -71,7 +86,9 @@ export async function PATCH(
         }
       }
       updateData.images = uploadedImagePaths;
-      updateData.coverImage = uploadedImagePaths[0];
+      if (!updateData.coverImage) {
+        updateData.coverImage = uploadedImagePaths[0];
+      }
     }
 
     const post = await prisma.post.update({

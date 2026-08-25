@@ -47,6 +47,17 @@ export async function POST(request: Request) {
       });
     }
 
+    const coverImageFile = formData.get('coverImageFile') as File | null;
+    let coverImagePath: string | null = (formData.get('coverImageUrl') as string) || null;
+
+    if (coverImageFile && coverImageFile.size > 0) {
+      coverImagePath = await optimizeAndStoreImage(coverImageFile);
+    }
+
+    if (!coverImagePath && uploadedImagePaths.length > 0) {
+      coverImagePath = uploadedImagePaths[0];
+    }
+
     // Generate a clean slug
     const baseSlug = title.toLowerCase().trim()
       .replace(/[^\w\s-]/g, '')
@@ -65,12 +76,12 @@ export async function POST(request: Request) {
         showOnHome: formData.get('showOnHome') === 'true',
         shortDescription: formData.get('shortDescription') as string || null,
         faqs: formData.get('faqs') ? JSON.parse(formData.get('faqs') as string) : null,
-        coverImage: uploadedImagePaths[0] || null,
-        images: uploadedImagePaths,
+        coverImage: coverImagePath,
+        images: coverImagePath && !uploadedImagePaths.includes(coverImagePath) ? [coverImagePath, ...uploadedImagePaths] : uploadedImagePaths,
         metaTitle: (formData.get('metaTitle') as string) || null,
         metaDescription: (formData.get('metaDescription') as string) || null,
         focusKeywords: (formData.get('focusKeywords') as string) || null,
-        ogImage: (formData.get('ogImage') as string) || null,
+        ogImage: (formData.get('ogImage') as string) || coverImagePath || null,
         canonicalUrl: (formData.get('canonicalUrl') as string) || null,
         isIndexable: formData.get('isIndexable') !== 'false',
       },

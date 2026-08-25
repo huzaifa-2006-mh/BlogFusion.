@@ -33,6 +33,10 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [isIndexable, setIsIndexable] = useState(true);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
 
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -59,6 +63,11 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           setIsIndexable(postData.isIndexable ?? true);
           setContent(postData.content || '');
 
+          if (postData.coverImage) {
+            setCoverPreview(postData.coverImage);
+            setCoverImageUrl(postData.coverImage);
+          }
+
           if (postData.images) {
             setPreviews(postData.images);
             setImageAlts(postData.images.map(() => ''));
@@ -73,6 +82,22 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
 
     fetchData();
   }, [id]);
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setCoverImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (event) => setCoverPreview(event.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeCoverImage = () => {
+    setCoverImageFile(null);
+    setCoverImageUrl('');
+    setCoverPreview(null);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -123,6 +148,22 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       formData.append('shortDescription', shortDescription);
       formData.append('categoryId', categoryId);
       formData.append('showOnHome', String(showOnHome));
+      formData.append('faqs', JSON.stringify(faqs));
+      formData.append('content', content);
+      formData.append('metaTitle', metaTitle);
+      formData.append('metaDescription', metaDescription);
+      formData.append('focusKeywords', focusKeywords);
+      formData.append('ogImage', ogImage || coverImageUrl || '');
+      formData.append('canonicalUrl', canonicalUrl);
+      formData.append('isIndexable', String(isIndexable));
+      formData.append('imageAlts', JSON.stringify(imageAlts));
+
+      if (coverImageFile) {
+        formData.append('coverImageFile', coverImageFile);
+      }
+      formData.append('coverImageUrl', coverImageUrl);
+
+      imageFiles.forEach((file) => formData.append('images', file));
       formData.append('faqs', JSON.stringify(faqs));
       formData.append('content', content);
       formData.append('metaTitle', metaTitle);
@@ -387,6 +428,90 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
 
           {/* Right Sidebar */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Featured Image (Cover Image) Card */}
+            <div className="dashboard-card" style={{ padding: '1.8rem' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <span>🖼️</span> Featured Image (Cover)
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '1.2rem' }}>
+                This image will appear on the blog card across the Homepage, Category grids, and at the top of the post.
+              </p>
+
+              {coverPreview || coverImageUrl ? (
+                <div style={{ marginBottom: '1.2rem', position: 'relative' }}>
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '160px',
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                      border: '1px solid #cbd5e1',
+                      background: '#f1f5f9',
+                    }}
+                  >
+                    <img
+                      src={coverPreview || coverImageUrl}
+                      alt="Featured Preview"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeCoverImage}
+                    style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: '8px',
+                      background: 'rgba(239, 68, 68, 0.9)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '28px',
+                      height: '28px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                    }}
+                    title="Remove Image"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : null}
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={labelStyle}>Upload New Image File</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverChange}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: '1px dashed #cbd5e1',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    background: '#f8fafc',
+                    cursor: 'pointer',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Or Enter Direct Image URL</label>
+                <input
+                  type="text"
+                  placeholder="https://images.unsplash.com/..."
+                  value={coverImageUrl}
+                  onChange={(e) => setCoverImageUrl(e.target.value)}
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
             <div className="dashboard-card" style={{ padding: '1.8rem' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.2rem' }}>
                 Update Controls
@@ -428,19 +553,18 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                   width: '100%',
                   padding: '0.9rem',
                   borderRadius: '8px',
-                  background: '#0f172a',
+                  background: '#6B4226',
                   color: 'white',
                   fontWeight: '800',
                   fontSize: '1rem',
                   border: 'none',
                   cursor: isUpdating ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 12px rgba(107, 66, 38, 0.25)',
                 }}
               >
-                {isUpdating ? 'Updating...' : '💾 Save Changes'}
+                {isUpdating ? 'Saving Changes...' : '💾 Update Blog Post'}
               </button>
             </div>
-
-
           </div>
         </div>
       </form>
