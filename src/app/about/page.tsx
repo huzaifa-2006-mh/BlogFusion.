@@ -116,10 +116,11 @@ export default async function About() {
       <section style={{ padding: '4.5rem 0 4rem 0', borderBottom: '1px solid #E8DFD8', background: 'linear-gradient(180deg, #FBF8F5 0%, #FFFFFF 100%)' }}>
         <div className="container">
           <div
+            className="hero-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '3.5rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+              gap: '3rem',
               alignItems: 'center',
             }}
           >
@@ -308,9 +309,10 @@ export default async function About() {
             </div>
 
             <div
+              className="topics-grid"
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
                 gap: '2rem',
               }}
             >
@@ -450,9 +452,10 @@ export default async function About() {
           </div>
 
           <div
+            className="values-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
               gap: '1.75rem',
             }}
           >
@@ -540,9 +543,10 @@ export default async function About() {
           </div>
 
           <div
+            className="audience-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
               gap: '1.75rem',
             }}
           >

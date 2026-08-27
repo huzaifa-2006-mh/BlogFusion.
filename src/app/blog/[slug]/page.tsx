@@ -289,8 +289,8 @@ export default async function BlogPostPage({ params }: any) {
         )}
 
         {/* Author Bio Box */}
-        <aside style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '1.5rem', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-          <div style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899 0%, #ff4b91 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(236,72,153,0.2)', flexShrink: 0 }}>
+        <aside className="author-bio-box" style={{ marginTop: '5rem', padding: '2rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+          <div className="author-bio-avatar" style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #6B4226 0%, #3E2618 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(107,66,38,0.2)', flexShrink: 0 }}>
             {post.author?.image ? (
               <img src={post.author.image} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : authorName.toLowerCase().includes('huzaifa') ? (
@@ -299,9 +299,9 @@ export default async function BlogPostPage({ params }: any) {
               authorInitial
             )}
           </div>
-          <div>
-            <h3 style={{ margin: '0 0 0.4rem 0', fontWeight: '800', color: '#0f172a', fontSize: '1.3rem' }}>
-              Written by <span style={{ color: '#ec4899' }}>{authorName.toLowerCase().includes('mari') ? 'Marium (CEO)' : authorName.toLowerCase().includes('huzaifa') ? 'Muhammad Huzaifa (Founder & Boss)' : authorName}</span>
+          <div className="author-bio-details">
+            <h3 style={{ margin: '0 0 0.4rem 0', fontWeight: '800', color: '#3E2618', fontSize: '1.3rem' }}>
+              Written by <span style={{ color: '#6B4226' }}>{authorName.toLowerCase().includes('mari') ? 'Marium (CEO)' : authorName.toLowerCase().includes('huzaifa') ? 'Muhammad Huzaifa (Founder & Boss)' : authorName}</span>
             </h3>
             <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
               {authorName.toLowerCase().includes('mari') 

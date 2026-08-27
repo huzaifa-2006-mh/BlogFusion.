@@ -62,51 +62,49 @@ export default function EmailSubscription() {
   }
 
   return (
-    <div style={{ marginTop: '1.5rem' }}>
-      <p style={{ color: '#a8b2d1', fontSize: '0.9rem', marginBottom: '0.6rem', fontWeight: 500 }}>
-        📬 Get latest articles in your inbox:
+    <div className="email-sub-box" style={{ marginTop: '1.5rem' }}>
+      <p style={{ color: '#6B4226', fontSize: '0.95rem', marginBottom: '0.75rem', fontWeight: 650 }}>
+        📬 Get our latest articles delivered to your inbox:
       </p>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+      <form onSubmit={handleSubmit} className="email-sub-form" style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
         <input
           type="email"
-          placeholder="your@email.com"
+          placeholder="Enter your email address..."
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={status === 'loading'}
+          className="email-sub-input"
           style={{
-            padding: '0.55rem 0.75rem',
-            borderRadius: '6px',
-            border: '1px solid rgba(100,255,218,0.2)',
-            fontSize: '0.9rem',
+            padding: '0.65rem 0.9rem',
+            borderRadius: '9999px',
+            border: '1px solid #E8DFD8',
+            fontSize: '16px',
             flex: 1,
-            minWidth: '180px',
-            background: 'rgba(255,255,255,0.05)',
-            color: '#ccd6f6',
+            minWidth: '200px',
+            background: '#FFFFFF',
+            color: '#222222',
             outline: 'none',
+            fontFamily: 'inherit',
           }}
         />
         <button
           type="submit"
           disabled={status === 'loading' || !email}
+          className="vip-btn-primary email-sub-btn"
           style={{
-            padding: '0.55rem 1.2rem',
-            borderRadius: '6px',
-            fontSize: '0.85rem',
+            padding: '0.65rem 1.4rem',
+            borderRadius: '9999px',
+            fontSize: '0.9rem',
             whiteSpace: 'nowrap',
-            background: status === 'loading' ? 'rgba(100,255,218,0.4)' : '#64ffda',
-            color: '#0a192f',
-            fontWeight: 700,
-            border: 'none',
             cursor: status === 'loading' ? 'not-allowed' : 'pointer',
-            transition: 'opacity 0.2s',
           }}
         >
-          {status === 'loading' ? 'Subscribing...' : 'Subscribe'}
+          {status === 'loading' ? 'Subscribing...' : 'Subscribe Free'}
         </button>
       </form>
       {status === 'error' && message && (
-        <p style={{ color: '#ff6b6b', fontSize: '0.8rem', marginTop: '0.4rem' }}>{message}</p>
+        <p style={{ color: '#dc2626', fontSize: '0.85rem', marginTop: '0.5rem', fontWeight: '600' }}>✕ {message}</p>
       )}
     </div>
   );

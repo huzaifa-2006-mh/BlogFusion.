@@ -180,7 +180,7 @@ export default function ContactForm() {
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
-  fontSize: '0.8rem',
+  fontSize: '0.82rem',
   fontWeight: '800',
   textTransform: 'uppercase',
   letterSpacing: '0.04em',
@@ -193,9 +193,10 @@ const inputStyle: React.CSSProperties = {
   padding: '0.85rem 1rem',
   border: '1px solid #E8DFD8',
   borderRadius: '10px',
-  fontSize: '0.95rem',
+  fontSize: '16px',
   color: '#222222',
   background: '#FAFAFA',
   outline: 'none',
+  fontFamily: 'inherit',
   transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
 };

@@ -52,22 +52,22 @@ export default function CategoryExplorer({
       : categories.find((c) => c.slug === selectedSlug);
 
   return (
-    <div className="container" style={{ padding: '3.5rem 2rem 6rem 2rem' }}>
+    <div className="container category-page-container" style={{ padding: '3.5rem 2rem 6rem 2rem' }}>
       {/* Page Title */}
       <div style={{ marginBottom: '2.5rem' }}>
         <h1
           style={{
-            fontSize: 'clamp(2.2rem, 4.5vw, 3.2rem)',
+            fontSize: 'clamp(2rem, 4.5vw, 3.2rem)',
             fontWeight: '900',
             color: '#3E2618',
             letterSpacing: '-0.03em',
             marginBottom: '0.5rem',
-            fontFamily: 'var(--font-outfit, sans-serif)',
+            fontFamily: 'var(--font-poppins), sans-serif',
           }}
         >
           Categories
         </h1>
-        <p style={{ color: '#666666', fontSize: '1.05rem', margin: 0, fontWeight: '500' }}>
+        <p style={{ color: '#666666', fontSize: '1rem', margin: 0, fontWeight: '500', lineHeight: '1.6' }}>
           {currentCategory?.description ||
             'Explore human-crafted articles, comprehensive guides, and actionable insights across all topics.'}
         </p>
@@ -75,55 +75,40 @@ export default function CategoryExplorer({
 
       {/* Main Layout: Left Sidebar + Right Card Grid */}
       <div className="category-layout">
-        {/* Left Sticky Sidebar */}
+        {/* Sticky Sidebar / Mobile Pill Row */}
         <aside className="category-sidebar">
-          <div
-            style={{
-              background: '#FFFFFF',
-              border: '1px solid #E8DFD8',
-              borderRadius: '16px',
-              padding: '1.25rem 1rem',
-              boxShadow: '0 2px 10px rgba(62, 38, 24, 0.03)',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '0.75rem',
-                fontWeight: '800',
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                color: '#6B4226',
-                padding: '0.4rem 0.8rem 0.8rem 0.8rem',
-                borderBottom: '1px solid #F5EDE4',
-                marginBottom: '0.6rem',
-              }}
-            >
+          <div className="category-sidebar-card">
+            <div className="category-sidebar-title">
               Filter by Topic
             </div>
 
-            {/* All Pill */}
-            <button
-              type="button"
-              onClick={() => setSelectedSlug('all')}
-              className={`category-pill-btn ${selectedSlug === 'all' ? 'active' : ''}`}
-            >
-              All Topics ({posts.length})
-            </button>
+            <div className="category-pills-list">
+              {/* All Pill */}
+              <button
+                type="button"
+                onClick={() => setSelectedSlug('all')}
+                className={`category-pill-btn ${selectedSlug === 'all' ? 'active' : ''}`}
+              >
+                <span>All Topics</span>
+                <span className="category-count-badge">({posts.length})</span>
+              </button>
 
-            {/* Dynamic Categories from Dashboard */}
-            {categories.map((cat) => {
-              const count = posts.filter((p) => p.category?.slug === cat.slug || p.categoryId === cat.id).length;
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setSelectedSlug(cat.slug)}
-                  className={`category-pill-btn ${selectedSlug === cat.slug ? 'active' : ''}`}
-                >
-                  {cat.name} {count > 0 && <span style={{ opacity: 0.6, fontSize: '0.8rem', float: 'right' }}>{count}</span>}
-                </button>
-              );
-            })}
+              {/* Dynamic Categories from Dashboard */}
+              {categories.map((cat) => {
+                const count = posts.filter((p) => p.category?.slug === cat.slug || p.categoryId === cat.id).length;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSelectedSlug(cat.slug)}
+                    className={`category-pill-btn ${selectedSlug === cat.slug ? 'active' : ''}`}
+                  >
+                    <span>{cat.name}</span>
+                    {count > 0 && <span className="category-count-badge">{count}</span>}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </aside>
 

@@ -2,9 +2,28 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Prevent background scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
   if (pathname.startsWith('/dashboard') || pathname === '/login') return null;
 
@@ -17,6 +36,7 @@ const Navbar = () => {
 
   return (
     <header
+      className="main-navbar"
       style={{
         background: 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(16px)',
@@ -146,7 +166,89 @@ const Navbar = () => {
             </Link>
           </div>
         </nav>
+
+        {/* Mobile Hamburger Button */}
+        <button
+          type="button"
+          className="mobile-nav-toggle-btn"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
+          )}
+        </button>
       </div>
+
+      {/* Mobile Drawer / Overlay Menu */}
+      {mobileMenuOpen && (
+        <div className="mobile-nav-overlay" onClick={() => setMobileMenuOpen(false)}>
+          <div
+            className="mobile-nav-drawer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mobile-nav-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <img src="/logo.png" alt="Blog Fusion" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+                <span style={{ fontWeight: '800', fontSize: '1.15rem', color: '#3E2618' }}>Menu</span>
+              </div>
+              <button
+                type="button"
+                className="mobile-nav-close"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                ✕
+              </button>
+            </div>
+
+            <nav className="mobile-nav-links">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`mobile-nav-link ${isActive ? 'active' : ''}`}
+                  >
+                    <span>{item.label}</span>
+                    {isActive && <span className="active-dot">•</span>}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="mobile-nav-footer">
+              <Link
+                href="/category"
+                onClick={() => setMobileMenuOpen(false)}
+                className="vip-btn-primary"
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  padding: '0.85rem 1.5rem',
+                  fontSize: '0.95rem',
+                  borderRadius: '9999px',
+                }}
+              >
+                <span>Explore All Topics</span>
+                <span>&rarr;</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

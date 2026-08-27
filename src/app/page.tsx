@@ -96,10 +96,11 @@ export default async function Home() {
       >
         <div className="container">
           <div
+            className="hero-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '3.5rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+              gap: '3rem',
               alignItems: 'center',
             }}
           >
@@ -346,9 +347,10 @@ export default async function Home() {
             </div>
 
             <div
+              className="topics-grid"
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
                 gap: '2rem',
               }}
             >
@@ -621,9 +623,10 @@ export default async function Home() {
           </div>
 
           <div
+            className="why-choose-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
               gap: '1.75rem',
             }}
           >
