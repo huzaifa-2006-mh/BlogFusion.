@@ -1,4 +1,11 @@
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app').replace(/\/+$/, '');
+function withProtocol(url: string): string {
+  const trimmed = (url || '').trim().replace(/\/+$/, '');
+  if (!trimmed) return 'https://blog-fusion-beta.vercel.app';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed.replace(/^\/+/, '')}`;
+}
+
+const SITE_URL = withProtocol(process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app');
 
 export function getSiteUrl() {
   return SITE_URL;
@@ -20,15 +27,28 @@ export function slugifyTyping(input: string): string {
 export function toBlogSlugInput(input: string): string {
   const val = (input || '').trim();
   if (!val) return '';
-  if (/https?:\/\//i.test(val) || val.includes('://') || /^www\./i.test(val) || /\/blog\//i.test(val)) {
+
+  const isCompleteUrl =
+    /^https?:\/\/\S+\.\S+/i.test(val) ||
+    /^www\.\S+\.\S+/i.test(val) ||
+    /\/blog\/[a-z0-9-]+\/?$/i.test(val);
+
+  if (isCompleteUrl) {
     return extractBlogSlug(val);
   }
+
   return slugifyTyping(val);
 }
 
 export function isCanonicalOk(input: string | null | undefined, slug: string): boolean {
-  const resolved = normalizeCanonicalUrl(input, slug ? defaultPostCanonical(slug) : '');
-  return /^https?:\/\/\S+/i.test(resolved);
+  const fallback = slug ? defaultPostCanonical(slugify(slug) || slug) : defaultPostCanonical('post');
+  const resolved = normalizeCanonicalUrl(input, fallback);
+  try {
+    const parsed = new URL(resolved);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return /^https?:\/\/[^\s]+/i.test(resolved);
+  }
 }
 
 /** Accepts a slug, path, or full URL and returns a clean blog slug. */
@@ -57,10 +77,14 @@ export function extractBlogSlug(input: string): string {
 
 export function normalizeCanonicalUrl(input: string | null | undefined, fallback: string): string {
   let raw = (input || '').trim();
-  if (!raw) return fallback.replace(/\/+$/, '');
+  raw = raw.replace(/^['"<]+|['">]+$/g, '').trim();
+
+  const safeFallback = withProtocol(fallback || defaultPostCanonical('post')).replace(/\/+$/, '');
+
+  if (!raw) return safeFallback;
 
   if (raw.startsWith('/')) {
-    return `${SITE_URL}${raw}`.replace(/\/+$/, '') || fallback;
+    return `${SITE_URL}${raw}`.replace(/\/+$/, '') || safeFallback;
   }
 
   if (!/^https?:\/\//i.test(raw)) {
@@ -68,15 +92,15 @@ export function normalizeCanonicalUrl(input: string | null | undefined, fallback
       return `https://${raw}`.replace(/\/+$/, '');
     }
     if (!raw.includes('.')) {
-      return `${SITE_URL}/blog/${slugify(raw)}`;
+      return `${SITE_URL}/blog/${slugify(raw)}`.replace(/\/+$/, '') || safeFallback;
     }
     return `https://${raw}`.replace(/\/+$/, '');
   }
 
-  return raw.replace(/\/+$/, '') || fallback;
+  return raw.replace(/\/+$/, '') || safeFallback;
 }
 
 export function defaultPostCanonical(slug: string): string {
-  return `${SITE_URL}/blog/${slug}`;
+  const clean = slugify(slug) || slug || 'post';
+  return `${SITE_URL}/blog/${clean}`;
 }
-

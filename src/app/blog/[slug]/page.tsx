@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
 import { defaultPostCanonical, normalizeCanonicalUrl } from '@/lib/blogUrl';
-import { extractFirstImageSrc, stripImageFromHtml } from '@/lib/postHtml';
+import { extractFirstImageSrc, stripCoverFromContent } from '@/lib/postHtml';
 
 export const dynamic = 'force-dynamic';
 
@@ -171,7 +171,7 @@ export default async function BlogPostPage({ params }: any) {
 
   const coverSrc = post.coverImage || extractFirstImageSrc(processedContent);
   if (coverSrc) {
-    processedContent = stripImageFromHtml(processedContent, coverSrc);
+    processedContent = stripCoverFromContent(processedContent, coverSrc);
   }
 
   // Schema.org JSON-LD definitions

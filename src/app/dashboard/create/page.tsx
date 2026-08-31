@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import RichTextEditor from '@/components/RichTextEditor';
 import SeoCheckCard from '@/components/SeoCheckCard';
-import { defaultPostCanonical, normalizeCanonicalUrl, slugify, toBlogSlugInput } from '@/lib/blogUrl';
+import { defaultPostCanonical, getSiteUrl, normalizeCanonicalUrl, slugify, toBlogSlugInput } from '@/lib/blogUrl';
 
 interface FAQ {
   question: string;

@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { applyImageAltPlaceholders, optimizeAndStoreImage } from '@/lib/imageUpload';
 import { generateNewsletterEmail } from '@/lib/newsletter';
 import { defaultPostCanonical, extractBlogSlug, normalizeCanonicalUrl } from '@/lib/blogUrl';
-import { stripImageFromHtml } from '@/lib/postHtml';
+import { stripCoverFromContent } from '@/lib/postHtml';
 import { ensureUniqueSlug } from '@/lib/uniqueSlug';
 import { Resend } from 'resend';
 
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     }
 
     if (coverImagePath) {
-      contentWithImages = stripImageFromHtml(contentWithImages, coverImagePath);
+      contentWithImages = stripCoverFromContent(contentWithImages, coverImagePath);
     }
 
     const customSlugInput = (formData.get('slug') as string)?.trim();

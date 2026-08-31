@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { applyImageAltPlaceholders, optimizeAndStoreImage } from '@/lib/imageUpload';
 import { defaultPostCanonical, extractBlogSlug, normalizeCanonicalUrl } from '@/lib/blogUrl';
-import { stripImageFromHtml } from '@/lib/postHtml';
+import { stripCoverFromContent } from '@/lib/postHtml';
 import { ensureUniqueSlug } from '@/lib/uniqueSlug';
 
 // GET a single post
@@ -109,7 +109,7 @@ export async function PATCH(
     const coverForStrip = updateData.coverImage
       || (await prisma.post.findUnique({ where: { id }, select: { coverImage: true } }))?.coverImage;
     if (coverForStrip) {
-      updateData.content = stripImageFromHtml(contentWithImages, coverForStrip);
+      updateData.content = stripCoverFromContent(contentWithImages, coverForStrip);
     }
 
     const post = await prisma.post.update({

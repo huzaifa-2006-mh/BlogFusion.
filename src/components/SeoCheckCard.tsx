@@ -1,4 +1,4 @@
-import { defaultPostCanonical, isCanonicalOk, normalizeCanonicalUrl } from '@/lib/blogUrl';
+import { defaultPostCanonical, isCanonicalOk, normalizeCanonicalUrl, slugify } from '@/lib/blogUrl';
 
 export default function SeoCheckCard({
   title,
@@ -17,14 +17,15 @@ export default function SeoCheckCard({
   canonicalUrl: string;
   coverImage: string | null;
 }) {
+  const cleanSlug = slugify(slug);
   const resolvedCanonical = normalizeCanonicalUrl(
     canonicalUrl,
-    defaultPostCanonical(slug || 'your-slug')
+    defaultPostCanonical(cleanSlug || 'your-slug')
   );
   const checks = [
     { label: 'Title', ok: title.trim().length > 0 },
-    { label: 'Custom URL / Slug', ok: slug.trim().length > 0 },
-    { label: 'Canonical URL', ok: isCanonicalOk(canonicalUrl, slug) },
+    { label: 'Custom URL / Slug', ok: cleanSlug.length > 0 },
+    { label: 'Canonical URL', ok: isCanonicalOk(canonicalUrl, cleanSlug) || Boolean(canonicalUrl.trim()) },
     { label: 'Meta description', ok: (metaDescription || '').trim().length >= 50 },
     { label: 'Focus keywords', ok: (focusKeywords || '').trim().length > 0 },
     { label: 'Cover image', ok: Boolean(coverImage) },
