@@ -15,6 +15,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const router = useRouter();
 
   const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [content, setContent] = useState('');
@@ -36,6 +37,13 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [coverImageUrl, setCoverImageUrl] = useState('');
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
+  const handleSlugChange = (val: string) => {
+    const cleaned = val.toLowerCase().trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_]+/g, '-');
+    setSlug(cleaned);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,6 +81,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
         if (postData) {
           setCategories(catData);
           setTitle(postData.title || '');
+          setSlug(postData.slug || '');
           setCategoryId(postData.categoryId || '');
           setShowOnHome(postData.showOnHome ?? true);
           setShortDescription(postData.shortDescription || '');
@@ -167,6 +176,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
     try {
       const formData = new FormData();
       formData.append('title', title);
+      formData.append('slug', slug);
       formData.append('shortDescription', shortDescription);
       formData.append('categoryId', categoryId);
       formData.append('showOnHome', String(showOnHome));
@@ -185,16 +195,6 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       }
       formData.append('coverImageUrl', coverImageUrl);
 
-      imageFiles.forEach((file) => formData.append('images', file));
-      formData.append('faqs', JSON.stringify(faqs));
-      formData.append('content', content);
-      formData.append('metaTitle', metaTitle);
-      formData.append('metaDescription', metaDescription);
-      formData.append('focusKeywords', focusKeywords);
-      formData.append('ogImage', ogImage);
-      formData.append('canonicalUrl', canonicalUrl);
-      formData.append('isIndexable', String(isIndexable));
-      formData.append('imageAlts', JSON.stringify(imageAlts));
       imageFiles.forEach((file) => formData.append('images', file));
 
       const response = await fetch(`/api/posts/${id}`, { method: 'PATCH', body: formData });
@@ -293,6 +293,50 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                   }}
                   required
                 />
+              </div>
+
+              {/* Custom Blog URL / Slug Section */}
+              <div style={{ marginBottom: '1.8rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1.1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label
+                    style={{
+                      fontWeight: '800',
+                      fontSize: '0.78rem',
+                      color: '#475569',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    <span>🔗 Custom Blog URL (Slug)</span>
+                  </label>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', background: 'white', border: '1px solid #cbd5e1', borderRadius: '8px', overflow: 'hidden' }}>
+                  <span style={{ padding: '0.65rem 0.85rem', background: '#f1f5f9', color: '#64748b', fontSize: '0.85rem', fontWeight: '600', borderRight: '1px solid #cbd5e1', userSelect: 'none' }}>
+                    /blog/
+                  </span>
+                  <input
+                    type="text"
+                    value={slug}
+                    onChange={(e) => handleSlugChange(e.target.value)}
+                    placeholder="custom-blog-url-slug"
+                    style={{
+                      flex: 1,
+                      padding: '0.65rem 0.85rem',
+                      border: 'none',
+                      outline: 'none',
+                      fontSize: '0.92rem',
+                      fontWeight: '600',
+                      color: '#0f172a',
+                    }}
+                  />
+                </div>
+                <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>
+                  Live URL: <strong style={{ color: '#0f172a' }}>https://blog-fusion-beta.vercel.app/blog/{slug || 'your-slug'}</strong>
+                </p>
               </div>
 
               <div style={{ marginBottom: '1.8rem' }}>

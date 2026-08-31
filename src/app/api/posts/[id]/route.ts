@@ -60,6 +60,17 @@ export async function PATCH(
       isIndexable: formData.get('isIndexable') !== 'false',
     };
 
+    const customSlugInput = (formData.get('slug') as string)?.trim();
+    if (customSlugInput) {
+      const cleanSlug = customSlugInput.toLowerCase().trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      if (cleanSlug) {
+        updateData.slug = cleanSlug;
+      }
+    }
+
     const coverImageFile = formData.get('coverImageFile') as File | null;
     const coverImageUrl = formData.get('coverImageUrl') as string | null;
 

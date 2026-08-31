@@ -28,10 +28,10 @@ const Navbar = () => {
   if (pathname.startsWith('/dashboard') || pathname === '/login') return null;
 
   const navItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Topics', href: '/category' },
-    { label: 'About Us', href: '/about' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Home', href: '/', icon: '🏠', desc: 'Latest articles & highlights' },
+    { label: 'Topics', href: '/category', icon: '📂', desc: 'Browse all categories & tags' },
+    { label: 'About Us', href: '/about', icon: '✨', desc: 'Our mission & editorial team' },
+    { label: 'Contact', href: '/contact', icon: '✉️', desc: 'Get in touch & queries' },
   ];
 
   return (
@@ -176,15 +176,15 @@ const Navbar = () => {
           aria-expanded={mobileMenuOpen}
         >
           {mobileMenuOpen ? (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="4" y1="6" x2="20" y2="6"></line>
-              <line x1="4" y1="12" x2="20" y2="12"></line>
-              <line x1="4" y1="18" x2="20" y2="18"></line>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           )}
         </button>
@@ -197,10 +197,32 @@ const Navbar = () => {
             className="mobile-nav-drawer"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Header */}
             <div className="mobile-nav-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <img src="/logo.png" alt="Blog Fusion" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
-                <span style={{ fontWeight: '800', fontSize: '1.15rem', color: '#3E2618' }}>Menu</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #6B4226 0%, #3E2618 100%)',
+                    padding: '2px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 10px rgba(107, 66, 38, 0.2)',
+                  }}
+                >
+                  <img src="/logo.png" alt="Blog Fusion" style={{ width: '100%', height: '100%', borderRadius: '8px', objectFit: 'cover' }} />
+                </div>
+                <div>
+                  <div style={{ fontWeight: '800', fontSize: '1.15rem', color: '#3E2618', lineHeight: '1.1', fontFamily: 'var(--font-poppins), sans-serif' }}>
+                    Blog<span style={{ color: '#6B4226' }}>Fusion</span>
+                  </div>
+                  <div style={{ fontSize: '0.65rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#888888' }}>
+                    Navigation Menu
+                  </div>
+                </div>
               </div>
               <button
                 type="button"
@@ -210,6 +232,11 @@ const Navbar = () => {
               >
                 ✕
               </button>
+            </div>
+
+            {/* Nav Items */}
+            <div style={{ fontSize: '0.72rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#6B4226', marginBottom: '0.75rem', paddingLeft: '0.25rem' }}>
+              Navigation Links
             </div>
 
             <nav className="mobile-nav-links">
@@ -222,14 +249,27 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`mobile-nav-link ${isActive ? 'active' : ''}`}
                   >
-                    <span>{item.label}</span>
-                    {isActive && <span className="active-dot">•</span>}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                      <span className="mobile-nav-icon">{item.icon}</span>
+                      <div>
+                        <div className="mobile-nav-item-title">{item.label}</div>
+                        <div className="mobile-nav-item-desc">{item.desc}</div>
+                      </div>
+                    </div>
+                    <span className="mobile-nav-arrow">&rsaquo;</span>
                   </Link>
                 );
               })}
             </nav>
 
-            <div className="mobile-nav-footer">
+            {/* Quick action card */}
+            <div className="mobile-nav-cta-card">
+              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#3E2618', marginBottom: '0.2rem' }}>
+                ✦ Knowledge Spheres
+              </div>
+              <p style={{ fontSize: '0.78rem', color: '#666666', margin: '0 0 0.85rem 0', lineHeight: '1.4' }}>
+                Discover guides in AI, Finance, Tech, Health and more.
+              </p>
               <Link
                 href="/category"
                 onClick={() => setMobileMenuOpen(false)}
@@ -237,14 +277,22 @@ const Navbar = () => {
                 style={{
                   width: '100%',
                   justifyContent: 'center',
-                  padding: '0.85rem 1.5rem',
-                  fontSize: '0.95rem',
+                  padding: '0.75rem 1.25rem',
+                  fontSize: '0.88rem',
                   borderRadius: '9999px',
+                  boxShadow: '0 4px 14px rgba(107, 66, 38, 0.25)',
                 }}
               >
-                <span>Explore All Topics</span>
+                <span>Browse All Topics</span>
                 <span>&rarr;</span>
               </Link>
+            </div>
+
+            {/* Footer */}
+            <div className="mobile-nav-footer">
+              <div style={{ fontSize: '0.72rem', color: '#888888', textAlign: 'center' }}>
+                Blog Fusion &bull; Ideas, Insights & Knowledge
+              </div>
             </div>
           </div>
         </div>

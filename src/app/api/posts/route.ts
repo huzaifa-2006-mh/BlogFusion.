@@ -58,8 +58,10 @@ export async function POST(request: Request) {
       coverImagePath = uploadedImagePaths[0];
     }
 
-    // Generate a clean slug
-    const baseSlug = title.toLowerCase().trim()
+    // Generate or use custom slug
+    const customSlugInput = (formData.get('slug') as string)?.trim();
+    const rawSlug = customSlugInput || title;
+    const baseSlug = rawSlug.toLowerCase().trim()
       .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '');
