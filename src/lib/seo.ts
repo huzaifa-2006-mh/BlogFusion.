@@ -48,6 +48,11 @@ export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): P
     const title = seoData.metaTitle?.trim() || defaultTitle;
     const description = seoData.metaDescription?.trim() || defaultDescription;
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
+    const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
+    const defaultCanonical = `${cleanSiteUrl}${normalizedPath === '/' ? '' : normalizedPath}`;
+    const canonical = seoData.canonicalUrl?.trim() || defaultCanonical;
+
     const metadata: Metadata = {
       title,
       description,
@@ -56,7 +61,7 @@ export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): P
         title,
         description,
         images: seoData.ogImage?.trim() ? [{ url: seoData.ogImage.trim() }] : undefined,
-        url: seoData.canonicalUrl?.trim() || undefined,
+        url: canonical,
         siteName: 'Blog Fusion',
         type: 'website',
       },
@@ -67,7 +72,7 @@ export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): P
         images: seoData.ogImage?.trim() ? [seoData.ogImage.trim()] : undefined,
       },
       alternates: {
-        canonical: seoData.canonicalUrl?.trim() || undefined,
+        canonical: canonical,
       },
     };
 

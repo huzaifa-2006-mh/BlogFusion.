@@ -260,6 +260,8 @@ export default async function Home() {
                         src={featuredLeadPost.coverImage}
                         alt={featuredLeadPost.title}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        decoding="async"
+                        fetchPriority="high"
                       />
                     </Link>
                   ) : (
@@ -267,6 +269,8 @@ export default async function Home() {
                       src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1000&auto=format&fit=crop"
                       alt="Blog Fusion - Ideas, Insights and Knowledge"
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      decoding="async"
+                      fetchPriority="high"
                     />
                   )}
                 </div>

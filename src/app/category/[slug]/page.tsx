@@ -18,17 +18,31 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
+  const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
   try {
     const { slug } = await params;
     const category = await prisma.category.findUnique({ where: { slug } });
+    const canonical = `${cleanSiteUrl}/category/${slug}`;
     return {
       title: category ? `${category.name} - Blog Fusion` : 'Category - Blog Fusion',
       description: category?.description || `Explore the latest articles, guides, and insights in ${category?.name || 'this category'}.`,
+      alternates: {
+        canonical,
+      },
+      openGraph: {
+        title: category ? `${category.name} - Blog Fusion` : 'Category - Blog Fusion',
+        description: category?.description || `Explore the latest articles, guides, and insights in ${category?.name || 'this category'}.`,
+        url: canonical,
+      },
     };
   } catch (error) {
     return {
       title: 'Categories - Blog Fusion',
       description: 'Explore topics on Blog Fusion',
+      alternates: {
+        canonical: `${cleanSiteUrl}/category`,
+      },
     };
   }
 }

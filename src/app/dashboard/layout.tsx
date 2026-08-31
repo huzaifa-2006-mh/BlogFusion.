@@ -20,9 +20,18 @@ export default function DashboardLayout({
     if (session) {
       setUsername(session.split('=')[1]);
       
-      // Fetch user profile for image
+      // Fetch user profile for image safely
       fetch('/api/user/profile')
-        .then(res => res.json())
+        .then(async (res) => {
+          if (!res.ok) return null;
+          const text = await res.text();
+          if (!text) return null;
+          try {
+            return JSON.parse(text);
+          } catch {
+            return null;
+          }
+        })
         .then(data => {
           if (data && data.image) {
             setUserImage(data.image);

@@ -36,8 +36,19 @@ export default function CreatePost() {
 
   useEffect(() => {
     fetch('/api/categories')
-      .then((res) => res.json())
-      .then((data) => setCategories(data));
+      .then(async (res) => {
+        if (!res.ok) return [];
+        const text = await res.text();
+        if (!text) return [];
+        try {
+          const parsed = JSON.parse(text);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      })
+      .then((data) => setCategories(Array.isArray(data) ? data : []))
+      .catch(() => setCategories([]));
   }, []);
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -516,7 +527,7 @@ export default function CreatePost() {
                   required
                 >
                   <option value="">Select Category...</option>
-                  {categories.map((cat) => (
+                  {Array.isArray(categories) && categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>

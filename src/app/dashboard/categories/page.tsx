@@ -12,10 +12,24 @@ export default function CategoriesPage() {
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/categories');
-      const data = await res.json();
-      setCategories(data);
+      if (!res.ok) {
+        setCategories([]);
+        return;
+      }
+      const text = await res.text();
+      if (!text) {
+        setCategories([]);
+        return;
+      }
+      try {
+        const data = JSON.parse(text);
+        setCategories(Array.isArray(data) ? data : []);
+      } catch {
+        setCategories([]);
+      }
     } catch (error) {
       console.error('Error fetching categories:', error);
+      setCategories([]);
     } finally {
       setIsLoading(false);
     }

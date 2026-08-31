@@ -45,8 +45,30 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           fetch(`/api/posts/${id}`),
         ]);
 
-        const catData = await catRes.json();
-        const postData = await postRes.json();
+        let catData = [];
+        if (catRes.ok) {
+          const text = await catRes.text();
+          if (text) {
+            try {
+              const parsed = JSON.parse(text);
+              catData = Array.isArray(parsed) ? parsed : [];
+            } catch {
+              catData = [];
+            }
+          }
+        }
+
+        let postData = null;
+        if (postRes.ok) {
+          const pText = await postRes.text();
+          if (pText) {
+            try {
+              postData = JSON.parse(pText);
+            } catch {
+              postData = null;
+            }
+          }
+        }
 
         if (postData) {
           setCategories(catData);
@@ -526,7 +548,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                   required
                 >
                   <option value="">Select Category...</option>
-                  {categories.map((cat) => (
+                  {Array.isArray(categories) && categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>

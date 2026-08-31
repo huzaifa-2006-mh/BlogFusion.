@@ -1,10 +1,25 @@
 import type { Metadata } from "next";
-import Script from "next/script"; 
+import Script from "next/script";
+import { Open_Sans, Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import SiteJsonLd from "@/components/SiteJsonLd";
+
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-opensans",
+});
+
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
 
@@ -20,6 +35,9 @@ export const metadata: Metadata = {
   creator: 'Blog Fusion',
   publisher: 'Blog Fusion',
   manifest: '/site.webmanifest',
+  alternates: {
+    canonical: siteUrl,
+  },
   verification: {
     google: 'googled854f7a7aedcc96b',
     other: {
@@ -62,16 +80,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${openSans.variable} ${poppins.variable}`}>
       <head>
         <meta name="application-name" content="Blog Fusion" />
         <meta name="apple-mobile-web-app-title" content="Blog Fusion" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Poppins:wght@500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body>
         <SiteJsonLd />

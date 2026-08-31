@@ -34,6 +34,12 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
       };
     }
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
+    const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
+    const canonical = (post.canonicalUrl && post.canonicalUrl.trim().length > 0)
+      ? post.canonicalUrl.trim()
+      : `${cleanSiteUrl}/blog/${slug}`;
+
     const metadata: Metadata = {
       title: post.metaTitle || `${post.title} - Blog Fusion`,
       description: post.metaDescription || post.excerpt,
@@ -42,11 +48,11 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
         title: post.metaTitle || post.title,
         description: post.metaDescription || post.excerpt,
         images: post.ogImage ? [{ url: post.ogImage }] : post.coverImage ? [{ url: post.coverImage }] : [],
-        url: post.canonicalUrl || undefined,
+        url: canonical,
         type: 'article',
       },
       alternates: {
-        canonical: post.canonicalUrl || undefined,
+        canonical: canonical,
       },
     };
 
@@ -65,9 +71,13 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
     return metadata;
   } catch (error) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
     return {
       title: 'Blog Fusion',
       description: 'Explore blogs on Blog Fusion',
+      alternates: {
+        canonical: siteUrl,
+      },
     };
   }
 }
@@ -148,7 +158,7 @@ export default async function BlogPostPage({ params }: any) {
     const altText = match[1] ? match[1].trim() : `Blog image ${imageIndex + 1}`;
     const imgHtml = `
       <figure class="inline-image" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
-        <img src="${inlineImages[imageIndex]}" alt="${altText}" style="width: 100%; height: auto; display: block;" />
+        <img src="${inlineImages[imageIndex]}" alt="${altText}" style="width: 100%; height: auto; display: block;" loading="lazy" decoding="async" />
         ${match[1] ? `<figcaption style="text-align: center; font-size: 0.85rem; color: #64748b; padding: 0.75rem; background: #f8fafc; border-top: 1px solid #e2e8f0; margin: 0;">${altText}</figcaption>` : ''}
       </figure>
     `;
@@ -158,8 +168,10 @@ export default async function BlogPostPage({ params }: any) {
 
   // Schema.org JSON-LD definitions
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
-  const postUrl = `${siteUrl}/blog/${post.slug}`;
-  const coverImg = post.ogImage || post.coverImage || `${siteUrl}/favicon-48x48.png`;
+  const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
+  const canonical = (post.canonicalUrl && post.canonicalUrl.trim().length > 0) ? post.canonicalUrl.trim() : `${cleanSiteUrl}/blog/${post.slug}`;
+  const postUrl = canonical;
+  const coverImg = post.ogImage || post.coverImage || `${cleanSiteUrl}/favicon-48x48.png`;
 
   const articleSchema = {
     '@context': 'https://schema.org',
@@ -178,7 +190,7 @@ export default async function BlogPostPage({ params }: any) {
       name: 'Blog Fusion',
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/favicon-48x48.png`,
+        url: `${cleanSiteUrl}/favicon-48x48.png`,
       },
     },
     mainEntityOfPage: {
@@ -268,20 +280,6 @@ export default async function BlogPostPage({ params }: any) {
                   <p style={{ color: '#475569', fontSize: '0.95rem', lineHeight: '1.5', margin: 0, fontWeight: '500' }}>
                     {faq.answer}
                   </p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Gallery */}
-        {imageIndex < inlineImages.length && (
-          <section style={{ marginTop: '4rem' }}>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.5rem' }}>Post Gallery</h3>
-            <div className="card-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-              {inlineImages.slice(imageIndex).map((img, index) => (
-                <div key={index} style={{ height: '220px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', boxShadow: '0 4px 10px rgba(0,0,0,0.03)' }}>
-                  <img src={img} alt={`Gallery image ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               ))}
             </div>

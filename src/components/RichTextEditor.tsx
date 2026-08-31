@@ -170,6 +170,10 @@ export default function RichTextEditor({
   const [imageUrl, setImageUrl] = useState('');
   const [imageAlt, setImageAlt] = useState('');
   const [imageCaption, setImageCaption] = useState('');
+  const [imageSizePreset, setImageSizePreset] = useState<'100%' | '75%' | '50%' | '35%' | 'custom'>('100%');
+  const [imageCustomWidth, setImageCustomWidth] = useState('450px');
+  const [imageAlignment, setImageAlignment] = useState<'center' | 'left' | 'right'>('center');
+  const [imageTab, setImageTab] = useState<'upload' | 'url'>('upload');
 
   // Format Block with cross-browser compatibility
   const handleBlockChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -272,16 +276,24 @@ export default function RichTextEditor({
       const data = await res.json();
       const urls: string[] = data.urls || (data.url ? [data.url] : []);
 
-      urls.forEach((imgUrl, i) => {
-        const alt = files[i]?.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Blog Image';
-        const figureHtml = `
-          <figure style="margin: 2rem 0; text-align: center;">
-            <img src="${imgUrl}" alt="${alt}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); display: inline-block;" />
-            <figcaption style="font-size: 0.85rem; color: #64748b; margin-top: 0.6rem; font-style: italic;">${alt}</figcaption>
-          </figure><p></p>
-        `;
-        execCmd('insertHTML', figureHtml);
-      });
+      if (urls.length === 1 && showImageModal) {
+        setImageUrl(urls[0]);
+        if (!imageAlt) {
+          setImageAlt(files[0]?.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Blog Image');
+        }
+      } else {
+        const effectiveWidth = imageSizePreset === 'custom' ? (imageCustomWidth || '100%') : imageSizePreset;
+        urls.forEach((imgUrl, i) => {
+          const alt = files[i]?.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Blog Image';
+          const figureHtml = `
+            <figure style="margin: 2rem 0; text-align: ${imageAlignment};">
+              <img src="${imgUrl}" alt="${alt}" style="width: ${effectiveWidth}; max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); display: inline-block;" loading="lazy" decoding="async" />
+              <figcaption style="font-size: 0.85rem; color: #64748b; margin-top: 0.6rem; font-style: italic;">${alt}</figcaption>
+            </figure><p></p>
+          `;
+          execCmd('insertHTML', figureHtml);
+        });
+      }
     } catch (err) {
       alert('Failed to upload image. Please try again.');
     } finally {
@@ -297,17 +309,18 @@ export default function RichTextEditor({
     }
   };
 
-  // Insert Image from URL Modal
-  const insertImageFromUrl = () => {
+  // Insert Image with selected size and alignment
+  const insertConfiguredImage = () => {
     if (!imageUrl) return;
     restoreSelection();
 
     const alt = imageAlt.trim() || 'Blog Image';
     const caption = imageCaption.trim();
+    const effectiveWidth = imageSizePreset === 'custom' ? (imageCustomWidth || '100%') : imageSizePreset;
 
     const figureHtml = `
-      <figure style="margin: 2rem 0; text-align: center;">
-        <img src="${imageUrl.trim()}" alt="${alt}" style="max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); display: inline-block;" />
+      <figure style="margin: 2rem 0; text-align: ${imageAlignment};">
+        <img src="${imageUrl.trim()}" alt="${alt}" style="width: ${effectiveWidth}; max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); display: inline-block;" loading="lazy" decoding="async" />
         ${caption ? `<figcaption style="font-size: 0.85rem; color: #64748b; margin-top: 0.6rem; font-style: italic;">${caption}</figcaption>` : ''}
       </figure><p></p>
     `;
@@ -344,6 +357,32 @@ export default function RichTextEditor({
       if (imgFiles.length > 0) {
         e.preventDefault();
         await uploadFiles(imgFiles);
+      }
+    }
+  };
+
+  // Quick resize selected image in editor
+  const handleSelectedImageResize = (sizeVal: string) => {
+    if (editorRef.current) {
+      const sel = window.getSelection();
+      if (sel && sel.anchorNode) {
+        let node: HTMLElement | null = (sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode) as HTMLElement;
+        while (node && node !== editorRef.current) {
+          if (node.tagName === 'IMG') {
+            node.style.width = sizeVal;
+            handleInput();
+            return;
+          }
+          if (node.tagName === 'FIGURE') {
+            const img = node.querySelector('img');
+            if (img) {
+              img.style.width = sizeVal;
+              handleInput();
+              return;
+            }
+          }
+          node = node.parentElement;
+        }
       }
     }
   };
@@ -548,20 +587,24 @@ export default function RichTextEditor({
         <div style={groupStyle}>
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            title="Upload Local Image (PNG, JPG, WEBP, GIF, SVG, AVIF)"
+            onClick={() => {
+              saveCurrentSelection();
+              setImageTab('upload');
+              setShowImageModal(true);
+            }}
+            title="Upload Local Image & Set Size"
             style={{ ...btnStyle, background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe', fontWeight: '700' }}
           >
-            {isUploading ? 'Uploading...' : '📁 Upload Image'}
+            📁 Upload Image
           </button>
           <button
             type="button"
             onClick={() => {
               saveCurrentSelection();
+              setImageTab('url');
               setShowImageModal(true);
             }}
-            title="Insert Image by URL"
+            title="Insert Image by URL & Set Size"
             style={{ ...btnStyle, background: '#fdf2f8', color: '#db2777', borderColor: '#fbcfe8', fontWeight: '700' }}
           >
             🌐 Image URL
@@ -575,6 +618,31 @@ export default function RichTextEditor({
           <button type="button" onClick={() => execCmd('insertHorizontalRule')} title="Horizontal Line" style={btnStyle}>
             Line
           </button>
+        </div>
+
+        {/* Quick Image Resize Toolbar Tool */}
+        <div style={groupStyle}>
+          <select
+            onChange={(e) => {
+              if (e.target.value) {
+                handleSelectedImageResize(e.target.value);
+                e.target.value = '';
+              }
+            }}
+            style={{ ...selectStyle, background: '#f8fafc', color: '#6B4226', fontWeight: '700' }}
+            defaultValue=""
+            title="Click an image in the editor and pick a size here to quickly resize it"
+          >
+            <option value="" disabled>
+              🖼️ Resize Image
+            </option>
+            <option value="100%">Full Width (100%)</option>
+            <option value="75%">Large (75%)</option>
+            <option value="50%">Medium (50%)</option>
+            <option value="35%">Small (35%)</option>
+            <option value="250px">Custom 250px</option>
+            <option value="400px">Custom 400px</option>
+          </select>
         </div>
 
         {/* Tools */}
@@ -645,83 +713,270 @@ export default function RichTextEditor({
         </div>
       </div>
 
-      {/* Image by URL Modal */}
+      {/* Modern Image Insert & Sizing Modal */}
       {showImageModal && (
         <div
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(15, 23, 42, 0.5)',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(6px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 10000,
+            padding: '1rem',
           }}
         >
           <div
             style={{
               background: 'white',
-              borderRadius: '12px',
+              borderRadius: '16px',
               padding: '1.8rem',
-              width: '90%',
-              maxWidth: '480px',
-              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              width: '100%',
+              maxWidth: '520px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
             }}
           >
-            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.25rem', fontWeight: '800', color: '#0f172a' }}>
-              Insert Image by URL
-            </h3>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
-                Image Web Link (URL) *
-              </label>
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://images.unsplash.com/photo-..."
-                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}
-                autoFocus
-              />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: '800', color: '#0f172a' }}>
+                Insert & Custom Size Image
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowImageModal(false);
+                  setImageUrl('');
+                }}
+                style={{ background: '#f1f5f9', border: 'none', borderRadius: '50%', width: '32px', height: '32px', cursor: 'pointer', fontWeight: 'bold' }}
+              >
+                ✕
+              </button>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
-                Alt Text (Description for SEO)
-              </label>
-              <input
-                type="text"
-                value={imageAlt}
-                onChange={(e) => setImageAlt(e.target.value)}
-                placeholder="Brief description of the image"
-                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}
-              />
+            {/* Modal Tabs */}
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', background: '#f1f5f9', padding: '4px', borderRadius: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setImageTab('upload')}
+                style={{
+                  flex: 1,
+                  padding: '0.55rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: imageTab === 'upload' ? 'white' : 'transparent',
+                  color: imageTab === 'upload' ? '#0f172a' : '#64748b',
+                  fontWeight: '750',
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  boxShadow: imageTab === 'upload' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
+                }}
+              >
+                📁 Upload File
+              </button>
+              <button
+                type="button"
+                onClick={() => setImageTab('url')}
+                style={{
+                  flex: 1,
+                  padding: '0.55rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: imageTab === 'url' ? 'white' : 'transparent',
+                  color: imageTab === 'url' ? '#0f172a' : '#64748b',
+                  fontWeight: '750',
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  boxShadow: imageTab === 'url' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
+                }}
+              >
+                🌐 Web URL
+              </button>
             </div>
 
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
-                Caption (Optional)
+            {imageTab === 'upload' ? (
+              <div style={{ marginBottom: '1.2rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
+                  Select Image from Computer
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      await uploadFiles([e.target.files[0]]);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem',
+                    border: '2px dashed #cbd5e1',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    background: '#f8fafc',
+                    cursor: 'pointer',
+                  }}
+                />
+                {isUploading && <p style={{ fontSize: '0.8rem', color: '#2563eb', fontWeight: '700', marginTop: '0.4rem' }}>Uploading image to server...</p>}
+              </div>
+            ) : (
+              <div style={{ marginBottom: '1.2rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
+                  Image Web Link (URL) *
+                </label>
+                <input
+                  type="text"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://images.unsplash.com/photo-..."
+                  style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.92rem' }}
+                />
+              </div>
+            )}
+
+            {/* Image Size Selection Controls */}
+            <div style={{ marginBottom: '1.2rem', background: '#FBF8F5', border: '1px solid #E8DFD8', padding: '1rem', borderRadius: '12px' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '800', color: '#3E2618', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.6rem' }}>
+                📐 Decide Image Size:
               </label>
-              <input
-                type="text"
-                value={imageCaption}
-                onChange={(e) => setImageCaption(e.target.value)}
-                placeholder="Image caption shown below image"
-                style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}
-              />
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem', marginBottom: '0.75rem' }}>
+                {(['100%', '75%', '50%', '35%'] as const).map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setImageSizePreset(preset)}
+                    style={{
+                      padding: '0.5rem 0.2rem',
+                      borderRadius: '8px',
+                      border: imageSizePreset === preset ? '2px solid #6B4226' : '1px solid #cbd5e1',
+                      background: imageSizePreset === preset ? '#F5EDE4' : 'white',
+                      color: imageSizePreset === preset ? '#6B4226' : '#475569',
+                      fontWeight: '800',
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {preset === '100%' ? 'Full (100%)' : preset === '75%' ? 'Large (75%)' : preset === '50%' ? 'Med (50%)' : 'Small (35%)'}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setImageSizePreset('custom')}
+                  style={{
+                    padding: '0.45rem 0.75rem',
+                    borderRadius: '8px',
+                    border: imageSizePreset === 'custom' ? '2px solid #6B4226' : '1px solid #cbd5e1',
+                    background: imageSizePreset === 'custom' ? '#F5EDE4' : 'white',
+                    color: imageSizePreset === 'custom' ? '#6B4226' : '#475569',
+                    fontWeight: '750',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Custom Width:
+                </button>
+                <input
+                  type="text"
+                  value={imageCustomWidth}
+                  onChange={(e) => {
+                    setImageCustomWidth(e.target.value);
+                    setImageSizePreset('custom');
+                  }}
+                  placeholder="e.g. 400px or 60%"
+                  style={{
+                    flex: 1,
+                    padding: '0.45rem 0.65rem',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.85rem',
+                    background: 'white',
+                  }}
+                />
+              </div>
             </div>
 
+            {/* Alignment Controls */}
+            <div style={{ marginBottom: '1.2rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '0.4rem' }}>
+                Alignment
+              </label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {(['center', 'left', 'right'] as const).map((align) => (
+                  <button
+                    key={align}
+                    type="button"
+                    onClick={() => setImageAlignment(align)}
+                    style={{
+                      flex: 1,
+                      padding: '0.45rem',
+                      borderRadius: '6px',
+                      border: imageAlignment === align ? '2px solid #0f172a' : '1px solid #cbd5e1',
+                      background: imageAlignment === align ? '#0f172a' : 'white',
+                      color: imageAlignment === align ? 'white' : '#475569',
+                      fontWeight: '700',
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {align}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Alt & Caption */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.2rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#475569', marginBottom: '0.3rem' }}>
+                  Alt Text (SEO)
+                </label>
+                <input
+                  type="text"
+                  value={imageAlt}
+                  onChange={(e) => setImageAlt(e.target.value)}
+                  placeholder="Image description"
+                  style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '700', color: '#475569', marginBottom: '0.3rem' }}>
+                  Caption (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={imageCaption}
+                  onChange={(e) => setImageCaption(e.target.value)}
+                  placeholder="Caption text"
+                  style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                />
+              </div>
+            </div>
+
+            {/* Live Preview */}
             {imageUrl && (
-              <div style={{ marginBottom: '1.5rem', textAlign: 'center', background: '#f8fafc', padding: '0.5rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <p style={{ margin: '0 0 0.4rem 0', fontSize: '0.75rem', fontWeight: '700', color: '#64748b' }}>Live Preview:</p>
+              <div style={{ marginBottom: '1.5rem', textAlign: imageAlignment, background: '#f8fafc', padding: '0.8rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                <p style={{ margin: '0 0 0.4rem 0', fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textAlign: 'left' }}>
+                  Live Preview ({imageSizePreset === 'custom' ? imageCustomWidth : imageSizePreset} - {imageAlignment}):
+                </p>
                 <img
                   src={imageUrl}
                   alt="Preview"
-                  style={{ maxHeight: '120px', maxWidth: '100%', borderRadius: '6px', objectFit: 'contain' }}
+                  style={{
+                    width: imageSizePreset === 'custom' ? (imageCustomWidth || '100%') : imageSizePreset,
+                    maxWidth: '100%',
+                    maxHeight: '180px',
+                    borderRadius: '8px',
+                    objectFit: 'contain',
+                    display: 'inline-block',
+                  }}
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = 'none';
                   }}
@@ -736,25 +991,27 @@ export default function RichTextEditor({
                   setShowImageModal(false);
                   setImageUrl('');
                 }}
-                style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: '1px solid #cbd5e1', background: 'white', fontWeight: '600', cursor: 'pointer' }}
+                style={{ padding: '0.6rem 1.1rem', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white', fontWeight: '600', cursor: 'pointer', fontSize: '0.9rem' }}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                onClick={insertImageFromUrl}
+                onClick={insertConfiguredImage}
                 disabled={!imageUrl.trim()}
                 style={{
-                  padding: '0.5rem 1.2rem',
-                  borderRadius: '6px',
+                  padding: '0.6rem 1.4rem',
+                  borderRadius: '8px',
                   border: 'none',
-                  background: imageUrl.trim() ? '#0f172a' : '#94a3b8',
+                  background: imageUrl.trim() ? '#6B4226' : '#94a3b8',
                   color: 'white',
-                  fontWeight: '700',
+                  fontWeight: '800',
                   cursor: imageUrl.trim() ? 'pointer' : 'not-allowed',
+                  boxShadow: imageUrl.trim() ? '0 4px 12px rgba(107, 66, 38, 0.25)' : 'none',
+                  fontSize: '0.9rem',
                 }}
               >
-                Insert Image
+                Insert Image ({imageSizePreset === 'custom' ? imageCustomWidth : imageSizePreset})
               </button>
             </div>
           </div>
