@@ -4,6 +4,9 @@ import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { applyImageAltPlaceholders, optimizeAndStoreImage } from '@/lib/imageUpload';
 import { generateNewsletterEmail } from '@/lib/newsletter';
+import { defaultPostCanonical, extractBlogSlug, normalizeCanonicalUrl } from '@/lib/blogUrl';
+import { stripImageFromHtml } from '@/lib/postHtml';
+import { ensureUniqueSlug } from '@/lib/uniqueSlug';
 import { Resend } from 'resend';
 
 export async function POST(request: Request) {
@@ -31,7 +34,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const contentWithImages = applyImageAltPlaceholders(content, imageAlts);
+    let contentWithImages = applyImageAltPlaceholders(content, imageAlts);
 
     // Find the user (author)
     const username = session.value;
@@ -58,13 +61,16 @@ export async function POST(request: Request) {
       coverImagePath = uploadedImagePaths[0];
     }
 
-    // Generate or use custom slug
+    if (coverImagePath) {
+      contentWithImages = stripImageFromHtml(contentWithImages, coverImagePath);
+    }
+
     const customSlugInput = (formData.get('slug') as string)?.trim();
-    const rawSlug = customSlugInput || title;
-    const baseSlug = rawSlug.toLowerCase().trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+    const requestedSlug = extractBlogSlug(customSlugInput || title);
+    const baseSlug = await ensureUniqueSlug(requestedSlug || title);
+
+    const fallbackCanonical = defaultPostCanonical(baseSlug);
+    const canonicalUrl = normalizeCanonicalUrl(formData.get('canonicalUrl') as string, fallbackCanonical);
 
     const post = await prisma.post.create({
       data: {
@@ -79,17 +85,18 @@ export async function POST(request: Request) {
         shortDescription: formData.get('shortDescription') as string || null,
         faqs: formData.get('faqs') ? JSON.parse(formData.get('faqs') as string) : null,
         coverImage: coverImagePath,
-        images: coverImagePath && !uploadedImagePaths.includes(coverImagePath) ? [coverImagePath, ...uploadedImagePaths] : uploadedImagePaths,
+        images: uploadedImagePaths.filter((path) => path !== coverImagePath),
         metaTitle: (formData.get('metaTitle') as string) || null,
         metaDescription: (formData.get('metaDescription') as string) || null,
         focusKeywords: (formData.get('focusKeywords') as string) || null,
         ogImage: (formData.get('ogImage') as string) || coverImagePath || null,
-        canonicalUrl: (formData.get('canonicalUrl') as string) || null,
+        canonicalUrl,
         isIndexable: formData.get('isIndexable') !== 'false',
       },
     });
 
     revalidatePath('/');
+    revalidatePath(`/blog/${baseSlug}`);
 
     // === NEWSLETTER: Send to all subscribers in background ===
     (async () => {

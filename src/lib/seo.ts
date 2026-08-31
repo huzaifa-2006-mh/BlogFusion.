@@ -41,16 +41,29 @@ export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): P
       where: { pagePath: normalizedPath },
     });
 
-    if (!seoData) return defaultMetadata;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
+    const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
+    const defaultCanonical = `${cleanSiteUrl}${normalizedPath === '/' ? '' : normalizedPath}`;
+
+    if (!seoData) {
+      return {
+        ...defaultMetadata,
+        alternates: {
+          ...defaultMetadata.alternates,
+          canonical: defaultMetadata.alternates?.canonical || defaultCanonical,
+        },
+        openGraph: {
+          ...defaultMetadata.openGraph,
+          url: defaultMetadata.openGraph?.url || defaultCanonical,
+        },
+      };
+    }
 
     const defaultTitle = resolveDefaultTitle(defaultMetadata.title);
     const defaultDescription = resolveDefaultDescription(defaultMetadata.description);
     const title = seoData.metaTitle?.trim() || defaultTitle;
     const description = seoData.metaDescription?.trim() || defaultDescription;
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
-    const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
-    const defaultCanonical = `${cleanSiteUrl}${normalizedPath === '/' ? '' : normalizedPath}`;
     const canonical = seoData.canonicalUrl?.trim() || defaultCanonical;
 
     const metadata: Metadata = {

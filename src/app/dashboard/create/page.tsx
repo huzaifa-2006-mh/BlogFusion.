@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import RichTextEditor from '@/components/RichTextEditor';
+import SeoCheckCard from '@/components/SeoCheckCard';
+import { defaultPostCanonical, normalizeCanonicalUrl, slugify, toBlogSlugInput } from '@/lib/blogUrl';
 
 interface FAQ {
   question: string;
@@ -29,6 +31,7 @@ export default function CreatePost() {
   const [focusKeywords, setFocusKeywords] = useState('');
   const [ogImage, setOgImage] = useState('');
   const [canonicalUrl, setCanonicalUrl] = useState('');
+  const [canonicalTouched, setCanonicalTouched] = useState(false);
   const [isIndexable, setIsIndexable] = useState(true);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
 
@@ -39,29 +42,18 @@ export default function CreatePost() {
   const handleTitleChange = (val: string) => {
     setTitle(val);
     if (!isCustomSlug) {
-      const generated = val.toLowerCase().trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-      setSlug(generated);
+      setSlug(slugify(val));
     }
   };
 
   const handleSlugChange = (val: string) => {
     setIsCustomSlug(true);
-    const cleaned = val.toLowerCase().trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_]+/g, '-');
-    setSlug(cleaned);
+    setSlug(toBlogSlugInput(val));
   };
 
   const resetSlugFromTitle = () => {
     setIsCustomSlug(false);
-    const generated = title.toLowerCase().trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    setSlug(generated);
+    setSlug(slugify(title));
   };
 
   useEffect(() => {
@@ -80,6 +72,12 @@ export default function CreatePost() {
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(() => setCategories([]));
   }, []);
+
+  useEffect(() => {
+    if (!canonicalTouched && slug) {
+      setCanonicalUrl(defaultPostCanonical(slugify(slug)));
+    }
+  }, [slug, canonicalTouched]);
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -143,7 +141,7 @@ export default function CreatePost() {
     try {
       const formData = new FormData();
       formData.append('title', title);
-      formData.append('slug', slug);
+      formData.append('slug', slugify(slug));
       formData.append('shortDescription', shortDescription);
       formData.append('categoryId', categoryId);
       formData.append('showOnHome', String(showOnHome));
@@ -153,7 +151,7 @@ export default function CreatePost() {
       formData.append('metaDescription', metaDescription);
       formData.append('focusKeywords', focusKeywords);
       formData.append('ogImage', ogImage || coverImageUrl || '');
-      formData.append('canonicalUrl', canonicalUrl);
+      formData.append('canonicalUrl', normalizeCanonicalUrl(canonicalUrl, defaultPostCanonical(slugify(slug))));
       formData.append('isIndexable', String(isIndexable));
       formData.append('imageAlts', JSON.stringify(imageAlts));
       
@@ -285,7 +283,7 @@ export default function CreatePost() {
                       gap: '0.4rem',
                     }}
                   >
-                    <span>🔗 Custom Blog URL (Slug)</span>
+                    <span>🔗 Custom Blog URL</span>
                     {isCustomSlug && (
                       <span style={{ fontSize: '0.7rem', color: '#16a34a', background: '#dcfce7', padding: '1px 6px', borderRadius: '4px' }}>
                         Customized
@@ -319,7 +317,7 @@ export default function CreatePost() {
                     type="text"
                     value={slug}
                     onChange={(e) => handleSlugChange(e.target.value)}
-                    placeholder="custom-blog-url-slug"
+                    placeholder="my-custom-url or paste a full link"
                     style={{
                       flex: 1,
                       padding: '0.65rem 0.85rem',
@@ -332,7 +330,8 @@ export default function CreatePost() {
                   />
                 </div>
                 <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>
-                  Preview: <strong style={{ color: '#0f172a' }}>https://blog-fusion-beta.vercel.app/blog/{slug || 'your-slug'}</strong>
+                  Type a custom slug or paste a full URL. Live URL:{' '}
+                  <strong style={{ color: '#0f172a' }}>{defaultPostCanonical(slugify(slug) || 'your-slug')}</strong>
                 </p>
               </div>
 
@@ -447,10 +446,16 @@ export default function CreatePost() {
                   <input
                     type="text"
                     value={canonicalUrl}
-                    onChange={(e) => setCanonicalUrl(e.target.value)}
-                    placeholder="https://example.com/blog/my-post"
+                    onChange={(e) => {
+                      setCanonicalTouched(true);
+                      setCanonicalUrl(e.target.value);
+                    }}
+                    placeholder="https://blog-fusion-beta.vercel.app/blog/my-post"
                     style={inputStyle}
                   />
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginTop: '0.35rem' }}>
+                    Will be saved as: {normalizeCanonicalUrl(canonicalUrl, defaultPostCanonical(slugify(slug) || 'your-slug'))}
+                  </span>
                 </div>
               </div>
 
@@ -531,7 +536,7 @@ export default function CreatePost() {
                 <span>🖼️</span> Featured Image (Cover)
               </h3>
               <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '1.2rem' }}>
-                This image will appear on the blog card across the Homepage, Category grids, and at the top of the post.
+                This image is shown at the top of the published post (above the title), not at the bottom of the article.
               </p>
 
               {coverPreview || coverImageUrl ? (
@@ -608,6 +613,16 @@ export default function CreatePost() {
                 />
               </div>
             </div>
+
+            <SeoCheckCard
+              title={title}
+              slug={slug}
+              metaTitle={metaTitle}
+              metaDescription={metaDescription}
+              focusKeywords={focusKeywords}
+              canonicalUrl={canonicalUrl}
+              coverImage={coverPreview || coverImageUrl}
+            />
 
             {/* Save & Publish Options */}
             <div className="dashboard-card" style={{ padding: '1.8rem' }}>
@@ -691,3 +706,4 @@ const inputStyle: React.CSSProperties = {
   outline: 'none',
   background: '#f8fafc',
 };
+

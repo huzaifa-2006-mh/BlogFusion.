@@ -35,9 +35,6 @@ export const metadata: Metadata = {
   creator: 'Blog Fusion',
   publisher: 'Blog Fusion',
   manifest: '/site.webmanifest',
-  alternates: {
-    canonical: siteUrl,
-  },
   verification: {
     google: 'googled854f7a7aedcc96b',
     other: {

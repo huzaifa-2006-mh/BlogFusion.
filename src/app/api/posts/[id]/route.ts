@@ -3,6 +3,9 @@ import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { applyImageAltPlaceholders, optimizeAndStoreImage } from '@/lib/imageUpload';
+import { defaultPostCanonical, extractBlogSlug, normalizeCanonicalUrl } from '@/lib/blogUrl';
+import { stripImageFromHtml } from '@/lib/postHtml';
+import { ensureUniqueSlug } from '@/lib/uniqueSlug';
 
 // GET a single post
 export async function GET(
@@ -42,7 +45,7 @@ export async function PATCH(
     const files = formData.getAll('images') as File[];
     const imageAlts = JSON.parse((formData.get('imageAlts') as string) || '[]') as string[];
 
-    const contentWithImages = applyImageAltPlaceholders(content, imageAlts);
+    let contentWithImages = applyImageAltPlaceholders(content, imageAlts);
 
     const updateData: any = {
       title,
@@ -56,20 +59,24 @@ export async function PATCH(
       metaDescription: (formData.get('metaDescription') as string) || null,
       focusKeywords: (formData.get('focusKeywords') as string) || null,
       ogImage: (formData.get('ogImage') as string) || null,
-      canonicalUrl: (formData.get('canonicalUrl') as string) || null,
       isIndexable: formData.get('isIndexable') !== 'false',
     };
 
     const customSlugInput = (formData.get('slug') as string)?.trim();
     if (customSlugInput) {
-      const cleanSlug = customSlugInput.toLowerCase().trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+      const cleanSlug = extractBlogSlug(customSlugInput);
       if (cleanSlug) {
-        updateData.slug = cleanSlug;
+        updateData.slug = await ensureUniqueSlug(cleanSlug, id);
       }
     }
+
+    const slugForCanonical = updateData.slug
+      || (await prisma.post.findUnique({ where: { id }, select: { slug: true } }))?.slug
+      || 'post';
+    updateData.canonicalUrl = normalizeCanonicalUrl(
+      formData.get('canonicalUrl') as string,
+      defaultPostCanonical(slugForCanonical)
+    );
 
     const coverImageFile = formData.get('coverImageFile') as File | null;
     const coverImageUrl = formData.get('coverImageUrl') as string | null;
@@ -77,9 +84,6 @@ export async function PATCH(
     if (coverImageFile && coverImageFile.size > 0) {
       const optimizedPath = await optimizeAndStoreImage(coverImageFile);
       updateData.coverImage = optimizedPath;
-      if (updateData.images) {
-        updateData.images = [optimizedPath, ...updateData.images];
-      }
     } else if (coverImageUrl !== null && coverImageUrl !== undefined) {
       if (coverImageUrl.trim()) {
         updateData.coverImage = coverImageUrl.trim();
@@ -96,10 +100,16 @@ export async function PATCH(
           uploadedImagePaths.push(optimizedPath);
         }
       }
-      updateData.images = uploadedImagePaths;
+      updateData.images = uploadedImagePaths.filter((path) => path !== updateData.coverImage);
       if (!updateData.coverImage) {
         updateData.coverImage = uploadedImagePaths[0];
       }
+    }
+
+    const coverForStrip = updateData.coverImage
+      || (await prisma.post.findUnique({ where: { id }, select: { coverImage: true } }))?.coverImage;
+    if (coverForStrip) {
+      updateData.content = stripImageFromHtml(contentWithImages, coverForStrip);
     }
 
     const post = await prisma.post.update({
@@ -108,6 +118,9 @@ export async function PATCH(
     });
 
     revalidatePath('/');
+    if (post.slug) {
+      revalidatePath(`/blog/${post.slug}`);
+    }
     return NextResponse.json(post);
   } catch (error) {
     console.error('Update error:', error);

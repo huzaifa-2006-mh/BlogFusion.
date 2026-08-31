@@ -4,6 +4,8 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 
 import RichTextEditor from '@/components/RichTextEditor';
+import SeoCheckCard from '@/components/SeoCheckCard';
+import { defaultPostCanonical, normalizeCanonicalUrl, slugify, toBlogSlugInput } from '@/lib/blogUrl';
 
 interface FAQ {
   question: string;
@@ -31,6 +33,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [focusKeywords, setFocusKeywords] = useState('');
   const [ogImage, setOgImage] = useState('');
   const [canonicalUrl, setCanonicalUrl] = useState('');
+  const [canonicalTouched, setCanonicalTouched] = useState(false);
   const [isIndexable, setIsIndexable] = useState(true);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
 
@@ -39,10 +42,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
   const handleSlugChange = (val: string) => {
-    const cleaned = val.toLowerCase().trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_]+/g, '-');
-    setSlug(cleaned);
+    setSlug(toBlogSlugInput(val));
   };
 
   useEffect(() => {
@@ -90,7 +90,10 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
           setMetaDescription(postData.metaDescription || '');
           setFocusKeywords(postData.focusKeywords || '');
           setOgImage(postData.ogImage || '');
-          setCanonicalUrl(postData.canonicalUrl || '');
+          const loadedCanonical = postData.canonicalUrl || '';
+          const generatedCanonical = defaultPostCanonical(postData.slug || '');
+          setCanonicalUrl(loadedCanonical || generatedCanonical);
+          setCanonicalTouched(Boolean(loadedCanonical && loadedCanonical.replace(/\/+$/, '') !== generatedCanonical.replace(/\/+$/, '')));
           setIsIndexable(postData.isIndexable ?? true);
           setContent(postData.content || '');
 
@@ -113,6 +116,12 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
 
     fetchData();
   }, [id]);
+
+  useEffect(() => {
+    if (!canonicalTouched && slug) {
+      setCanonicalUrl(defaultPostCanonical(slugify(slug)));
+    }
+  }, [slug, canonicalTouched]);
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -176,7 +185,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
     try {
       const formData = new FormData();
       formData.append('title', title);
-      formData.append('slug', slug);
+      formData.append('slug', slugify(slug));
       formData.append('shortDescription', shortDescription);
       formData.append('categoryId', categoryId);
       formData.append('showOnHome', String(showOnHome));
@@ -186,7 +195,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
       formData.append('metaDescription', metaDescription);
       formData.append('focusKeywords', focusKeywords);
       formData.append('ogImage', ogImage || coverImageUrl || '');
-      formData.append('canonicalUrl', canonicalUrl);
+      formData.append('canonicalUrl', normalizeCanonicalUrl(canonicalUrl, defaultPostCanonical(slugify(slug))));
       formData.append('isIndexable', String(isIndexable));
       formData.append('imageAlts', JSON.stringify(imageAlts));
 
@@ -310,7 +319,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                       gap: '0.4rem',
                     }}
                   >
-                    <span>🔗 Custom Blog URL (Slug)</span>
+                    <span>🔗 Custom Blog URL</span>
                   </label>
                 </div>
 
@@ -322,7 +331,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                     type="text"
                     value={slug}
                     onChange={(e) => handleSlugChange(e.target.value)}
-                    placeholder="custom-blog-url-slug"
+                    placeholder="my-custom-url or paste a full link"
                     style={{
                       flex: 1,
                       padding: '0.65rem 0.85rem',
@@ -335,7 +344,8 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                   />
                 </div>
                 <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.75rem', color: '#64748b' }}>
-                  Live URL: <strong style={{ color: '#0f172a' }}>https://blog-fusion-beta.vercel.app/blog/{slug || 'your-slug'}</strong>
+                  You can type a custom slug or paste a full URL. Live URL:{' '}
+                  <strong style={{ color: '#0f172a' }}>{defaultPostCanonical(slug || 'your-slug')}</strong>
                 </p>
               </div>
 
@@ -419,10 +429,16 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                   <input
                     type="text"
                     value={canonicalUrl}
-                    onChange={(e) => setCanonicalUrl(e.target.value)}
-                    placeholder="https://example.com/blog/my-post"
+                    onChange={(e) => {
+                      setCanonicalTouched(true);
+                      setCanonicalUrl(e.target.value);
+                    }}
+                    placeholder="https://blog-fusion-beta.vercel.app/blog/my-post"
                     style={inputStyle}
                   />
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginTop: '0.35rem' }}>
+                    Will be saved as: {normalizeCanonicalUrl(canonicalUrl, defaultPostCanonical(slugify(slug) || 'your-slug'))}
+                  </span>
                 </div>
               </div>
 
@@ -500,7 +516,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                 <span>🖼️</span> Featured Image (Cover)
               </h3>
               <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '1.2rem' }}>
-                This image will appear on the blog card across the Homepage, Category grids, and at the top of the post.
+                This image is shown at the top of the published post (above the title), not at the bottom of the article.
               </p>
 
               {coverPreview || coverImageUrl ? (
@@ -577,6 +593,16 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                 />
               </div>
             </div>
+
+            <SeoCheckCard
+              title={title}
+              slug={slug}
+              metaTitle={metaTitle}
+              metaDescription={metaDescription}
+              focusKeywords={focusKeywords}
+              canonicalUrl={canonicalUrl}
+              coverImage={coverPreview || coverImageUrl}
+            />
 
             <div className="dashboard-card" style={{ padding: '1.8rem' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginBottom: '1.2rem' }}>

@@ -3,6 +3,8 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
+import { defaultPostCanonical, normalizeCanonicalUrl } from '@/lib/blogUrl';
+import { extractFirstImageSrc, stripImageFromHtml } from '@/lib/postHtml';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,9 +38,8 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
     const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
-    const canonical = (post.canonicalUrl && post.canonicalUrl.trim().length > 0)
-      ? post.canonicalUrl.trim()
-      : `${cleanSiteUrl}/blog/${slug}`;
+    const fallbackCanonical = `${cleanSiteUrl}/blog/${slug}`;
+    const canonical = normalizeCanonicalUrl(post.canonicalUrl, fallbackCanonical);
 
     const metadata: Metadata = {
       title: post.metaTitle || `${post.title} - Blog Fusion`,
@@ -147,7 +148,7 @@ export default async function BlogPostPage({ params }: any) {
     });
   }
 
-  const gallery = [...(post.images || [])];
+  const gallery = (post.images || []).filter((img) => img && img !== post.coverImage);
   const inlineImages = [...gallery];
   let imageIndex = 0;
   const imageRegex = /(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/i;
@@ -166,12 +167,19 @@ export default async function BlogPostPage({ params }: any) {
     imageIndex++;
   }
 
+  processedContent = processedContent.replace(/(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/gi, '');
+
+  const coverSrc = post.coverImage || extractFirstImageSrc(processedContent);
+  if (coverSrc) {
+    processedContent = stripImageFromHtml(processedContent, coverSrc);
+  }
+
   // Schema.org JSON-LD definitions
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
   const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
-  const canonical = (post.canonicalUrl && post.canonicalUrl.trim().length > 0) ? post.canonicalUrl.trim() : `${cleanSiteUrl}/blog/${post.slug}`;
+  const canonical = normalizeCanonicalUrl(post.canonicalUrl, defaultPostCanonical(post.slug));
   const postUrl = canonical;
-  const coverImg = post.ogImage || post.coverImage || `${cleanSiteUrl}/favicon-48x48.png`;
+  const coverImg = post.ogImage || coverSrc || `${cleanSiteUrl}/favicon-48x48.png`;
 
   const articleSchema = {
     '@context': 'https://schema.org',
@@ -235,6 +243,24 @@ export default async function BlogPostPage({ params }: any) {
         <Link href="/" className="back-link">
           &larr; Back to Home
         </Link>
+
+        {coverSrc ? (
+          <figure
+            className="blog-cover-image"
+            style={{
+              margin: '0 0 2rem 0',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              boxShadow: '0 12px 32px rgba(15, 23, 42, 0.08)',
+            }}
+          >
+            <img
+              src={coverSrc}
+              alt={post.title}
+              style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '460px', objectFit: 'cover' }}
+            />
+          </figure>
+        ) : null}
 
         {/* Dynamic Detail Header */}
         <header style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
