@@ -16,7 +16,7 @@ export default function SiteJsonLd() {
     },
     chiefExecutiveOfficer: {
       '@type': 'Person',
-      name: 'Marium',
+      name: 'Marium Waseem',
       jobTitle: 'CEO',
       url: siteUrl,
     },
@@ -45,14 +45,14 @@ export default function SiteJsonLd() {
   const mariumPersonSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: 'Marium',
+    name: 'Marium Waseem',
     jobTitle: 'CEO',
     worksFor: {
       '@type': 'Organization',
       name: 'Blog Fusion',
       url: siteUrl,
     },
-    description: 'Marium is the Chief Executive Officer (CEO) of Blog Fusion.',
+    description: 'Marium Waseem is the Chief Executive Officer (CEO) of Blog Fusion.',
     url: siteUrl,
   };
 
