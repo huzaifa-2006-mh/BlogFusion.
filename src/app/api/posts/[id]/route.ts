@@ -47,13 +47,18 @@ export async function PATCH(
 
     let contentWithImages = applyImageAltPlaceholders(content, imageAlts);
 
+    const userCardDescription = (formData.get('shortDescription') as string)?.trim() || (formData.get('cardDescription') as string)?.trim() || '';
+    const cleanContentText = contentWithImages.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+    const fallbackExcerpt = cleanContentText.slice(0, 160) + (cleanContentText.length > 160 ? '...' : '');
+    const finalDescription = userCardDescription || fallbackExcerpt || title;
+
     const updateData: any = {
       title,
       content: contentWithImages,
       categoryId,
-      excerpt: contentWithImages.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...',
+      excerpt: finalDescription,
       showOnHome: formData.get('showOnHome') === 'true',
-      shortDescription: formData.get('shortDescription') as string || null,
+      shortDescription: finalDescription,
       faqs: formData.get('faqs') ? JSON.parse(formData.get('faqs') as string) : null,
       metaTitle: (formData.get('metaTitle') as string) || null,
       metaDescription: (formData.get('metaDescription') as string) || null,

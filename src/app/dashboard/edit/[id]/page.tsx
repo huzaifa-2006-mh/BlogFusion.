@@ -361,14 +361,47 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                 </p>
               </div>
 
-              <div style={{ marginBottom: '1.8rem' }}>
-                <label style={labelStyle}>Short Description</label>
-                <input
-                  type="text"
+              {/* Dedicated Card Description Feature */}
+              <div style={{ marginBottom: '1.8rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '1.1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label
+                    style={{
+                      fontWeight: '800',
+                      fontSize: '0.8rem',
+                      color: '#0f172a',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    <span>🗂️ Card Description (Topics & Home Cards)</span>
+                  </label>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                    {shortDescription.length} characters
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 0.6rem 0' }}>
+                  Write a dedicated summary description that will appear directly on the blog cards in Topics and Home pages.
+                </p>
+                <textarea
+                  rows={2}
                   value={shortDescription}
                   onChange={(e) => setShortDescription(e.target.value)}
-                  placeholder="A catchy, brief sub-title..."
-                  style={inputStyle}
+                  placeholder="Write a clear 1-2 sentence preview description for this blog card..."
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 0.9rem',
+                    border: '1px solid #cbd5e1',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    fontSize: '0.92rem',
+                    fontFamily: 'inherit',
+                    lineHeight: '1.5',
+                    background: 'white',
+                    resize: 'vertical',
+                  }}
                 />
               </div>
 

@@ -72,17 +72,22 @@ export async function POST(request: Request) {
     const fallbackCanonical = defaultPostCanonical(baseSlug);
     const canonicalUrl = normalizeCanonicalUrl(formData.get('canonicalUrl') as string, fallbackCanonical);
 
+    const userCardDescription = (formData.get('shortDescription') as string)?.trim() || (formData.get('cardDescription') as string)?.trim() || '';
+    const cleanContentText = contentWithImages.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+    const fallbackExcerpt = cleanContentText.slice(0, 160) + (cleanContentText.length > 160 ? '...' : '');
+    const finalDescription = userCardDescription || fallbackExcerpt || title;
+
     const post = await prisma.post.create({
       data: {
         title,
         slug: baseSlug,
         content: contentWithImages,
-        excerpt: contentWithImages.substring(0, 150).replace(/<[^>]*>?/gm, '') + '...',
+        excerpt: finalDescription,
         categoryId,
         authorId: user.id,
         published: true,
         showOnHome: formData.get('showOnHome') === 'true',
-        shortDescription: formData.get('shortDescription') as string || null,
+        shortDescription: finalDescription,
         faqs: formData.get('faqs') ? JSON.parse(formData.get('faqs') as string) : null,
         coverImage: coverImagePath,
         images: uploadedImagePaths.filter((path) => path !== coverImagePath),

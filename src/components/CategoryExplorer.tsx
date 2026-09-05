@@ -15,6 +15,7 @@ interface Post {
   title: string;
   slug: string;
   excerpt: string;
+  shortDescription?: string | null;
   coverImage?: string | null;
   createdAt: string | Date;
   categoryId: string;
@@ -167,8 +168,12 @@ export default function CategoryExplorer({
                         {/* Title */}
                         <h2 className="blog-card-title">{post.title}</h2>
 
-                        {/* Excerpt */}
-                        <p className="blog-card-excerpt">{post.excerpt}</p>
+                        {/* Card Description */}
+                        {(post.shortDescription || post.excerpt) && (
+                          <p className="blog-card-excerpt">
+                            {post.shortDescription || post.excerpt}
+                          </p>
+                        )}
 
                         {/* Author Info */}
                         <div className="blog-card-author">
