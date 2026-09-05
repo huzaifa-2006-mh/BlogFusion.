@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     template: '%s | Blog Fusion',
   },
   description: 'Welcome to Blog Fusion — practical information, useful ideas, and insights across AI & Technology, Finance, Education, Careers, Health, and Fitness.',
-  authors: [{ name: 'Blog Fusion' }],
-  creator: 'Blog Fusion',
+  authors: [{ name: 'Muhammad Huzaifa (Founder)' }, { name: 'Marium Waseem (CEO)' }],
+  creator: 'Muhammad Huzaifa',
   publisher: 'Blog Fusion',
   manifest: '/site.webmanifest',
   verification: {
