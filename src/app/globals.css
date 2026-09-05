@@ -2823,7 +2823,6 @@ html, body {
 img {
   max-width: 100%;
   height: auto;
-  content-visibility: auto;
 }
 
 @media (max-width: 768px) {
