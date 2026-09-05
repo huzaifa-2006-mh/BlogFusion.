@@ -56,7 +56,7 @@ export default function EmailSubscription() {
   if (status === 'success') {
     return (
       <div style={{ marginTop: '1rem' }}>
-        <p style={{ color: '#64ffda', fontSize: '0.9rem', fontWeight: 600 }}>✓ {message}</p>
+        <p style={{ color: '#166534', fontSize: '0.95rem', fontWeight: 700 }}>✓ {message}</p>
       </div>
     );
   }

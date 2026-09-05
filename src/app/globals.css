@@ -2808,5 +2808,137 @@ pre, code {
   to { transform: translateX(0); }
 }
 
+/* ==========================================================================
+   MOBILE RESPONSIVENESS & PERFORMANCE ENHANCEMENTS
+   ========================================================================== */
 
+/* Prevent horizontal jitter on touch devices */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
 
+/* Smooth mobile images & prevent content shifts */
+img {
+  max-width: 100%;
+  height: auto;
+  content-visibility: auto;
+}
+
+@media (max-width: 768px) {
+  /* Optimize container breathing room on mobile */
+  .container {
+    padding: 0 1.15rem !important;
+  }
+
+  /* Optimize section vertical padding for faster mobile scrolling */
+  section {
+    padding-top: clamp(2rem, 5vw, 3rem) !important;
+    padding-bottom: clamp(2rem, 5vw, 3rem) !important;
+  }
+
+  /* Hero adjustments for mobile */
+  .hero-grid {
+    gap: 2rem !important;
+  }
+
+  .hero-grid > div:nth-child(2) > div > div:first-child {
+    height: 240px !important;
+  }
+
+  /* Simplify heavy backdrop blurs on mobile to maintain 60fps */
+  .mobile-nav-overlay {
+    background: rgba(40, 24, 15, 0.72) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Author Bio Box responsive column layout */
+  .author-bio-box {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    padding: 1.5rem 1.25rem !important;
+    margin-top: 3rem !important;
+  }
+
+  .author-bio-details {
+    margin-top: 0.5rem;
+  }
+
+  /* Article typography on mobile */
+  .blog-content {
+    font-size: 16px !important;
+    line-height: 1.75 !important;
+  }
+
+  .blog-content h1 {
+    font-size: 1.65rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .blog-content h2 {
+    font-size: 1.35rem !important;
+    line-height: 1.3 !important;
+    margin-top: 2rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .blog-content h3 {
+    font-size: 1.18rem !important;
+    line-height: 1.35 !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.6rem !important;
+  }
+
+  .blog-content h4, .blog-content h5, .blog-content h6 {
+    font-size: 1.05rem !important;
+  }
+
+  /* Prevent code blocks & tables from forcing horizontal overflow */
+  .blog-content pre,
+  .blog-content table,
+  .code-block {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 8px !important;
+  }
+
+  .blog-content table {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .blog-content figure {
+    margin: 1.5rem 0 !important;
+  }
+
+  .blog-content figure img {
+    border-radius: 10px !important;
+  }
+
+  /* Footer responsiveness */
+  .footer-minimal {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .footer-nav {
+    gap: 1rem 1.25rem !important;
+  }
+
+  /* Category explorer responsive tweaks */
+  .category-explorer-layout {
+    flex-direction: column !important;
+  }
+
+  /* Touch buttons ergonomics */
+  button, a.vip-btn-primary, .back-link {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

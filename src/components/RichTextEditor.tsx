@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { compressAndConvertToWebP } from '@/lib/clientImageCompressor';
 
 type RichTextEditorProps = {
   value: string;
@@ -261,8 +262,11 @@ export default function RichTextEditor({
     if (!files || files.length === 0) return;
     setIsUploading(true);
     try {
+      const compressedFiles = await Promise.all(
+        files.map((file) => compressAndConvertToWebP(file))
+      );
       const formData = new FormData();
-      files.forEach((file) => formData.append('images', file));
+      compressedFiles.forEach((file) => formData.append('images', file));
 
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -439,7 +443,7 @@ export default function RichTextEditor({
         type="file"
         ref={fileInputRef}
         onChange={handleImageFileSelect}
-        accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.svg,.avif,.bmp"
+        accept="image/*,.jpg,.jpeg,.png,.webp,.avif,.bmp,.tiff,.gif,.heic,.heif,.svg"
         multiple
         style={{ display: 'none' }}
       />
@@ -803,7 +807,7 @@ export default function RichTextEditor({
                 </label>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.jpg,.jpeg,.png,.webp,.avif,.bmp,.tiff,.gif,.heic,.heif,.svg"
                   onChange={async (e) => {
                     if (e.target.files && e.target.files[0]) {
                       await uploadFiles([e.target.files[0]]);

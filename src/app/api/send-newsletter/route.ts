@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prismaClient from '@/lib/prisma'; // Sahi import naam ke saath
+import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {

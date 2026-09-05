@@ -169,9 +169,8 @@ export default async function BlogPostPage({ params }: any) {
 
   processedContent = processedContent.replace(/(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/gi, '');
 
-  const coverSrc = post.coverImage || extractFirstImageSrc(processedContent);
-  if (coverSrc) {
-    processedContent = stripCoverFromContent(processedContent, coverSrc);
+  if (post.coverImage) {
+    processedContent = stripCoverFromContent(processedContent, post.coverImage);
   }
 
   // Schema.org JSON-LD definitions
@@ -179,7 +178,7 @@ export default async function BlogPostPage({ params }: any) {
   const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
   const canonical = normalizeCanonicalUrl(post.canonicalUrl, defaultPostCanonical(post.slug));
   const postUrl = canonical;
-  const coverImg = post.ogImage || coverSrc || `${cleanSiteUrl}/favicon-48x48.png`;
+  const coverImg = post.ogImage || post.coverImage || extractFirstImageSrc(processedContent) || `${cleanSiteUrl}/favicon-48x48.png`;
 
   const articleSchema = {
     '@context': 'https://schema.org',
@@ -244,23 +243,6 @@ export default async function BlogPostPage({ params }: any) {
           &larr; Back to Home
         </Link>
 
-        {coverSrc ? (
-          <figure
-            className="blog-cover-image"
-            style={{
-              margin: '0 0 2rem 0',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              boxShadow: '0 12px 32px rgba(15, 23, 42, 0.08)',
-            }}
-          >
-            <img
-              src={coverSrc}
-              alt={post.title}
-              style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '460px', objectFit: 'cover' }}
-            />
-          </figure>
-        ) : null}
 
         {/* Dynamic Detail Header */}
         <header style={{ marginBottom: '2.5rem', textAlign: 'center' }}>

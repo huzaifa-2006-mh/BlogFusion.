@@ -119,7 +119,7 @@ export default function BlogImageUploader({
         >
           <span style={{ fontSize: '1.6rem', fontWeight: 'bold' }}>+</span>
           <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>Add Photo</span>
-          <input type="file" hidden multiple onChange={onImagesChange} accept="image/*" />
+          <input type="file" hidden multiple onChange={onImagesChange} accept="image/*,.jpg,.jpeg,.png,.webp,.avif,.bmp,.tiff,.gif,.heic,.heif" />
         </label>
       </div>
     </div>

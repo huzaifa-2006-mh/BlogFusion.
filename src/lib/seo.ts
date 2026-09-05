@@ -12,8 +12,8 @@ export function normalizePagePath(pagePath: string): string {
 
 export function revalidatePageSeo(pagePath: string) {
   const normalizedPath = normalizePagePath(pagePath);
-  revalidateTag(PAGE_SEO_TAG);
-  revalidateTag(`${PAGE_SEO_TAG}:${normalizedPath}`);
+  (revalidateTag as any)(PAGE_SEO_TAG);
+  (revalidateTag as any)(`${PAGE_SEO_TAG}:${normalizedPath}`);
 }
 
 function resolveDefaultTitle(title: Metadata['title']): string | undefined {

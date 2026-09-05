@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import RichTextEditor from '@/components/RichTextEditor';
 import SeoCheckCard from '@/components/SeoCheckCard';
 import { defaultPostCanonical, normalizeCanonicalUrl, slugify, toBlogSlugInput } from '@/lib/blogUrl';
+import { compressAndConvertToWebP } from '@/lib/clientImageCompressor';
 
 interface FAQ {
   question: string;
@@ -123,13 +124,21 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
     }
   }, [slug, canonicalTouched]);
 
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setCoverImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => setCoverPreview(event.target?.result as string);
-      reader.readAsDataURL(file);
+      const originalFile = e.target.files[0];
+      try {
+        const webpFile = await compressAndConvertToWebP(originalFile);
+        setCoverImageFile(webpFile);
+        const reader = new FileReader();
+        reader.onload = (event) => setCoverPreview(event.target?.result as string);
+        reader.readAsDataURL(webpFile);
+      } catch (err) {
+        setCoverImageFile(originalFile);
+        const reader = new FileReader();
+        reader.onload = (event) => setCoverPreview(event.target?.result as string);
+        reader.readAsDataURL(originalFile);
+      }
     }
   };
 
@@ -139,15 +148,18 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
     setCoverPreview(null);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setImageFiles((prev) => [...prev, ...files]);
+      const rawFiles = Array.from(e.target.files);
+      const convertedFiles = await Promise.all(
+        rawFiles.map((file) => compressAndConvertToWebP(file))
+      );
+      setImageFiles((prev) => [...prev, ...convertedFiles]);
       setImageAlts((prev) => [
         ...prev,
-        ...files.map((file) => file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')),
+        ...convertedFiles.map((file) => file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ')),
       ]);
-      files.forEach((file) => {
+      convertedFiles.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (event) => setPreviews((prev) => [...prev, event.target?.result as string]);
         reader.readAsDataURL(file);
@@ -568,7 +580,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                 <label style={labelStyle}>Upload New Image File</label>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.jpg,.jpeg,.png,.webp,.avif,.bmp,.tiff,.gif,.heic,.heif"
                   onChange={handleCoverChange}
                   style={{
                     width: '100%',
