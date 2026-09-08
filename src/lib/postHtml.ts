@@ -9,6 +9,11 @@ function srcVariants(imageUrl: string): string[] {
 
   variants.add(raw);
   variants.add(raw.replace(/&amp;/g, '&'));
+
+  if (raw.startsWith('data:')) {
+    return [...variants];
+  }
+
   try {
     variants.add(decodeURIComponent(raw));
   } catch {
@@ -45,13 +50,40 @@ export function extractLastImageSrc(html: string): string | null {
 export function stripImageFromHtml(html: string, imageUrl?: string | null): string {
   if (!html || !imageUrl) return html || '';
 
+  const targetVariants = srcVariants(imageUrl);
+  if (!targetVariants.length) return html;
+
   let next = html;
-  for (const variant of srcVariants(imageUrl)) {
-    const src = escapeRegExp(variant);
-    next = next
-      .replace(new RegExp(`<figure[^>]*>[\\s\\S]*?<img[^>]*src=["'][^"']*${src}[^"']*["'][^>]*>[\\s\\S]*?</figure>`, 'gi'), '')
-      .replace(new RegExp(`<p[^>]*>\\s*<img[^>]*src=["'][^"']*${src}[^"']*["'][^>]*>\\s*</p>`, 'gi'), '')
-      .replace(new RegExp(`<img[^>]*src=["'][^"']*${src}[^"']*["'][^>]*/?>`, 'gi'), '');
+
+  try {
+    // Safely remove <figure> containing the target image
+    next = next.replace(
+      /<figure[^>]*>[\s\S]*?<img\b[^>]*?\bsrc=["']([^"']+)["'][^>]*>[\s\S]*?<\/figure>/gi,
+      (match, src) => {
+        const matchesTarget = targetVariants.some((variant) => src === variant || src.includes(variant) || variant.includes(src));
+        return matchesTarget ? '' : match;
+      }
+    );
+
+    // Safely remove <p> containing the target image
+    next = next.replace(
+      /<p[^>]*>\s*<img\b[^>]*?\bsrc=["']([^"']+)["'][^>]*>\s*<\/p>/gi,
+      (match, src) => {
+        const matchesTarget = targetVariants.some((variant) => src === variant || src.includes(variant) || variant.includes(src));
+        return matchesTarget ? '' : match;
+      }
+    );
+
+    // Safely remove standalone <img> matching target
+    next = next.replace(
+      /<img\b[^>]*?\bsrc=["']([^"']+)["'][^>]*\/?>/gi,
+      (match, src) => {
+        const matchesTarget = targetVariants.some((variant) => src === variant || src.includes(variant) || variant.includes(src));
+        return matchesTarget ? '' : match;
+      }
+    );
+  } catch (err) {
+    console.warn('Error in stripImageFromHtml:', err);
   }
 
   return next.replace(/<p>\s*<\/p>/gi, '').replace(/<figure>\s*<\/figure>/gi, '').trim();
@@ -70,17 +102,16 @@ export function stripTrailingImage(html: string): string {
 /** Cover belongs at the top of the post, never as a leftover image under the article. */
 export function stripCoverFromContent(html: string, coverUrl?: string | null): string {
   let next = html || '';
-  if (coverUrl) {
-    next = stripImageFromHtml(next, coverUrl);
-  }
+  if (!coverUrl) return next;
+
+  next = stripImageFromHtml(next, coverUrl);
 
   const lastSrc = extractLastImageSrc(next);
-  if (coverUrl && lastSrc) {
+  if (lastSrc) {
     const coverBits = srcVariants(coverUrl);
     const lastBits = srcVariants(lastSrc);
-    const isSame = coverBits.some((bit) => lastBits.includes(bit));
-    const imageCount = (next.match(/<img\b/gi) || []).length;
-    if (isSame || imageCount === 1) {
+    const isSame = coverBits.some((bit) => lastBits.includes(bit) || bit.includes(lastBits[0]));
+    if (isSame) {
       next = stripTrailingImage(next);
     }
   }
