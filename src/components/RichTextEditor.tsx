@@ -144,10 +144,103 @@ export default function RichTextEditor({
   };
 
   const execCmd = (command: string, value: string | undefined = undefined) => {
+    if (editorRef.current && document.activeElement !== editorRef.current) {
+      editorRef.current.focus();
+    }
     document.execCommand(command, false, value);
     if (editorRef.current) {
       handleInput();
     }
+  };
+
+  const alignContent = (alignment: 'left' | 'center' | 'right' | 'justify') => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+
+    const cmdMap: Record<string, string> = {
+      left: 'justifyLeft',
+      center: 'justifyCenter',
+      right: 'justifyRight',
+      justify: 'justifyFull',
+    };
+
+    // 1. Try native execCommand
+    try {
+      document.execCommand(cmdMap[alignment], false);
+    } catch {
+      /* fallback */
+    }
+
+    // 2. Direct DOM styling: align enclosing block, heading, list, figure or image
+    try {
+      const sel = window.getSelection();
+      if (sel && sel.anchorNode) {
+        let node: HTMLElement | null = (
+          sel.anchorNode.nodeType === Node.TEXT_NODE
+            ? sel.anchorNode.parentElement
+            : sel.anchorNode
+        ) as HTMLElement;
+
+        while (node && node !== editorRef.current) {
+          const tag = node.tagName.toLowerCase();
+
+          // Figure or container with an image
+          if (tag === 'figure') {
+            node.style.textAlign = alignment;
+            const img = node.querySelector('img');
+            if (img) {
+              img.style.display = 'inline-block';
+            }
+            break;
+          }
+
+          // Direct image
+          if (tag === 'img') {
+            if (node.parentElement && node.parentElement !== editorRef.current) {
+              node.parentElement.style.textAlign = alignment;
+            }
+            if (alignment === 'center') {
+              node.style.display = 'block';
+              node.style.marginLeft = 'auto';
+              node.style.marginRight = 'auto';
+            } else if (alignment === 'right') {
+              node.style.display = 'block';
+              node.style.marginLeft = 'auto';
+              node.style.marginRight = '0';
+            } else {
+              node.style.display = 'block';
+              node.style.marginLeft = '0';
+              node.style.marginRight = 'auto';
+            }
+            break;
+          }
+
+          // Standard text blocks
+          if (['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'blockquote', 'li', 'td', 'th'].includes(tag)) {
+            node.style.textAlign = alignment;
+            break;
+          }
+
+          node = node.parentElement;
+        }
+
+        // If selection is directly inside canvas without a wrapper block
+        if ((!node || node === editorRef.current) && sel.rangeCount > 0) {
+          const range = sel.getRangeAt(0);
+          const parent = range.commonAncestorContainer instanceof HTMLElement
+            ? range.commonAncestorContainer
+            : range.commonAncestorContainer.parentElement;
+
+          if (parent && parent !== editorRef.current) {
+            parent.style.textAlign = alignment;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('Alignment error:', err);
+    }
+
+    handleInput();
   };
 
   const saveCurrentSelection = () => {
@@ -523,22 +616,22 @@ export default function RichTextEditor({
 
         {/* Bold, Italic, Underline, Strike, Sub, Super */}
         <div style={groupStyle}>
-          <button type="button" onClick={() => execCmd('bold')} title="Bold (Ctrl+B)" style={{ ...btnStyle, fontWeight: 'bold' }}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('bold'); }} title="Bold (Ctrl+B)" style={{ ...btnStyle, fontWeight: 'bold' }}>
             B
           </button>
-          <button type="button" onClick={() => execCmd('italic')} title="Italic (Ctrl+I)" style={{ ...btnStyle, fontStyle: 'italic' }}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('italic'); }} title="Italic (Ctrl+I)" style={{ ...btnStyle, fontStyle: 'italic' }}>
             I
           </button>
-          <button type="button" onClick={() => execCmd('underline')} title="Underline (Ctrl+U)" style={{ ...btnStyle, textDecoration: 'underline' }}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('underline'); }} title="Underline (Ctrl+U)" style={{ ...btnStyle, textDecoration: 'underline' }}>
             U
           </button>
-          <button type="button" onClick={() => execCmd('strikeThrough')} title="Strikethrough" style={{ ...btnStyle, textDecoration: 'line-through' }}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('strikeThrough'); }} title="Strikethrough" style={{ ...btnStyle, textDecoration: 'line-through' }}>
             S
           </button>
-          <button type="button" onClick={() => execCmd('subscript')} title="Subscript" style={btnStyle}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('subscript'); }} title="Subscript" style={btnStyle}>
             x₂
           </button>
-          <button type="button" onClick={() => execCmd('superscript')} title="Superscript" style={btnStyle}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('superscript'); }} title="Superscript" style={btnStyle}>
             x²
           </button>
         </div>
@@ -555,34 +648,81 @@ export default function RichTextEditor({
           </label>
         </div>
 
-        {/* Alignment */}
-        <div style={groupStyle}>
-          <button type="button" onClick={() => execCmd('justifyLeft')} title="Align Left" style={btnStyle}>
-            ≡
+        {/* Alignment Controls (Left, Center, Right, Justify) */}
+        <div style={{ ...groupStyle, background: '#f1f5f9', padding: '0.2rem 0.4rem', borderRadius: '8px' }}>
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              alignContent('left');
+            }}
+            title="Align Left (بائیں طرف کریں)"
+            style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '0.35rem 0.6rem' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3 4h18v2H3V4zm0 5h12v2H3V9zm0 5h18v2H3v-2zm0 5h12v2H3v-2z" />
+            </svg>
+            <span style={{ fontSize: '0.75rem', fontWeight: '700' }}>Left</span>
           </button>
-          <button type="button" onClick={() => execCmd('justifyCenter')} title="Align Center" style={btnStyle}>
-            ≂
+
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              alignContent('center');
+            }}
+            title="Align Center (درمیان میں کریں)"
+            style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '0.35rem 0.6rem' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3 4h18v2H3V4zm3 5h12v2H6V9zm-3 5h18v2H3v-2zm3 5h12v2H6v-2z" />
+            </svg>
+            <span style={{ fontSize: '0.75rem', fontWeight: '700' }}>Center</span>
           </button>
-          <button type="button" onClick={() => execCmd('justifyRight')} title="Align Right" style={btnStyle}>
-            ≡
+
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              alignContent('right');
+            }}
+            title="Align Right (دائیں طرف کریں)"
+            style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '0.35rem 0.6rem' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3 4h18v2H3V4zm6 5h12v2H9V9zm-6 5h18v2H3v-2zm6 5h12v2H9v-2z" />
+            </svg>
+            <span style={{ fontSize: '0.75rem', fontWeight: '700' }}>Right</span>
           </button>
-          <button type="button" onClick={() => execCmd('justifyFull')} title="Justify" style={btnStyle}>
-            ≣
+
+          <button
+            type="button"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              alignContent('justify');
+            }}
+            title="Justify (برابر کریں)"
+            style={{ ...btnStyle, display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '0.35rem 0.6rem' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3 4h18v2H3V4zm0 5h18v2H3V9zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
+            </svg>
+            <span style={{ fontSize: '0.75rem', fontWeight: '700' }}>Justify</span>
           </button>
         </div>
 
         {/* Lists & Indent */}
         <div style={groupStyle}>
-          <button type="button" onClick={() => execCmd('insertUnorderedList')} title="Bullet List" style={btnStyle}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('insertUnorderedList'); }} title="Bullet List" style={btnStyle}>
             • List
           </button>
-          <button type="button" onClick={() => execCmd('insertOrderedList')} title="Numbered List" style={btnStyle}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('insertOrderedList'); }} title="Numbered List" style={btnStyle}>
             1. List
           </button>
-          <button type="button" onClick={() => execCmd('outdent')} title="Decrease Indent" style={btnStyle}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('outdent'); }} title="Decrease Indent" style={btnStyle}>
             ⇤
           </button>
-          <button type="button" onClick={() => execCmd('indent')} title="Increase Indent" style={btnStyle}>
+          <button type="button" onMouseDown={(e) => { e.preventDefault(); execCmd('indent'); }} title="Increase Indent" style={btnStyle}>
             ⇥
           </button>
         </div>
