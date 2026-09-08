@@ -169,12 +169,6 @@ export default async function BlogPostPage({ params }: any) {
 
   processedContent = processedContent.replace(/(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/gi, '');
 
-  const featuredCover = post.coverImage || post.ogImage || (post.images && post.images.length > 0 ? post.images[0] : null) || extractFirstImageSrc(content);
-
-  if (featuredCover) {
-    processedContent = stripCoverFromContent(processedContent, featuredCover);
-  }
-
   // Schema.org JSON-LD definitions
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://blog-fusion-beta.vercel.app';
   const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
@@ -271,36 +265,6 @@ export default async function BlogPostPage({ params }: any) {
             </Link>
           </div>
         </header>
-
-        {/* Featured Cover Image */}
-        {featuredCover && (
-          <div
-            className="blog-featured-image-wrapper"
-            style={{
-              marginBottom: '2.5rem',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
-            }}
-          >
-            <img
-              src={featuredCover}
-              alt={post.title}
-              width={800}
-              height={450}
-              decoding="async"
-              fetchPriority="high"
-              style={{
-                width: '100%',
-                maxHeight: '480px',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
-          </div>
-        )}
 
         {/* Clean Article Content */}
         <div className="blog-content" style={{ ...customStyles }}>

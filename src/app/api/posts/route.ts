@@ -68,10 +68,7 @@ export async function POST(request: Request) {
       coverImagePath = extractFirstImageSrc(contentWithImages);
     }
 
-    if (coverImagePath) {
-      // Remove cover image from content to avoid duplicate display
-      contentWithImages = stripCoverFromContent(contentWithImages, coverImagePath);
-    }
+
 
     const customSlugInput = (formData.get('slug') as string)?.trim();
     const requestedSlug = extractBlogSlug(customSlugInput || title);

@@ -111,11 +111,7 @@ export async function PATCH(
       }
     }
 
-    const coverForStrip = updateData.coverImage
-      || (await prisma.post.findUnique({ where: { id }, select: { coverImage: true } }))?.coverImage;
-    if (coverForStrip) {
-      updateData.content = stripCoverFromContent(contentWithImages, coverForStrip);
-    }
+
 
     const post = await prisma.post.update({
       where: { id },

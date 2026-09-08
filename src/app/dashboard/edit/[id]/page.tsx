@@ -562,7 +562,7 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
                 <span>🖼️</span> Featured Image (Cover)
               </h3>
               <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '1.2rem' }}>
-                This image is shown at the top of the published post (above the title), not at the bottom of the article.
+                This image represents the blog on cards (Home page, Topics & Social previews). It will only appear on cards and not inside the article text.
               </p>
 
               {coverPreview || coverImageUrl ? (
