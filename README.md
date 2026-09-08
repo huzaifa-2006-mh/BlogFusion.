@@ -76,8 +76,7 @@ This project is open source and available under the MIT License.
 
 ## Contributors
 
-- **Muhammad Huzaifa** - Founder & Lead Developer
-- **Marium Waseem** - CEO & Co-Founder
+- **Marium Waseem** - CEO & Editorial Director
 
 ---
 

@@ -129,7 +129,8 @@ export async function PATCH(
     return NextResponse.json(post);
   } catch (error) {
     console.error('Update error:', error);
-    return NextResponse.json({ error: 'Failed to update post' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to update post', reason: errorMessage }, { status: 500 });
   }
 }
 

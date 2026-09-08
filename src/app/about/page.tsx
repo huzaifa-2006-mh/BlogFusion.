@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 import { Metadata } from 'next';
 import { getPageSeo } from '@/lib/seo';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300; // ISR for fast mobile caching
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/about', {
@@ -243,6 +243,10 @@ export default async function About() {
                   <img
                     src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=1000&auto=format&fit=crop"
                     alt="Editorial workspace - Blog Fusion"
+                    width={800}
+                    height={450}
+                    decoding="async"
+                    fetchPriority="high"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 </div>
@@ -338,6 +342,10 @@ export default async function About() {
                       <img
                         src={coverImage}
                         alt={cat.name}
+                        width={400}
+                        height={225}
+                        loading="lazy"
+                        decoding="async"
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                       <div

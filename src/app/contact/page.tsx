@@ -98,12 +98,6 @@ export default function Contact() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <a
-                    href="mailto:huzaifamm70@gmail.com"
-                    style={{ fontWeight: '700', color: '#3E2618', fontSize: '0.95rem', textDecoration: 'none' }}
-                  >
-                    ✉️ huzaifamm70@gmail.com
-                  </a>
-                  <a
                     href="mailto:mwaseem0488@gmail.com"
                     style={{ fontWeight: '700', color: '#3E2618', fontSize: '0.95rem', textDecoration: 'none' }}
                   >

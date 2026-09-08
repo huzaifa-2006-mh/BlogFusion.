@@ -9,15 +9,17 @@ import SiteJsonLd from "@/components/SiteJsonLd";
 
 const openSans = Open_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "700"],
   display: "swap",
+  preload: true,
   variable: "--font-opensans",
 });
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800", "900"],
+  weight: ["600", "700", "800"],
   display: "swap",
+  preload: true,
   variable: "--font-poppins",
 });
 
@@ -31,8 +33,8 @@ export const metadata: Metadata = {
     template: '%s | Blog Fusion',
   },
   description: 'Welcome to Blog Fusion — practical information, useful ideas, and insights across AI & Technology, Finance, Education, Careers, Health, and Fitness.',
-  authors: [{ name: 'Muhammad Huzaifa (Founder)' }, { name: 'Marium Waseem (CEO)' }],
-  creator: 'Muhammad Huzaifa',
+  authors: [{ name: 'Marium Waseem (CEO)' }],
+  creator: 'Marium Waseem',
   publisher: 'Blog Fusion',
   manifest: '/site.webmanifest',
   verification: {
@@ -81,11 +83,13 @@ export default function RootLayout({
       <head>
         <meta name="application-name" content="Blog Fusion" />
         <meta name="apple-mobile-web-app-title" content="Blog Fusion" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
       </head>
       <body>
         <SiteJsonLd />
-        <Script strategy="afterInteractive" src="https://www.googletagmanager.com/gtag/js?id=G-8612225GGD" />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script strategy="lazyOnload" src="https://www.googletagmanager.com/gtag/js?id=G-8612225GGD" />
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

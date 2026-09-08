@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 import { getPageSeo } from '@/lib/seo';
 import type { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // ISR - revalidate every 60s for ultra-fast mobile TTFB
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/', {
@@ -259,6 +259,8 @@ export default async function Home() {
                       <img
                         src={featuredLeadPost.coverImage}
                         alt={featuredLeadPost.title}
+                        width={800}
+                        height={450}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         decoding="async"
                         fetchPriority="high"
@@ -268,6 +270,8 @@ export default async function Home() {
                     <img
                       src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1000&auto=format&fit=crop"
                       alt="Blog Fusion - Ideas, Insights and Knowledge"
+                      width={800}
+                      height={450}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       decoding="async"
                       fetchPriority="high"
@@ -380,6 +384,10 @@ export default async function Home() {
                       <img
                         src={coverImage}
                         alt={cat.name}
+                        width={400}
+                        height={225}
+                        loading="lazy"
+                        decoding="async"
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                       <div
@@ -535,7 +543,15 @@ export default async function Home() {
                     <Link href={`/blog/${post.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', height: '100%' }}>
                       <div className="img-container">
                         {post.coverImage ? (
-                          <img src={post.coverImage} alt={post.title} loading="lazy" />
+                          <img
+                            src={post.coverImage}
+                            alt={post.title}
+                            width={600}
+                            height={340}
+                            loading="lazy"
+                            decoding="async"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
                         ) : (
                           <div
                             style={{

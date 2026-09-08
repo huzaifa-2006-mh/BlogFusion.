@@ -183,7 +183,8 @@ export default function CreatePost() {
         router.push('/dashboard/posts');
       } else {
         const errData = await response.json().catch(() => ({}));
-        alert(errData.error || 'Failed to publish blog.');
+        const message = errData.error ? `${errData.error}${errData.reason ? ': ' + errData.reason : ''}` : 'Failed to publish blog.';
+        alert(message);
       }
     } catch (error) {
       alert('An error occurred while publishing.');

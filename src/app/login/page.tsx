@@ -12,8 +12,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Hardcoded credentials as requested
-    if ((username === 'huzaifa' || username === 'marium') && password === 'Sedil@1234') {
+    // Author credentials
+    if (username === 'marium' && password === 'Sedil@1234') {
       // Set a simple cookie (in a real app, use a secure session token)
       document.cookie = `auth_session=${username}; path=/; max-age=86400`;
       router.push('/dashboard');

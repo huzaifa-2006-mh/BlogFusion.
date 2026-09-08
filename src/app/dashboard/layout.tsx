@@ -99,7 +99,7 @@ export default function DashboardLayout({
           </div>
           <div>
             <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginBottom: '0.25rem' }}>Admin</p>
-            <p style={{ fontWeight: '700', color: '#ffffff', fontSize: '0.9rem' }}>{username || 'Huzaifa'}</p>
+            <p style={{ fontWeight: '700', color: '#ffffff', fontSize: '0.9rem' }}>{username || 'Marium'}</p>
           </div>
         </div>
 

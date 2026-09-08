@@ -225,7 +225,8 @@ export default function EditPost({ params }: { params: Promise<{ id: string }> }
         router.push('/dashboard/posts');
       } else {
         const errData = await response.json().catch(() => ({}));
-        alert(errData.error || 'Failed to update blog.');
+        const message = errData.error ? `${errData.error}${errData.reason ? ': ' + errData.reason : ''}` : 'Failed to update blog.';
+        alert(message);
       }
     } catch (error) {
       alert('An error occurred while updating.');

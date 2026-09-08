@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { applyImageAltPlaceholders, optimizeAndStoreImage } from '@/lib/imageUpload';
 import { generateNewsletterEmail } from '@/lib/newsletter';
 import { defaultPostCanonical, extractBlogSlug, normalizeCanonicalUrl } from '@/lib/blogUrl';
-import { stripCoverFromContent } from '@/lib/postHtml';
+import { extractFirstImageSrc, stripCoverFromContent } from '@/lib/postHtml';
 import { ensureUniqueSlug } from '@/lib/uniqueSlug';
 import { Resend } from 'resend';
 
@@ -51,17 +51,25 @@ export async function POST(request: Request) {
     }
 
     const coverImageFile = formData.get('coverImageFile') as File | null;
-    let coverImagePath: string | null = (formData.get('coverImageUrl') as string) || null;
+    let coverImagePath: string | null = (formData.get('coverImageUrl') as string)?.trim() || null;
 
     if (coverImageFile && coverImageFile.size > 0) {
+      // Optimize and store explicit cover image file
       coverImagePath = await optimizeAndStoreImage(coverImageFile);
     }
 
+    // Fallback 1: if no explicit cover image, use the first uploaded image as cover automatically
     if (!coverImagePath && uploadedImagePaths.length > 0) {
       coverImagePath = uploadedImagePaths[0];
     }
 
+    // Fallback 2: if still no cover image, check if content has an embedded image
+    if (!coverImagePath) {
+      coverImagePath = extractFirstImageSrc(contentWithImages);
+    }
+
     if (coverImagePath) {
+      // Remove cover image from content to avoid duplicate display
       contentWithImages = stripCoverFromContent(contentWithImages, coverImagePath);
     }
 
@@ -137,8 +145,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(post);
   } catch (error) {
+    // Provide detailed error information to the client for debugging
     console.error('Post creation error:', error);
-    return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to create post', reason: errorMessage }, { status: 500 });
   }
 }
 

@@ -133,7 +133,11 @@ export default function CategoryExplorer({
                           <img
                             src={post.coverImage}
                             alt={post.title}
+                            width={600}
+                            height={340}
                             loading="lazy"
+                            decoding="async"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           />
                         ) : (
                           <div

@@ -44,6 +44,7 @@ export async function optimizeAndStoreImage(file: File): Promise<string> {
 
   // Compress raster image to web-optimized WebP (max 1600px width, 80% quality)
   let optimizedBuffer: Buffer;
+  let isWebp = true;
   try {
     optimizedBuffer = await sharp(buffer)
       .rotate() // auto-orient based on EXIF
@@ -53,21 +54,25 @@ export async function optimizeAndStoreImage(file: File): Promise<string> {
   } catch (sharpErr) {
     console.warn('Sharp optimization error, using original buffer:', sharpErr);
     optimizedBuffer = buffer;
+    isWebp = false;
   }
+
+  const ext = isWebp ? '.webp' : (fileExt || '.png');
+  const mime = isWebp ? 'image/webp' : (file.type || 'image/png');
 
   // Attempt saving to public/uploads directory (works locally)
   try {
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     await fs.mkdir(uploadsDir, { recursive: true });
-    const fileName = `${baseName}_${Date.now()}_${randomHash}.webp`;
+    const fileName = `${baseName}_${Date.now()}_${randomHash}${ext}`;
     const filePath = path.join(uploadsDir, fileName);
     await fs.writeFile(filePath, optimizedBuffer);
     return `/uploads/${fileName}`;
   } catch (fsErr) {
-    // Failover for Vercel Serverless (read-only filesystem) -> Return compressed WebP Data URL
-    console.log('Serverless environment detected (read-only filesystem). Returning compressed WebP Data URL.');
+    // Failover for Vercel Serverless (read-only filesystem) -> Return compressed Data URL
+    console.log('Serverless environment detected (read-only filesystem). Returning Data URL.');
     const base64 = optimizedBuffer.toString('base64');
-    return `data:image/webp;base64,${base64}`;
+    return `data:${mime};base64,${base64}`;
   }
 }
 

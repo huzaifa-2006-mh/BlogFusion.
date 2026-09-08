@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   },
   compress: true,
   poweredByHeader: false,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 2592000,
+  },
   async headers() {
     return [
       {
@@ -26,6 +30,12 @@ const nextConfig: NextConfig = {
         source: "/icon",
         headers: [
           { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+        ],
+      },
+      {
+        source: "/:all*(svg|jpg|jpeg|png|webp|avif|ico|woff|woff2)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
     ];

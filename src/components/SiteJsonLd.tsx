@@ -8,12 +8,6 @@ export default function SiteJsonLd() {
     alternateName: 'BlogFusion',
     url: siteUrl,
     logo: `${siteUrl}/favicon-48x48.png`,
-    founder: {
-      '@type': 'Person',
-      name: 'Muhammad Huzaifa',
-      jobTitle: 'Founder & Boss',
-      url: siteUrl,
-    },
     chiefExecutiveOfficer: {
       '@type': 'Person',
       name: 'Marium Waseem',
@@ -21,25 +15,9 @@ export default function SiteJsonLd() {
       url: siteUrl,
     },
     sameAs: [
-      'https://github.com/huzaifa-2006-mh',
       'https://www.facebook.com/profile.php?id=61590547042139',
       'https://www.linkedin.com/in/mhssoftwarehouse/',
     ],
-  };
-
-  const huzaifaPersonSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: 'Muhammad Huzaifa',
-    jobTitle: 'Founder & Boss',
-    worksFor: {
-      '@type': 'Organization',
-      name: 'Blog Fusion',
-      url: siteUrl,
-    },
-    description: 'Muhammad Huzaifa is the Founder and Boss of Blog Fusion.',
-    url: siteUrl,
-    image: `${siteUrl}/huzaifa.png`,
   };
 
   const mariumPersonSchema = {
@@ -77,10 +55,6 @@ export default function SiteJsonLd() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(huzaifaPersonSchema) }}
       />
       <script
         type="application/ld+json"

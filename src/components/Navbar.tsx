@@ -45,7 +45,7 @@ function MobileDrawer({
         <div className="mobile-nav-header">
           <Link href="/" onClick={onClose} className="mobile-nav-brand">
             <span className="mobile-nav-brand-mark">
-              <img src="/logo.png" alt="" />
+              <img src="/logo.webp" alt="Blog Fusion logo" width="34" height="34" decoding="async" />
             </span>
             <span>
               <span className="mobile-nav-brand-title">
@@ -127,7 +127,7 @@ const Navbar = () => {
         <div className="container main-navbar-inner">
           <Link href="/" className="main-navbar-brand">
             <span className="main-navbar-logo">
-              <img src="/logo.png" alt="Blog Fusion" />
+              <img src="/logo.webp" alt="Blog Fusion" width="36" height="36" decoding="async" fetchPriority="high" />
             </span>
             <span>
               <span className="main-navbar-title">

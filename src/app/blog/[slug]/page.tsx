@@ -6,7 +6,7 @@ import { Metadata } from 'next';
 import { defaultPostCanonical, normalizeCanonicalUrl } from '@/lib/blogUrl';
 import { extractFirstImageSrc, stripCoverFromContent } from '@/lib/postHtml';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // ISR for instant mobile delivery
 
 export async function generateStaticParams() {
   try {
@@ -169,8 +169,10 @@ export default async function BlogPostPage({ params }: any) {
 
   processedContent = processedContent.replace(/(?:<p>\s*)?\[IMAGE(?:[:|]\s*(.*?))?\](?:\s*<\/p>)?/gi, '');
 
-  if (post.coverImage) {
-    processedContent = stripCoverFromContent(processedContent, post.coverImage);
+  const featuredCover = post.coverImage || post.ogImage || (post.images && post.images.length > 0 ? post.images[0] : null) || extractFirstImageSrc(content);
+
+  if (featuredCover) {
+    processedContent = stripCoverFromContent(processedContent, featuredCover);
   }
 
   // Schema.org JSON-LD definitions
@@ -270,6 +272,36 @@ export default async function BlogPostPage({ params }: any) {
           </div>
         </header>
 
+        {/* Featured Cover Image */}
+        {featuredCover && (
+          <div
+            className="blog-featured-image-wrapper"
+            style={{
+              marginBottom: '2.5rem',
+              borderRadius: '16px',
+              overflow: 'hidden',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+            }}
+          >
+            <img
+              src={featuredCover}
+              alt={post.title}
+              width={800}
+              height={450}
+              decoding="async"
+              fetchPriority="high"
+              style={{
+                width: '100%',
+                maxHeight: '480px',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+            />
+          </div>
+        )}
+
         {/* Clean Article Content */}
         <div className="blog-content" style={{ ...customStyles }}>
           <div dangerouslySetInnerHTML={{ __html: processedContent }} />
@@ -299,20 +331,18 @@ export default async function BlogPostPage({ params }: any) {
           <div className="author-bio-avatar" style={{ width: '75px', height: '75px', borderRadius: '50%', background: 'linear-gradient(135deg, #6B4226 0%, #3E2618 100%)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '1.8rem', boxShadow: '0 8px 20px rgba(107,66,38,0.2)', flexShrink: 0 }}>
             {post.author?.image ? (
               <img src={post.author.image} alt={authorName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : authorName.toLowerCase().includes('huzaifa') ? (
-              <img src="/huzaifa.png" alt="Muhammad Huzaifa" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               authorInitial
             )}
           </div>
           <div className="author-bio-details">
             <h3 style={{ margin: '0 0 0.4rem 0', fontWeight: '800', color: '#3E2618', fontSize: '1.3rem' }}>
-              Written by <span style={{ color: '#6B4226' }}>{authorName.toLowerCase().includes('mari') ? 'Marium Waseem (CEO)' : authorName.toLowerCase().includes('huzaifa') ? 'Muhammad Huzaifa (Founder & Boss)' : authorName}</span>
+              Written by <span style={{ color: '#6B4226' }}>{authorName.toLowerCase().includes('mari') ? 'Marium Waseem (CEO)' : authorName}</span>
             </h3>
             <p style={{ margin: 0, color: '#475569', fontSize: '0.95rem', lineHeight: '1.5' }}>
               {authorName.toLowerCase().includes('mari') 
                 ? "Marium Waseem is the Chief Executive Officer (CEO) of Blog Fusion. She leads company strategy, technology insights, and editorial excellence." 
-                : "Muhammad Huzaifa is the Founder and Boss of Blog Fusion. He is a passionate software engineer and creator dedicated to sharing practical tech guides."}
+                : "Editorial Desk at Blog Fusion. Sharing practical guides, insights, and knowledge for a better future."}
             </p>
           </div>
         </aside>
