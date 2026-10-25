@@ -52,7 +52,8 @@ export default function AnalyticsTracker() {
       });
 
       if (navigator.sendBeacon) {
-        navigator.sendBeacon('/api/analytics', data);
+        const blob = new Blob([data], { type: 'application/json' });
+        navigator.sendBeacon('/api/analytics', blob);
       } else {
         fetch('/api/analytics', {
           method: 'POST',
