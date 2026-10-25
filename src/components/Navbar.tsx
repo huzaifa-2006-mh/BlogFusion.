@@ -186,10 +186,16 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
     if (!mobileMenuOpen && toggleBtnRef.current) {
-      // Return focus to toggle button when drawer closes
+      // Return focus to toggle button only when drawer closes, not on page load
       toggleBtnRef.current.focus();
     }
     return () => {

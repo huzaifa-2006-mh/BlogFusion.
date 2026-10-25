@@ -7,7 +7,7 @@ const securityHeaders = [
       "default-src 'self'",
       // NOTE: This static header is a fallback for static assets only.
       // HTML pages get a stronger nonce-based CSP injected by middleware.ts
-      "script-src 'self' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com",
+      "script-src 'self' 'strict-dynamic' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://images.unsplash.com https://*.google-analytics.com https://*.googletagmanager.com https:",
       "font-src 'self' data: https://fonts.gstatic.com",

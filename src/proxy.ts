@@ -2,17 +2,16 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Middleware: Auth guard + Per-request CSP nonce injection
- *
- * 1. Redirects unauthenticated users away from /dashboard (merged from proxy.ts)
- * 2. Replaces `script-src 'unsafe-inline'` with a cryptographic nonce,
- *    satisfying the Lighthouse / PageSpeed "Trust & Safety" CSP warning.
- *    The nonce is forwarded to server components via the `x-nonce` request header.
+ * Next.js Proxy (replaces deprecated middleware in Next.js 16+)
+ * 
+ * 1. Auth Guard: Redirects unauthenticated users away from /dashboard
+ * 2. CSP Nonce: Injects cryptographic per-request nonces for all HTML pages,
+ *    satisfying the PageSpeed / Lighthouse Trust & Safety CSP requirements.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ── Auth guard (was in proxy.ts) ─────────────────────────────────────────
+  // ── Auth guard ──────────────────────────────────────────────────────────
   if (pathname.startsWith('/dashboard')) {
     const session = request.cookies.get('auth_session');
     if (!session) {
@@ -20,7 +19,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // ── Skip static assets — no CSP nonce needed ──────────────────────────────
+  // ── Skip static assets & Next.js internals ──────────────────────────────
   if (
     pathname.startsWith('/_next/static') ||
     pathname.startsWith('/_next/image') ||
@@ -30,13 +29,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ── Generate a fresh random nonce for every HTML response ─────────────────
+  // ── Generate cryptographic nonce for HTML responses ─────────────────────
   const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
 
   const csp = [
     "default-src 'self'",
-    // nonce covers Next.js inline scripts; host allowlist covers external GTM/GA
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https://images.unsplash.com https://*.google-analytics.com https://*.googletagmanager.com https:",
     "font-src 'self' data: https://fonts.gstatic.com",
@@ -51,12 +49,10 @@ export function middleware(request: NextRequest) {
   ].join('; ');
 
   const requestHeaders = new Headers(request.headers);
-  // Pass nonce to server components via a request header
   requestHeaders.set('x-nonce', nonce);
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
 
-  // Set the nonce-based CSP on the response
   response.headers.set('Content-Security-Policy', csp);
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'SAMEORIGIN');
@@ -65,12 +61,12 @@ export function middleware(request: NextRequest) {
   return response;
 }
 
+// Next.js 16 supports default export or named export `proxy`
+export default proxy;
+
 export const config = {
   matcher: [
-    // Auth guard for dashboard
     '/dashboard/:path*',
-    // CSP nonce for all HTML pages (excludes static files and API routes)
     '/((?!_next/static|_next/image|favicon|api/|.*\\.(?:ico|png|jpg|jpeg|webp|svg|woff|woff2)).*)',
   ],
 };
-
