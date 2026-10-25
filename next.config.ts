@@ -5,7 +5,9 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
+      // NOTE: This static header is a fallback for static assets only.
+      // HTML pages get a stronger nonce-based CSP injected by middleware.ts
+      "script-src 'self' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://images.unsplash.com https://*.google-analytics.com https://*.googletagmanager.com https:",
       "font-src 'self' data: https://fonts.gstatic.com",
@@ -56,6 +58,12 @@ const nextConfig: NextConfig = {
   },
   compress: true,
   poweredByHeader: false,
+  experimental: {
+    // Inline critical CSS → eliminates render-blocking CSS chunk (~150ms saving)
+    optimizeCss: true,
+    // Tree-shake heavy packages → removes unused CSS/JS code paths
+    optimizePackageImports: ['lucide-react', 'react-icons', 'date-fns'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 2592000,
@@ -69,11 +77,8 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Apply security headers to all routes (single rule is sufficient)
         source: "/(.*)",
-        headers: securityHeaders,
-      },
-      {
-        source: "/:path*",
         headers: securityHeaders,
       },
       {

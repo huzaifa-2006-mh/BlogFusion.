@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Open_Sans, Poppins } from "next/font/google";
 import "./globals.css";
@@ -73,11 +74,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Read the nonce injected by middleware for CSP compliance
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') ?? '';
+
   return (
     <html lang="en" className={`${openSans.variable} ${poppins.variable}`}>
       <head>
@@ -85,7 +90,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Blog Fusion" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        {/* Trusted Types bootstrap — nonce allows it to run without 'unsafe-inline' */}
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `if(typeof window!=='undefined'&&window.trustedTypes&&window.trustedTypes.createPolicy){try{window.trustedTypes.createPolicy('default',{createHTML:function(s){return s},createScript:function(s){return s},createScriptURL:function(s){return s}})}catch(e){}}`,
           }}
@@ -93,7 +100,7 @@ export default function RootLayout({
       </head>
       <body>
         <SiteJsonLd />
-        <GoogleAnalytics gaId="G-8612225GGD" />
+        <GoogleAnalytics gaId="G-8612225GGD" nonce={nonce} />
         <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>

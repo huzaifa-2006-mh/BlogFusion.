@@ -4,9 +4,10 @@ import { useEffect } from 'react';
 
 interface GoogleAnalyticsProps {
   gaId: string;
+  nonce?: string;
 }
 
-export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
+export default function GoogleAnalytics({ gaId, nonce }: GoogleAnalyticsProps) {
   useEffect(() => {
     let scriptLoaded = false;
 
@@ -21,10 +22,11 @@ export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
       window.removeEventListener('keydown', loadScript);
       window.removeEventListener('click', loadScript);
 
-      // Inject gtag.js asynchronously
+      // Inject gtag.js asynchronously with nonce for CSP compliance
       const script = document.createElement('script');
       script.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
       script.async = true;
+      if (nonce) script.nonce = nonce;
       document.head.appendChild(script);
 
       // Initialize dataLayer and gtag
@@ -67,7 +69,7 @@ export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
       window.removeEventListener('keydown', loadScript);
       window.removeEventListener('click', loadScript);
     };
-  }, [gaId]);
+  }, [gaId, nonce]);
 
   return null;
 }
