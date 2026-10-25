@@ -5,6 +5,7 @@ import ShareButtons from '@/components/ShareButtons';
 import { Metadata } from 'next';
 import { defaultPostCanonical, normalizeCanonicalUrl } from '@/lib/blogUrl';
 import { extractFirstImageSrc, stripCoverFromContent } from '@/lib/postHtml';
+import './article.css';
 
 export const revalidate = 60; // ISR for instant mobile delivery
 
