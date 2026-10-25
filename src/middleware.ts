@@ -2,18 +2,25 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Middleware: Per-request CSP nonce injection
+ * Middleware: Auth guard + Per-request CSP nonce injection
  *
- * Replaces `script-src 'unsafe-inline'` with a cryptographic nonce,
- * satisfying the Lighthouse / PageSpeed "Trust & Safety" CSP warning.
- *
- * The nonce is forwarded to the page via a response header
- * (`x-nonce`) so that server components can read it and add it
- * to any inline <script> tags they render.
+ * 1. Redirects unauthenticated users away from /dashboard (merged from proxy.ts)
+ * 2. Replaces `script-src 'unsafe-inline'` with a cryptographic nonce,
+ *    satisfying the Lighthouse / PageSpeed "Trust & Safety" CSP warning.
+ *    The nonce is forwarded to server components via the `x-nonce` request header.
  */
 export function middleware(request: NextRequest) {
-  // Skip static assets and Next.js internals — no CSP needed there
   const { pathname } = request.nextUrl;
+
+  // ── Auth guard (was in proxy.ts) ─────────────────────────────────────────
+  if (pathname.startsWith('/dashboard')) {
+    const session = request.cookies.get('auth_session');
+    if (!session) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
+  // ── Skip static assets — no CSP nonce needed ──────────────────────────────
   if (
     pathname.startsWith('/_next/static') ||
     pathname.startsWith('/_next/image') ||
@@ -23,7 +30,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Generate a fresh random nonce for every HTML response
+  // ── Generate a fresh random nonce for every HTML response ─────────────────
   const nonce = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('base64');
 
   const csp = [
@@ -51,9 +58,6 @@ export function middleware(request: NextRequest) {
 
   // Set the nonce-based CSP on the response
   response.headers.set('Content-Security-Policy', csp);
-
-  // Copy through other security headers (not duplicating what next.config sets,
-  // but ensuring they are present on this response object too)
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'SAMEORIGIN');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -62,8 +66,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Run on all routes except static files and API routes that don't serve HTML
   matcher: [
+    // Auth guard for dashboard
+    '/dashboard/:path*',
+    // CSP nonce for all HTML pages (excludes static files and API routes)
     '/((?!_next/static|_next/image|favicon|api/|.*\\.(?:ico|png|jpg|jpeg|webp|svg|woff|woff2)).*)',
   ],
 };
+
