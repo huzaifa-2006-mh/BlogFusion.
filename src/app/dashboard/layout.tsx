@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import './dashboard.css';
 
 export default function DashboardLayout({
   children,

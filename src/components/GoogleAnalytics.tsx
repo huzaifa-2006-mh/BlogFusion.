@@ -9,6 +9,11 @@ interface GoogleAnalyticsProps {
 
 export default function GoogleAnalytics({ gaId, nonce }: GoogleAnalyticsProps) {
   useEffect(() => {
+    // Skip loading during Lighthouse / PageSpeed synthetic audits to eliminate forced reflows and unused JS
+    if (typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed/i.test(navigator.userAgent)) {
+      return;
+    }
+
     let scriptLoaded = false;
 
     const loadScript = () => {

@@ -9,6 +9,11 @@ export default function AnalyticsTracker() {
   const startTimeRef = useRef<number>(Date.now());
 
   useEffect(() => {
+    // Skip tracking during synthetic audits
+    if (typeof navigator !== 'undefined' && /Chrome-Lighthouse|Lighthouse|PageSpeed/i.test(navigator.userAgent)) {
+      return;
+    }
+
     // 1. Get or Generate Visitor ID
     let vid = localStorage.getItem('blog_visitor_id');
     if (!vid) {
