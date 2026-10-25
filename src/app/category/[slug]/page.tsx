@@ -12,7 +12,7 @@ export async function generateStaticParams() {
     return categories.map((cat) => ({
       slug: cat.slug
     }));
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -22,7 +22,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const cleanSiteUrl = siteUrl.replace(/\/+$/, '');
   try {
     const { slug } = await params;
-    const category = await prisma.category.findUnique({ where: { slug } });
+    const category = await prisma.category.findUnique({
+      where: { slug },
+      select: { name: true, description: true },
+    });
     const canonical = `${cleanSiteUrl}/category/${slug}`;
     return {
       title: category ? `${category.name} - Blog Fusion` : 'Category - Blog Fusion',
@@ -36,7 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         url: canonical,
       },
     };
-  } catch (error) {
+  } catch {
     return {
       title: 'Categories - Blog Fusion',
       description: 'Explore topics on Blog Fusion',
@@ -52,27 +55,71 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   let categories: any[] = [];
   let posts: any[] = [];
+  let totalPostCount = 0;
 
   try {
-    categories = await prisma.category.findMany({
-      orderBy: { name: 'asc' },
-    });
+    const [cats, catPosts, totalCount] = await Promise.all([
+      prisma.category.findMany({
+        orderBy: { name: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          _count: {
+            select: { posts: { where: { published: true } } },
+          },
+        },
+      }),
+      prisma.post.findMany({
+        where: {
+          published: true,
+          category: { slug },
+        },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          excerpt: true,
+          shortDescription: true,
+          coverImage: true,
+          createdAt: true,
+          categoryId: true,
+          category: {
+            select: {
+              name: true,
+              slug: true,
+            },
+          },
+          author: {
+            select: {
+              username: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.post.count({
+        where: { published: true },
+      }),
+    ]);
 
-    posts = await prisma.post.findMany({
-      where: { published: true },
-      include: {
-        category: true,
-        author: true,
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    categories = cats;
+    posts = catPosts;
+    totalPostCount = totalCount;
   } catch (error) {
-    console.error('Failed to fetch categories or posts:', error);
+    console.error('Failed to fetch category posts:', error);
   }
 
   return (
     <div style={{ background: '#FFFFFF', minHeight: '80vh' }}>
-      <CategoryExplorer categories={categories} posts={posts} initialCategorySlug={slug} />
+      <CategoryExplorer
+        categories={categories}
+        posts={posts}
+        initialCategorySlug={slug}
+        totalPostCount={totalPostCount}
+      />
     </div>
   );
 }

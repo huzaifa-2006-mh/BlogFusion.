@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import { Open_Sans, Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -88,15 +88,7 @@ export default function RootLayout({
       </head>
       <body>
         <SiteJsonLd />
-        <Script strategy="lazyOnload" src="https://www.googletagmanager.com/gtag/js?id=G-8612225GGD" />
-        <Script id="google-analytics" strategy="lazyOnload">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-8612225GGD');
-          `}
-        </Script>
+        <GoogleAnalytics gaId="G-8612225GGD" />
         <AnalyticsTracker />
         <Navbar />
         <main>{children}</main>

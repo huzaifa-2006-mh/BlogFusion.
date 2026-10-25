@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 const navItems = [
@@ -22,26 +22,93 @@ function MobileDrawer({
   pathname: string;
 }) {
   const [mounted, setMounted] = useState(false);
+  const drawerRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  // Focus management & keyboard navigation (Escape + Tab focus trap)
+  useEffect(() => {
+    if (!open) return;
+
+    // Focus close button on open
+    const focusTimer = setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && drawerRef.current) {
+        const focusableElements = drawerRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open, onClose]);
+
+  if (!mounted || !open) return null;
 
   return createPortal(
     <div
       className={`mobile-nav-overlay${open ? ' is-open' : ''}`}
       onClick={onClose}
-      aria-hidden={!open}
+      role="presentation"
     >
       <aside
+        ref={drawerRef}
         className="mobile-nav-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label="Site menu"
+        aria-labelledby="mobile-nav-heading"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Visually hidden heading for screen readers to satisfy WCAG dialog labeling */}
+        <h2
+          id="mobile-nav-heading"
+          style={{
+            position: 'absolute',
+            width: '1px',
+            height: '1px',
+            padding: 0,
+            margin: '-1px',
+            overflow: 'hidden',
+            clip: 'rect(0, 0, 0, 0)',
+            whiteSpace: 'nowrap',
+            border: 0,
+          }}
+        >
+          Site Navigation Menu
+        </h2>
+
         <div className="mobile-nav-header">
           <Link href="/" onClick={onClose} className="mobile-nav-brand">
             <span className="mobile-nav-brand-mark">
@@ -54,14 +121,20 @@ function MobileDrawer({
               <span className="mobile-nav-brand-sub">Menu</span>
             </span>
           </Link>
-          <button type="button" className="mobile-nav-close" onClick={onClose} aria-label="Close menu">
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="mobile-nav-close"
+            onClick={onClose}
+            aria-label="Close navigation menu"
+          >
             ✕
           </button>
         </div>
 
         <p className="mobile-nav-section-label">Pages</p>
 
-        <nav className="mobile-nav-links">
+        <nav className="mobile-nav-links" aria-label="Mobile Navigation Links">
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
@@ -107,6 +180,7 @@ function MobileDrawer({
 const Navbar = () => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const toggleBtnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -114,6 +188,10 @@ const Navbar = () => {
 
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+    if (!mobileMenuOpen && toggleBtnRef.current) {
+      // Return focus to toggle button when drawer closes
+      toggleBtnRef.current.focus();
+    }
     return () => {
       document.body.style.overflow = '';
     };
@@ -154,6 +232,7 @@ const Navbar = () => {
           </nav>
 
           <button
+            ref={toggleBtnRef}
             type="button"
             className={`mobile-nav-toggle-btn${mobileMenuOpen ? ' is-open' : ''}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

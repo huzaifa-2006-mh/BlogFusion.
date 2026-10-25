@@ -241,10 +241,12 @@ export default async function About() {
               >
                 <div style={{ height: '380px', width: '100%', overflow: 'hidden' }}>
                   <img
-                    src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?q=80&w=1000&auto=format&fit=crop"
+                    src="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=720&q=75"
+                    srcSet="https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=400&q=75 400w, https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=720&q=75 720w"
+                    sizes="(max-width: 640px) 100vw, 50vw"
                     alt="Editorial workspace - Blog Fusion"
-                    width={800}
-                    height={450}
+                    width={720}
+                    height={405}
                     decoding="async"
                     fetchPriority="high"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -321,7 +323,7 @@ export default async function About() {
               }}
             >
               {dbCategories.map((cat, index) => {
-                const coverImage = cat.posts?.[0]?.coverImage || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800&auto=format&fit=crop';
+                const coverImage = cat.posts?.[0]?.coverImage || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=75';
                 const postCount = cat._count?.posts || 0;
 
                 return (

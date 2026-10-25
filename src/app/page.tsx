@@ -2,6 +2,7 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import { getPageSeo } from '@/lib/seo';
 import type { Metadata } from 'next';
+import { optimizeImageUrl, getResponsiveImageSrcSet } from '@/lib/imageOptimizer';
 
 export const revalidate = 60; // ISR - revalidate every 60s for ultra-fast mobile TTFB
 
@@ -61,7 +62,27 @@ export default async function Home() {
       where: { published: true },
       orderBy: { createdAt: 'desc' },
       take: 6,
-      include: { category: true, author: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        shortDescription: true,
+        coverImage: true,
+        createdAt: true,
+        category: {
+          select: {
+            name: true,
+            slug: true,
+          },
+        },
+        author: {
+          select: {
+            username: true,
+            image: true,
+          },
+        },
+      },
     });
 
     dbCategories = await prisma.category.findMany({
@@ -257,10 +278,12 @@ export default async function Home() {
                   {featuredLeadPost?.coverImage ? (
                     <Link href={`/blog/${featuredLeadPost.slug}`}>
                       <img
-                        src={featuredLeadPost.coverImage}
+                        src={optimizeImageUrl(featuredLeadPost.coverImage, 720, 75)}
+                        srcSet={getResponsiveImageSrcSet(featuredLeadPost.coverImage, [400, 720, 960])}
+                        sizes="(max-width: 640px) 100vw, 50vw"
                         alt={featuredLeadPost.title}
-                        width={800}
-                        height={450}
+                        width={720}
+                        height={405}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         decoding="async"
                         fetchPriority="high"
@@ -268,10 +291,12 @@ export default async function Home() {
                     </Link>
                   ) : (
                     <img
-                      src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=1000&auto=format&fit=crop"
+                      src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=720&q=75"
+                      srcSet="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=75 400w, https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=720&q=75 720w"
+                      sizes="(max-width: 640px) 100vw, 50vw"
                       alt="Blog Fusion - Ideas, Insights and Knowledge"
-                      width={800}
-                      height={450}
+                      width={720}
+                      height={405}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       decoding="async"
                       fetchPriority="high"
@@ -363,7 +388,9 @@ export default async function Home() {
               }}
             >
               {dbCategories.map((cat, index) => {
-                const coverImage = cat.posts?.[0]?.coverImage || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800&auto=format&fit=crop';
+                const coverImage = cat.posts?.[0]?.coverImage
+                  ? optimizeImageUrl(cat.posts[0].coverImage, 400, 75)
+                  : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=75';
                 const postCount = cat._count?.posts || 0;
 
                 return (
@@ -544,7 +571,9 @@ export default async function Home() {
                       <div className="img-container">
                         {post.coverImage ? (
                           <img
-                            src={post.coverImage}
+                            src={optimizeImageUrl(post.coverImage, 600, 75)}
+                            srcSet={getResponsiveImageSrcSet(post.coverImage, [360, 600, 800])}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
                             alt={post.title}
                             width={600}
                             height={340}
@@ -587,7 +616,15 @@ export default async function Home() {
 
                         <div className="blog-card-author">
                           {post.author?.image ? (
-                            <img src={post.author.image} alt={post.author.username || 'Author'} />
+                            <img
+                              src={optimizeImageUrl(post.author.image, 64, 80)}
+                              alt={post.author.username || 'Author'}
+                              width={32}
+                              height={32}
+                              loading="lazy"
+                              decoding="async"
+                              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
+                            />
                           ) : (
                             <div className="author-fallback">
                               {(post.author?.username || 'BF').charAt(0).toUpperCase()}

@@ -1,16 +1,19 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { optimizeImageUrl, getResponsiveImageSrcSet } from '@/lib/imageOptimizer';
 
-interface Category {
+export interface CategoryItem {
   id: string;
   name: string;
   slug: string;
   description?: string | null;
+  _count?: {
+    posts: number;
+  };
 }
 
-interface Post {
+export interface PostItem {
   id: string;
   title: string;
   slug: string;
@@ -30,27 +33,28 @@ interface Post {
 }
 
 interface CategoryExplorerProps {
-  categories: Category[];
-  posts: Post[];
+  categories: CategoryItem[];
+  posts: PostItem[];
   initialCategorySlug?: string;
+  totalPostCount?: number;
 }
 
 export default function CategoryExplorer({
   categories,
   posts,
   initialCategorySlug = 'all',
+  totalPostCount,
 }: CategoryExplorerProps) {
-  const [selectedSlug, setSelectedSlug] = useState<string>(initialCategorySlug);
-
-  const filteredPosts =
-    selectedSlug === 'all'
-      ? posts
-      : posts.filter((p) => p.category?.slug === selectedSlug || p.categoryId === selectedSlug);
+  const selectedSlug = initialCategorySlug;
 
   const currentCategory =
     selectedSlug === 'all'
       ? null
       : categories.find((c) => c.slug === selectedSlug);
+
+  const calculatedTotalCount =
+    totalPostCount ??
+    categories.reduce((acc, cat) => acc + (cat._count?.posts || 0), 0);
 
   return (
     <div className="container category-page-container" style={{ padding: '3.5rem 2rem 6rem 2rem' }}>
@@ -66,7 +70,7 @@ export default function CategoryExplorer({
             fontFamily: 'var(--font-poppins), sans-serif',
           }}
         >
-          Categories
+          {currentCategory ? currentCategory.name : 'All Categories'}
         </h1>
         <p style={{ color: '#666666', fontSize: '1rem', margin: 0, fontWeight: '500', lineHeight: '1.6' }}>
           {currentCategory?.description ||
@@ -85,28 +89,30 @@ export default function CategoryExplorer({
 
             <div className="category-pills-list">
               {/* All Pill */}
-              <button
-                type="button"
-                onClick={() => setSelectedSlug('all')}
+              <Link
+                href="/category"
                 className={`category-pill-btn ${selectedSlug === 'all' ? 'active' : ''}`}
               >
                 <span>All Topics</span>
-                <span className="category-count-badge">({posts.length})</span>
-              </button>
+                {calculatedTotalCount > 0 && (
+                  <span className="category-count-badge">({calculatedTotalCount})</span>
+                )}
+              </Link>
 
-              {/* Dynamic Categories from Dashboard */}
+              {/* Dynamic Categories */}
               {categories.map((cat) => {
-                const count = posts.filter((p) => p.category?.slug === cat.slug || p.categoryId === cat.id).length;
+                const count = cat._count?.posts ?? 0;
+                const isActive = selectedSlug === cat.slug;
+
                 return (
-                  <button
+                  <Link
                     key={cat.id}
-                    type="button"
-                    onClick={() => setSelectedSlug(cat.slug)}
-                    className={`category-pill-btn ${selectedSlug === cat.slug ? 'active' : ''}`}
+                    href={`/category/${cat.slug}`}
+                    className={`category-pill-btn ${isActive ? 'active' : ''}`}
                   >
                     <span>{cat.name}</span>
                     {count > 0 && <span className="category-count-badge">{count}</span>}
-                  </button>
+                  </Link>
                 );
               })}
             </div>
@@ -115,23 +121,37 @@ export default function CategoryExplorer({
 
         {/* Right Main Grid */}
         <main>
-          {filteredPosts.length > 0 ? (
+          {posts.length > 0 ? (
             <div className="blog-grid-livesession">
-              {filteredPosts.map((post) => {
+              {posts.map((post) => {
                 const dateStr = new Date(post.createdAt).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric',
                 });
 
+                const optimizedCover = optimizeImageUrl(post.coverImage, 600, 75);
+                const srcSet = getResponsiveImageSrcSet(post.coverImage, [360, 600, 800]);
+
                 return (
                   <article key={post.id} className="blog-card-livesession fade-in">
-                    <Link href={`/blog/${post.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      style={{
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        height: '100%',
+                      }}
+                    >
                       {/* Featured / Cover Image */}
                       <div className="img-container">
                         {post.coverImage ? (
                           <img
-                            src={post.coverImage}
+                            src={optimizedCover}
+                            srcSet={srcSet}
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
                             alt={post.title}
                             width={600}
                             height={340}
@@ -183,8 +203,13 @@ export default function CategoryExplorer({
                         <div className="blog-card-author">
                           {post.author?.image ? (
                             <img
-                              src={post.author.image}
+                              src={optimizeImageUrl(post.author.image, 64, 80)}
                               alt={post.author.username || 'Author'}
+                              width={32}
+                              height={32}
+                              loading="lazy"
+                              decoding="async"
+                              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
                             />
                           ) : (
                             <div className="author-fallback">
@@ -218,16 +243,15 @@ export default function CategoryExplorer({
                 No articles in this category yet
               </h3>
               <p style={{ color: '#666666', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
-                Articles created from the dashboard will automatically display here.
+                Articles created for this topic will automatically display here.
               </p>
-              <button
-                type="button"
-                onClick={() => setSelectedSlug('all')}
+              <Link
+                href="/category"
                 className="vip-btn-primary"
-                style={{ padding: '0.6rem 1.4rem', fontSize: '0.9rem' }}
+                style={{ padding: '0.6rem 1.4rem', fontSize: '0.9rem', display: 'inline-flex' }}
               >
                 View All Topics
-              </button>
+              </Link>
             </div>
           )}
         </main>
