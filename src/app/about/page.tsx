@@ -402,6 +402,7 @@ export default async function About() {
                       <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #F5EDE4' }}>
                         <Link
                           href={`/category/${cat.slug}`}
+                          prefetch={false}
                           style={{
                             fontWeight: '750',
                             fontSize: '15px',

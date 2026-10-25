@@ -13,6 +13,10 @@ const securityHeaders = [
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",
+      "object-src 'none'",
+      "require-trusted-types-for 'script'",
+      "trusted-types default 'allow-duplicates'",
+      "upgrade-insecure-requests",
     ].join("; "),
   },
   {
@@ -64,6 +68,10 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: "/(.*)",
+        headers: securityHeaders,
+      },
       {
         source: "/:path*",
         headers: securityHeaders,

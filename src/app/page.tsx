@@ -243,6 +243,7 @@ export default async function Home() {
                     <Link
                       key={cat.id}
                       href={`/category/${cat.slug}`}
+                      prefetch={false}
                       style={{
                         fontSize: '14px',
                         fontWeight: '600',
@@ -469,6 +470,7 @@ export default async function Home() {
                       <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #F5EDE4' }}>
                         <Link
                           href={`/category/${cat.slug}`}
+                          prefetch={false}
                           style={{
                             fontWeight: '750',
                             fontSize: '15px',

@@ -25,7 +25,6 @@ export default async function CategoryIndexPage() {
           id: true,
           name: true,
           slug: true,
-          description: true,
           _count: {
             select: { posts: { where: { published: true } } },
           },
@@ -37,8 +36,8 @@ export default async function CategoryIndexPage() {
           id: true,
           title: true,
           slug: true,
-          excerpt: true,
           shortDescription: true,
+          excerpt: true,
           coverImage: true,
           createdAt: true,
           categoryId: true,
@@ -55,6 +54,7 @@ export default async function CategoryIndexPage() {
             },
           },
         },
+        take: 18,
         orderBy: { createdAt: 'desc' },
       }),
       prisma.post.count({
@@ -63,8 +63,20 @@ export default async function CategoryIndexPage() {
     ]);
 
     categories = cats;
-    posts = allPosts;
     totalPostCount = count;
+
+    // Sanitize and minimize payload per post card
+    posts = allPosts.map((p) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.shortDescription || (p.excerpt ? p.excerpt.slice(0, 140) + '...' : ''),
+      coverImage: p.coverImage,
+      createdAt: p.createdAt.toISOString(),
+      categoryId: p.categoryId,
+      category: p.category,
+      author: p.author ? { username: p.author.username, image: p.author.image } : null,
+    }));
   } catch (error) {
     console.error('Failed to fetch categories or posts:', error);
   }

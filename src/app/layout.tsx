@@ -85,6 +85,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Blog Fusion" />
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(typeof window!=='undefined'&&window.trustedTypes&&window.trustedTypes.createPolicy){try{window.trustedTypes.createPolicy('default',{createHTML:function(s){return s},createScript:function(s){return s},createScriptURL:function(s){return s}})}catch(e){}}`,
+          }}
+        />
       </head>
       <body>
         <SiteJsonLd />

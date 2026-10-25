@@ -165,7 +165,7 @@ function MobileDrawer({
         <div className="mobile-nav-cta-card">
           <p className="mobile-nav-cta-kicker">Explore</p>
           <p className="mobile-nav-cta-title">All Knowledge Topics</p>
-          <Link href="/category" onClick={onClose} className="mobile-nav-cta-btn">
+          <Link href="/category" prefetch={false} onClick={onClose} className="mobile-nav-cta-btn">
             Browse Topics →
           </Link>
         </div>
@@ -225,7 +225,7 @@ const Navbar = () => {
                 </Link>
               );
             })}
-            <Link href="/category" className="vip-btn-primary desktop-nav-cta">
+            <Link href="/category" prefetch={false} className="vip-btn-primary desktop-nav-cta">
               <span>Explore Topics</span>
               <span>&rarr;</span>
             </Link>

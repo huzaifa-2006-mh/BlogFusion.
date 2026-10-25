@@ -56,16 +56,20 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   let categories: any[] = [];
   let posts: any[] = [];
   let totalPostCount = 0;
+  let currentCategoryInfo: { name: string; description: string | null } | null = null;
 
   try {
-    const [cats, catPosts, totalCount] = await Promise.all([
+    const [currentCat, cats, catPosts, totalCount] = await Promise.all([
+      prisma.category.findUnique({
+        where: { slug },
+        select: { name: true, description: true },
+      }),
       prisma.category.findMany({
         orderBy: { name: 'asc' },
         select: {
           id: true,
           name: true,
           slug: true,
-          description: true,
           _count: {
             select: { posts: { where: { published: true } } },
           },
@@ -80,8 +84,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           id: true,
           title: true,
           slug: true,
-          excerpt: true,
           shortDescription: true,
+          excerpt: true,
           coverImage: true,
           createdAt: true,
           categoryId: true,
@@ -98,6 +102,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             },
           },
         },
+        take: 12,
         orderBy: { createdAt: 'desc' },
       }),
       prisma.post.count({
@@ -105,9 +110,22 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       }),
     ]);
 
+    currentCategoryInfo = currentCat;
     categories = cats;
-    posts = catPosts;
     totalPostCount = totalCount;
+
+    // Sanitize and minimize payload per post card
+    posts = catPosts.map((p) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      excerpt: p.shortDescription || (p.excerpt ? p.excerpt.slice(0, 140) + '...' : ''),
+      coverImage: p.coverImage,
+      createdAt: p.createdAt.toISOString(),
+      categoryId: p.categoryId,
+      category: p.category,
+      author: p.author ? { username: p.author.username, image: p.author.image } : null,
+    }));
   } catch (error) {
     console.error('Failed to fetch category posts:', error);
   }
@@ -119,6 +137,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         posts={posts}
         initialCategorySlug={slug}
         totalPostCount={totalPostCount}
+        activeCategoryTitle={currentCategoryInfo?.name}
+        activeCategoryDescription={currentCategoryInfo?.description}
       />
     </div>
   );

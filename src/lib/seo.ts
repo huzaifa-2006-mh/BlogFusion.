@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { unstable_noStore as noStore, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import prisma from './prisma';
 
 export const PAGE_SEO_TAG = 'page-seo';
@@ -32,8 +32,6 @@ function resolveDefaultDescription(description: Metadata['description']): string
 }
 
 export async function getPageSeo(pagePath: string, defaultMetadata: Metadata): Promise<Metadata> {
-  noStore();
-
   const normalizedPath = normalizePagePath(pagePath);
 
   try {

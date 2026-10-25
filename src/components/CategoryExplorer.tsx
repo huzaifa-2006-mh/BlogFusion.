@@ -37,6 +37,8 @@ interface CategoryExplorerProps {
   posts: PostItem[];
   initialCategorySlug?: string;
   totalPostCount?: number;
+  activeCategoryTitle?: string;
+  activeCategoryDescription?: string | null;
 }
 
 export default function CategoryExplorer({
@@ -44,6 +46,8 @@ export default function CategoryExplorer({
   posts,
   initialCategorySlug = 'all',
   totalPostCount,
+  activeCategoryTitle,
+  activeCategoryDescription,
 }: CategoryExplorerProps) {
   const selectedSlug = initialCategorySlug;
 
@@ -55,6 +59,9 @@ export default function CategoryExplorer({
   const calculatedTotalCount =
     totalPostCount ??
     categories.reduce((acc, cat) => acc + (cat._count?.posts || 0), 0);
+
+  const headingTitle = activeCategoryTitle || (currentCategory ? currentCategory.name : 'All Categories');
+  const headingDesc = activeCategoryDescription || currentCategory?.description || 'Explore human-crafted articles, comprehensive guides, and actionable insights across all topics.';
 
   return (
     <div className="container category-page-container" style={{ padding: '3.5rem 2rem 6rem 2rem' }}>
@@ -70,11 +77,10 @@ export default function CategoryExplorer({
             fontFamily: 'var(--font-poppins), sans-serif',
           }}
         >
-          {currentCategory ? currentCategory.name : 'All Categories'}
+          {headingTitle}
         </h1>
         <p style={{ color: '#666666', fontSize: '1rem', margin: 0, fontWeight: '500', lineHeight: '1.6' }}>
-          {currentCategory?.description ||
-            'Explore human-crafted articles, comprehensive guides, and actionable insights across all topics.'}
+          {headingDesc}
         </p>
       </div>
 
@@ -91,6 +97,7 @@ export default function CategoryExplorer({
               {/* All Pill */}
               <Link
                 href="/category"
+                prefetch={false}
                 className={`category-pill-btn ${selectedSlug === 'all' ? 'active' : ''}`}
               >
                 <span>All Topics</span>
@@ -108,6 +115,7 @@ export default function CategoryExplorer({
                   <Link
                     key={cat.id}
                     href={`/category/${cat.slug}`}
+                    prefetch={false}
                     className={`category-pill-btn ${isActive ? 'active' : ''}`}
                   >
                     <span>{cat.name}</span>

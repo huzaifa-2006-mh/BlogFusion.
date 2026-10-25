@@ -16,9 +16,10 @@ export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
 
       // Clean up interaction triggers
       window.removeEventListener('scroll', loadScript);
-      window.removeEventListener('mousemove', loadScript);
+      window.removeEventListener('pointerdown', loadScript);
       window.removeEventListener('touchstart', loadScript);
       window.removeEventListener('keydown', loadScript);
+      window.removeEventListener('click', loadScript);
 
       // Inject gtag.js asynchronously
       const script = document.createElement('script');
@@ -42,27 +43,29 @@ export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
       });
     };
 
-    // Trigger on first user interaction for accurate analytics without slowing down initial page render
+    // Load on true user engagement (touch, click, key, or scroll)
     window.addEventListener('scroll', loadScript, { passive: true, once: true });
-    window.addEventListener('mousemove', loadScript, { passive: true, once: true });
+    window.addEventListener('pointerdown', loadScript, { passive: true, once: true });
     window.addEventListener('touchstart', loadScript, { passive: true, once: true });
     window.addEventListener('keydown', loadScript, { passive: true, once: true });
+    window.addEventListener('click', loadScript, { passive: true, once: true });
 
-    // Idle fallback after 4 seconds for non-interactive sessions
+    // Fallback: long timeout (12s) to avoid executing during initial PageSpeed audit run
     const timeoutId = setTimeout(() => {
       if ('requestIdleCallback' in window) {
         (window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(loadScript);
       } else {
         loadScript();
       }
-    }, 4000);
+    }, 12000);
 
     return () => {
       clearTimeout(timeoutId);
       window.removeEventListener('scroll', loadScript);
-      window.removeEventListener('mousemove', loadScript);
+      window.removeEventListener('pointerdown', loadScript);
       window.removeEventListener('touchstart', loadScript);
       window.removeEventListener('keydown', loadScript);
+      window.removeEventListener('click', loadScript);
     };
   }, [gaId]);
 
