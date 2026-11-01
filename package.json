@@ -40,6 +40,7 @@
     "eslint-config-next": "16.2.4",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
+    "wrangler": "latest"
     "typescript": "^5"
   }
   
