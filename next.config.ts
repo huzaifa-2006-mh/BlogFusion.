@@ -65,6 +65,7 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'react-icons', 'date-fns'],
   },
   images: {
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 2592000,
     remotePatterns: [
