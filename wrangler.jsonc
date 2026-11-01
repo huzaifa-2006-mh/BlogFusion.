@@ -4,11 +4,15 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-23",
   "compatibility_flags": [
-    "nodejs_compat"
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env"
   ],
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
+  },
+  "vars": {
+    "DATABASE_URL": "postgresql://neondb_owner:npg_ay7TAzBC6vwr@ep-blue-mountain-anfdzi6q-pooler.c-6.us-east-1.aws.neon.tech/neondb?sslmode=require"
   },
   "build": {
     "command": "npm run build"
