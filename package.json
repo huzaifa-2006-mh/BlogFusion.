@@ -8,9 +8,9 @@
     "build": "prisma generate && node scripts/remove-polyfills.js && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate && node scripts/remove-polyfills.js"
+    "postinstall": "prisma generate && node scripts/remove-polyfills.js",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "keywords": [
     "blog",
@@ -22,6 +22,7 @@
   "author": "Blog Fusion Team",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@opennextjs/cloudflare": "^1.20.15",
     "@prisma/client": "^6.19.3",
     "next": "16.2.4",
     "react": "19.2.4",
@@ -40,8 +41,7 @@
     "eslint-config-next": "16.2.4",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
-    "wrangler": "latest"
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.156.0"
   }
-  
 }
