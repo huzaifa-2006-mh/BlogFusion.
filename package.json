@@ -23,11 +23,11 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@opennextjs/cloudflare": "^1.20.15",
+    "@prisma/client": "^6.19.3",
     "next": "16.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^4.0.0",
-    "sharp": "^0.34.5",
     "to-ico": "^1.1.5"
   },
   "devDependencies": {

@@ -1,4 +1,3 @@
-import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
@@ -21,7 +20,7 @@ export async function optimizeAndStoreImage(file: File): Promise<string> {
       await fs.writeFile(filePath, buffer);
       return `/uploads/${fileName}`;
     } catch (fsErr) {
-      // Fallback for Vercel Serverless (read-only filesystem)
+      // Fallback for Serverless / Cloudflare (read-only filesystem)
       const base64 = buffer.toString('base64');
       return `data:image/svg+xml;base64,${base64}`;
     }
@@ -36,29 +35,14 @@ export async function optimizeAndStoreImage(file: File): Promise<string> {
       await fs.writeFile(filePath, buffer);
       return `/uploads/${fileName}`;
     } catch (fsErr) {
-      // Fallback for Vercel Serverless (read-only filesystem)
+      // Fallback for Serverless / Cloudflare (read-only filesystem)
       const base64 = buffer.toString('base64');
       return `data:image/gif;base64,${base64}`;
     }
   }
 
-  // Compress raster image to web-optimized WebP (max 1600px width, 80% quality)
-  let optimizedBuffer: Buffer;
-  let isWebp = true;
-  try {
-    optimizedBuffer = await sharp(buffer)
-      .rotate() // auto-orient based on EXIF
-      .resize({ width: 1600, withoutEnlargement: true })
-      .webp({ quality: 80, effort: 4 })
-      .toBuffer();
-  } catch (sharpErr) {
-    console.warn('Sharp optimization error, using original buffer:', sharpErr);
-    optimizedBuffer = buffer;
-    isWebp = false;
-  }
-
-  const ext = isWebp ? '.webp' : (fileExt || '.png');
-  const mime = isWebp ? 'image/webp' : (file.type || 'image/png');
+  const ext = fileExt || (file.type === 'image/webp' ? '.webp' : '.png');
+  const mime = file.type || (ext === '.webp' ? 'image/webp' : 'image/png');
 
   // Attempt saving to public/uploads directory (works locally)
   try {
@@ -66,12 +50,12 @@ export async function optimizeAndStoreImage(file: File): Promise<string> {
     await fs.mkdir(uploadsDir, { recursive: true });
     const fileName = `${baseName}_${Date.now()}_${randomHash}${ext}`;
     const filePath = path.join(uploadsDir, fileName);
-    await fs.writeFile(filePath, optimizedBuffer);
+    await fs.writeFile(filePath, buffer);
     return `/uploads/${fileName}`;
   } catch (fsErr) {
-    // Failover for Vercel Serverless (read-only filesystem) -> Return compressed Data URL
+    // Failover for Serverless / Cloudflare (read-only filesystem) -> Return Data URL
     console.log('Serverless environment detected (read-only filesystem). Returning Data URL.');
-    const base64 = optimizedBuffer.toString('base64');
+    const base64 = buffer.toString('base64');
     return `data:${mime};base64,${base64}`;
   }
 }
