@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate && node scripts/remove-polyfills.js"
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "keywords": [
     "blog",
@@ -40,4 +42,5 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   }
+  
 }
