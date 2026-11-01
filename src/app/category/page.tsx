@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { getPageSeo } from '@/lib/seo';
 import CategoryExplorer from '@/components/CategoryExplorer';
 
-export const revalidate = 60; // ISR for instant mobile delivery
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/category', {

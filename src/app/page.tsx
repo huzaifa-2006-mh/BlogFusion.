@@ -4,7 +4,7 @@ import { getPageSeo } from '@/lib/seo';
 import type { Metadata } from 'next';
 import { optimizeImageUrl, getResponsiveImageSrcSet } from '@/lib/imageOptimizer';
 
-export const revalidate = 60; // ISR - revalidate every 60s for ultra-fast mobile TTFB
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/', {

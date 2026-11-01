@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 import { Metadata } from 'next';
 import { getPageSeo } from '@/lib/seo';
 
-export const revalidate = 300; // ISR for fast mobile caching
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getPageSeo('/about', {

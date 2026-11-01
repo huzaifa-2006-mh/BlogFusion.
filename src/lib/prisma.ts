@@ -1,17 +1,13 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaNeon } from '@prisma/adapter-neon';
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import ws from 'ws';
+import { PrismaNeonHTTP } from '@prisma/adapter-neon';
 
 const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL;
 
   if (connectionString && connectionString.includes('neon.tech')) {
-    if (typeof WebSocket === 'undefined') {
-      neonConfig.webSocketConstructor = ws;
-    }
-    const pool = new Pool({ connectionString });
-    const adapter = new PrismaNeon(pool);
+    // Remove channel_binding parameter if present as HTTP endpoint does not use it
+    const cleanUrl = connectionString.replace(/&?channel_binding=[^&]*/g, '');
+    const adapter = new PrismaNeonHTTP(cleanUrl);
     return new PrismaClient({ adapter });
   }
 

@@ -7,7 +7,7 @@ import { defaultPostCanonical, normalizeCanonicalUrl } from '@/lib/blogUrl';
 import { extractFirstImageSrc, stripCoverFromContent } from '@/lib/postHtml';
 import './article.css';
 
-export const revalidate = 60; // ISR for instant mobile delivery
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   try {
