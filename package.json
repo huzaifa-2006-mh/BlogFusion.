@@ -23,7 +23,6 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "@opennextjs/cloudflare": "^1.20.15",
-    "@prisma/client": "^6.19.3",
     "next": "16.4.3",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -38,7 +37,7 @@
     "@types/react-dom": "^19",
     "critters": "^0.0.23",
     "eslint": "^9",
-   "eslint-config-next": "16.4.3",
+    "eslint-config-next": "16.4.3",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "typescript": "^5",
